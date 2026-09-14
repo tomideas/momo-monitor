@@ -271,6 +271,60 @@ public partial class MainWindow
         _settings.AskOnClose = true;
         PopulateFeatures();
 
+        // The footer's version has to be the build's, not a number somebody remembered to edit.
+        // It had already drifted once: the project moved to 0.1.1 with the window still saying
+        // v0.1.0, which is the kind of wrong that a bug report is filed against.
+        string assemblyVersion = typeof(MainWindow).Assembly.GetName().Version?.ToString(3) ?? "";
+        Check(_vm.VersionText == "v" + assemblyVersion,
+            $"The footer version must come from the assembly: shows {_vm.VersionText}, built {assemblyVersion}");
+
+        // ---- the supply, and what the headline figure claims ----
+        // Every combo on this page needs an explicit ItemTemplate. A bare DisplayMemberPath does
+        // not reach the selection box under this style, and the box then prints the record's
+        // ToString - which is exactly what the new one did before this check existed.
+        foreach (var combo in VisualTree<ComboBox>(this))
+            Check(combo.ItemTemplate is not null || combo.ItemsSource is null,
+                "A settings combo without an ItemTemplate will print its item's type name");
+
+        // Off by default: switching it on changes what the number means, and the claim cannot be
+        // made without a supply to measure the load against.
+        Check(_settings.WallPowerMode == false, "Counting supply losses must be opt-in");
+        string dcLabel = _vm.PowerLabel;
+        _settings.WallPowerMode = true;
+        PopulateFeatures();
+        Check(WallModeBox.IsChecked == true, "The supply-loss switch must reflect the setting");
+
+        // A rating outside what a desktop supply comes in is refused, and the box goes back to
+        // the stored figure rather than keeping something that was not accepted.
+        int storedWatts = _settings.PsuRatedWatts;
+        foreach (string bad in new[] { "0", "40", "5000", "half a kilowatt", "" })
+        {
+            PsuWattsBox.Text = bad;
+            ApplyPsuWatts(PsuWattsBox, new RoutedEventArgs());
+            Check(_settings.PsuRatedWatts == storedWatts, $"A rating of '{bad}' must be refused");
+            Check(PsuWattsBox.Text == storedWatts.ToString(), $"A refused rating must not be left in the box: '{bad}'");
+        }
+        PsuWattsBox.Text = "650";
+        ApplyPsuWatts(PsuWattsBox, new RoutedEventArgs());
+        Check(_settings.PsuRatedWatts == 650, "A rating inside the range must be kept");
+
+        PsuClassCombo.SelectedValue = "gold";
+        Check(_settings.PsuEfficiencyClass == "gold", "The badge selector must update the preference");
+        foreach (var option in ViewModels.MainViewModel.PsuClassOptions())
+            Check(Power.PowerModel.EfficiencyClasses.Contains(option.Id),
+                $"The badge '{option.Id}' is offered but the curve does not know it");
+
+        // The label is the claim, so the two figures cannot share one name - and the live label
+        // has to be one of them rather than some third string nobody meant to ship.
+        Check(Loc.Instance["power_now"] != Loc.Instance["power_now_wall"],
+            "What the parts draw and what the wall sees must not share a label");
+        Check(dcLabel == Loc.Instance["power_now"] || dcLabel == Loc.Instance["power_now_wall"],
+            "The headline label must be one of the two figures' names");
+        _settings.WallPowerMode = false;
+        _settings.PsuRatedWatts = storedWatts;
+        _settings.PsuEfficiencyClass = "bronze";
+        PopulateFeatures();
+
         // Every fan-row icon must resolve to a real geometry. A mistyped key draws nothing at
         // all, which looks like a layout bug rather than a missing resource.
         foreach (string key in new[] { "IcoFan", "IcoCpu", "IcoGpu", "IcoCpuFan", "IcoChassis", "IcoFlow", "IcoPump" })

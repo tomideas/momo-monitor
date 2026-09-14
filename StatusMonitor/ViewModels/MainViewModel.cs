@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Reflection;
 using System.ComponentModel;
 using System.Globalization;
 using System.Windows.Threading;
@@ -284,6 +285,27 @@ public sealed partial class MainViewModel : INotifyPropertyChanged
         _ => "energy_total",
     }];
 
+    /// <summary>
+    /// The build's own version, read from the assembly. It used to be typed into the window,
+    /// and it drifted the first time it mattered: the project went to 0.1.1 and shipped with a
+    /// footer still reading v0.1.0. A number that has to be updated in two places eventually
+    /// is not.
+    /// </summary>
+    public string VersionText
+    {
+        get
+        {
+            var assembly = typeof(MainViewModel).Assembly;
+            string version = assembly
+                .GetCustomAttribute<System.Reflection.AssemblyInformationalVersionAttribute>()
+                ?.InformationalVersion ?? assembly.GetName().Version?.ToString(3) ?? "";
+            // Some build setups append build metadata after a '+'; the footer wants the version.
+            int plus = version.IndexOf('+');
+            if (plus > 0) version = version[..plus];
+            return version.Length > 0 ? "v" + version : "";
+        }
+    }
+
     public string TotalWattsText => Watts(_snap.TotalWatts);
 
     /// <summary>
@@ -291,6 +313,44 @@ public sealed partial class MainViewModel : INotifyPropertyChanged
     /// first: an estimate is a number with a known shape, while a card missing from the total
     /// makes it plainly low, and that is the more misleading of the two to leave unsaid.
     /// </summary>
+    /// <summary>
+    /// Cards the total had to leave out, offered to the settings page so the owner can supply
+    /// the rating nobody else has. Rebuilt only when the set actually changes: these rows hold
+    /// a text box, and replacing them every tick would take the caret with it.
+    /// </summary>
+    public ObservableCollection<GpuTdpVm> UnratedGpus { get; } = new();
+
+    public bool HasUnratedGpus => UnratedGpus.Count > 0;
+
+    /// <summary>
+    /// Preview hook: puts a card into the unrated list so the settings block it drives can be
+    /// rendered and checked. Every machine here has cards the table already knows, so without
+    /// this the one screen that exists for unknown hardware could only be read, never seen.
+    /// </summary>
+    internal void PreviewUnratedGpu(string name)
+    {
+        if (_snap.UnratedGpus.Contains(name)) return;
+        _snap.UnratedGpus.Add(name);
+        RefreshUnratedGpus();
+        OnPropertyChanged(null);
+    }
+
+    private void RefreshUnratedGpus()
+    {
+        if (UnratedGpus.Count == _snap.UnratedGpus.Count &&
+            UnratedGpus.Select(v => v.Name).SequenceEqual(_snap.UnratedGpus)) return;
+        UnratedGpus.Clear();
+        foreach (string name in _snap.UnratedGpus)
+            UnratedGpus.Add(new GpuTdpVm(name, Settings, Settings.Save));
+    }
+
+    /// <summary>
+    /// What the headline figure is called. It is two different claims - what the parts draw,
+    /// and what the wall sees - so the label has to move with it rather than stay generic.
+    /// </summary>
+    public string PowerLabel =>
+        _snap.WallMode ? I18n.Loc.Instance["power_now_wall"] : I18n.Loc.Instance["power_now"];
+
     public string PowerNote =>
         _snap.PowerIncomplete ? I18n.Loc.Instance["power_missing_gpu"]
         : _snap.PowerEstimated ? I18n.Loc.Instance["power_from_curve"]
@@ -382,6 +442,7 @@ public sealed partial class MainViewModel : INotifyPropertyChanged
     {
         _snap = snap;
         RefreshGpuCards();
+        RefreshUnratedGpus();
         // PeakLoad needs every card built first, so tones are stamped after the refresh.
         if (GpuCard1 is not null) GpuCard1.Tone = ToneFor(GpuCard1.Load);
         if (GpuCard2 is not null) GpuCard2.Tone = ToneFor(GpuCard2.Load);

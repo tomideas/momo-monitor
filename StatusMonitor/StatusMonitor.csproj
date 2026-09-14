@@ -16,7 +16,7 @@
     <RootNamespace>StatusMonitor</RootNamespace>
     <AssemblyTitle>Momo System Monitor</AssemblyTitle>
     <Product>Momo System Monitor · Momo 系統監測</Product>
-    <Version>0.1.1</Version>
+    <Version>0.1.2</Version>
     <PlatformTarget>x64</PlatformTarget>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
   </PropertyGroup>
@@ -40,7 +40,7 @@
 
   <ItemGroup>
     <Resource Include="app.ico" />
-    <Resource Include="Assets\momo_pop.png" />
+    <Resource Include="Assets\momo.png" />
     <Resource Include="Fonts\Geist-Regular.ttf" />
     <Resource Include="Fonts\Geist-Medium.ttf" />
     <Resource Include="Fonts\Geist-SemiBold.ttf" />

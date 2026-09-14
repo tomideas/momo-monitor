@@ -64,6 +64,18 @@ public sealed partial class MainViewModel
         new("power", Loc.Instance["power_now"])
     };
 
+    /// <summary>
+    /// The 80 PLUS badges, in the order they rank. The base certification has no metal in its
+    /// name, and an unrated supply behaves about like one, so they share a row rather than
+    /// pretending an uncertified unit can be told apart from the cheapest certified one.
+    /// </summary>
+    public static List<FeatureOption> PsuClassOptions() => new()
+    {
+        new("white", Loc.Instance["psu_none"]), new("bronze", "80 PLUS Bronze"),
+        new("gold", "80 PLUS Gold"), new("platinum", "80 PLUS Platinum"),
+        new("titanium", "80 PLUS Titanium")
+    };
+
     private void RefreshGpuCards()
     {
         var visible = GpuSelection.Visible(_snap, Settings.PreferredGpuId, Settings.HideIntegratedGpu);

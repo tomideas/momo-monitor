@@ -29,7 +29,7 @@
            where identity is the whole point, so the mark leads at 72 DIP rather than sitting
            beside the text as a 34 DIP caption. -->
       <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-        <Image Source="pack://application:,,,/Assets/momo_pop.png" Width="72" Height="72"
+        <Image Source="pack://application:,,,/Assets/momo.png" Width="72" Height="72"
                RenderOptions.BitmapScalingMode="HighQuality" VerticalAlignment="Center" />
         <StackPanel VerticalAlignment="Center" Margin="16,0,0,0">
           <TextBlock Text="Momo" FontFamily="{StaticResource DisplayFont}" FontSize="52" FontWeight="Black"

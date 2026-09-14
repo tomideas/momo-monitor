@@ -724,6 +724,57 @@
                   <TextBlock Text="{Binding Source={x:Static i18n:Loc.Instance}, Path=[primary_gpu]}" FontSize="17" FontWeight="Bold" Margin="0,0,0,8" />
                   <ComboBox x:Name="GpuCombo" ItemTemplate="{StaticResource NameItemT}" SelectedValuePath="Id" SelectionChanged="SelectGpu" Margin="0,0,0,10" />
                   <CheckBox x:Name="HideIntegratedBox" Content="{Binding Source={x:Static i18n:Loc.Instance}, Path=[hide_integrated]}" Click="ChangeFeatureCheck" Margin="0,0,0,24" />
+                  <!-- Only present when a card was actually left out of the wattage total. A
+                       permanent empty box here would be a setting for a problem most machines
+                       do not have; appearing exactly when it can be acted on makes it an
+                       answer to the note under the hero figure rather than more configuration. -->
+                  <StackPanel x:Name="GpuTdpBlock" Margin="0,0,0,24"
+                              Visibility="{Binding HasUnratedGpus, Converter={StaticResource BoolToVisibility}}">
+                    <TextBlock Text="{Binding Source={x:Static i18n:Loc.Instance}, Path=[gpu_tdp]}"
+                               FontSize="17" FontWeight="Bold" Margin="0,0,0,6" />
+                    <TextBlock Text="{Binding Source={x:Static i18n:Loc.Instance}, Path=[gpu_tdp_hint]}"
+                               Style="{StaticResource Label}" TextWrapping="Wrap" Margin="0,0,0,10" />
+                    <ItemsControl ItemsSource="{Binding UnratedGpus}">
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                          <HeaderedContentControl Style="{StaticResource SettingRow}" Header="{Binding Name}">
+                            <StackPanel Orientation="Horizontal">
+                              <TextBox Text="{Binding Watts, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Width="60" />
+                              <TextBlock Text="W" VerticalAlignment="Center" Margin="7,0,0,0"
+                                         Foreground="{DynamicResource MutedBrush}" FontSize="11" />
+                            </StackPanel>
+                          </HeaderedContentControl>
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                  </StackPanel>
+                  <!-- Off by default. Switching it on changes what the headline figure claims,
+                       and the claim cannot be made at all without the two facts underneath, so
+                       it asks rather than assumes: a default supply rating would be a guess
+                       about every machine this is handed to. -->
+                  <StackPanel x:Name="WallPowerBlock" Margin="0,0,0,24">
+                    <TextBlock Text="{Binding Source={x:Static i18n:Loc.Instance}, Path=[wall_power_title]}"
+                               FontSize="17" FontWeight="Bold" Margin="0,0,0,6" />
+                    <TextBlock Text="{Binding Source={x:Static i18n:Loc.Instance}, Path=[wall_power_hint]}"
+                               Style="{StaticResource Label}" TextWrapping="Wrap" Margin="0,0,0,10" />
+                    <CheckBox x:Name="WallModeBox" Content="{Binding Source={x:Static i18n:Loc.Instance}, Path=[wall_power]}"
+                              Click="ChangeFeatureCheck" Margin="0,0,0,12" />
+                    <UniformGrid Columns="2">
+                      <StackPanel Margin="0,0,12,0">
+                        <TextBlock Text="{Binding Source={x:Static i18n:Loc.Instance}, Path=[psu_rated]}" Style="{StaticResource Label}" />
+                        <StackPanel Orientation="Horizontal">
+                          <TextBox x:Name="PsuWattsBox" Padding="6,4" Width="80" LostFocus="ApplyPsuWatts" />
+                          <TextBlock Text="W" VerticalAlignment="Center" Margin="7,0,0,0"
+                                     Foreground="{DynamicResource MutedBrush}" FontSize="11" />
+                        </StackPanel>
+                      </StackPanel>
+                      <StackPanel Margin="0,0,12,0">
+                        <TextBlock Text="{Binding Source={x:Static i18n:Loc.Instance}, Path=[psu_class]}" Style="{StaticResource Label}" />
+                        <ComboBox x:Name="PsuClassCombo" ItemTemplate="{StaticResource NameItemT}" SelectedValuePath="Id"
+                                  SelectionChanged="SelectPsuClass" />
+                      </StackPanel>
+                    </UniformGrid>
+                  </StackPanel>
                   <TextBlock Text="{Binding Source={x:Static i18n:Loc.Instance}, Path=[monitoring]}" FontSize="17" FontWeight="Bold" Margin="0,0,0,8" />
                   <CheckBox x:Name="EnableAlertsBox" Content="{Binding Source={x:Static i18n:Loc.Instance}, Path=[alerts_enabled]}" Click="ChangeFeatureCheck" Margin="0,0,0,12" />
                   <UniformGrid Columns="2">
@@ -786,12 +837,12 @@
             <!-- A brand lockup, not a caption: at 18px the mark was decoration nobody could
                  identify. 34px with the name and version stacked beside it reads as the app. -->
             <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="0,12,0,0">
-              <Image Source="pack://application:,,,/Assets/momo_pop.png" Width="34" Height="34"
+              <Image Source="pack://application:,,,/Assets/momo.png" Width="34" Height="34"
                      RenderOptions.BitmapScalingMode="HighQuality" VerticalAlignment="Center" />
               <StackPanel VerticalAlignment="Center" Margin="9,0,0,0">
                 <TextBlock Text="{Binding Source={x:Static i18n:Loc.Instance}, Path=[app_brand]}"
                            FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource InkBrush}" />
-                <TextBlock Text="v0.1.0" FontFamily="{StaticResource MonoFont}" FontSize="10"
+                <TextBlock Text="{Binding VersionText}" FontFamily="{StaticResource MonoFont}" FontSize="10"
                            Foreground="{DynamicResource MutedBrush}" Margin="0,1,0,0" />
               </StackPanel>
             </StackPanel>

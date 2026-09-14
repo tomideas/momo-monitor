@@ -584,7 +584,7 @@
     <ColumnDefinition Width="2.4*" MinWidth="190" />
   </Grid.ColumnDefinitions>
   <StackPanel Grid.Column="0">
-    <TextBlock Text="{Binding Source={x:Static i18n:Loc.Instance}, Path=[power_now]}" Style="{StaticResource MicroLabel}" Margin="0,0,0,8" />
+    <TextBlock Text="{Binding PowerLabel}" Style="{StaticResource MicroLabel}" Margin="0,0,0,8" />
     <Viewbox Stretch="Uniform" StretchDirection="DownOnly" HorizontalAlignment="Left">
       <StackPanel Orientation="Horizontal">
         <TextBlock Text="{Binding TotalWattsValue}" Style="{StaticResource HeroValue}" />

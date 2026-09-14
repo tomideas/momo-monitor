@@ -3,6 +3,7 @@ using StatusMonitor.Models;
 using StatusMonitor.Power;
 using StatusMonitor.Services;
 using StatusMonitor.Settings;
+using StatusMonitor.ViewModels;
 
 int checks = 0;
 void Check(bool condition, string message) { if (!condition) throw new Exception(message); checks++; }
@@ -233,7 +234,7 @@ Check(PowerModel.LookupGpuTdp("Some Unreleased Card 9999") == 0, "An unknown car
 
 double idleGpu = PowerModel.EstimateGpuWatts(47, 0);
 double fullGpu = PowerModel.EstimateGpuWatts(47, 100);
-Check(Math.Abs(idleGpu - 4.7) < 0.01, $"A 47 W card must idle at a tenth of its rating, got {idleGpu:N2}");
+Check(Math.Abs(idleGpu - 5.82) < 0.01, $"A 47 W card must idle near 5.8 W, got {idleGpu:N2}");
 Check(Math.Abs(fullGpu - 47) < 0.01, $"A card must not be estimated above its board power, got {fullGpu:N2}");
 Check(PowerModel.EstimateGpuWatts(47, 50) > idleGpu && PowerModel.EstimateGpuWatts(47, 50) < fullGpu,
     "The curve must rise between idle and full");
@@ -243,6 +244,133 @@ Check(PowerModel.EstimateGpuWatts(100, 0) < PowerModel.EstimateCpuWatts(100, 0),
     "A GPU must be estimated to idle lower than a CPU of the same rating");
 Check(PowerModel.EstimateGpuWatts(100, 100) < PowerModel.EstimateCpuWatts(100, 100),
     "A CPU may be estimated past its rating; a card may not");
+
+// ---- how a card idles ----
+// Idle board power does not scale with the rating, which a flat tenth assumed it did. Across
+// the range the ratings span more than tenfold while the idle figures span about fourfold, so
+// the share model reads low on small cards and roughly double on the largest ones.
+Check(Math.Abs(PowerModel.GpuIdleWatts(47) - 5.82) < 0.001, "A 47 W card idles on the slope, not on a share");
+Check(Math.Abs(PowerModel.GpuIdleWatts(250) - 18.0) < 0.001, "A 250 W card must idle near 18 W");
+Check(PowerModel.GpuIdleWatts(450) == 25.0, "The largest cards must hit the idle cap, not a share of the rating");
+Check(PowerModel.GpuIdleWatts(450) < 450 * 0.10,
+    "A 450 W card must no longer be said to idle at a tenth of its rating");
+// The small end has two guards and the tighter one has to win, or a card is estimated to idle
+// at more than it can draw.
+Check(PowerModel.GpuIdleWatts(12) <= 12 * 0.25 + 0.001, "Idle must stay under a quarter of a small card's rating");
+Check(PowerModel.GpuIdleWatts(12) < PowerModel.GpuIdleWatts(47), "Idle must still rise with the rating");
+Check(PowerModel.GpuIdleWatts(575) == PowerModel.GpuIdleWatts(450), "Past the cap every card idles the same");
+for (int tdp = 10; tdp <= 600; tdp += 10)
+    Check(PowerModel.GpuIdleWatts(tdp) < tdp && PowerModel.GpuIdleWatts(tdp) > 0,
+        $"Idle must sit between nothing and the rating at {tdp} W");
+
+// ---- Intel parts and their suffixes ----
+// 11th gen was absent from the table. The machine that exposed it has an i5-11400, whose
+// 65 W the fallback happened to produce; the i5-11600K one shelf over is 125 W, and the
+// fallback would have halved it. The CPU figure is usually the largest term in the total,
+// so a wrong rating here is not a detail.
+Check(PowerModel.LookupCpuTdp("11th Gen Intel(R) Core(TM) i5-11400 @ 2.60GHz") == 65, "The i5-11400 is a 65 W part");
+Check(PowerModel.LookupCpuTdp("11th Gen Intel(R) Core(TM) i5-11600K") == 125, "The i5-11600K is a 125 W part");
+Check(PowerModel.LookupCpuTdp("11th Gen Intel(R) Core(TM) i9-11900K") == 125, "The i9-11900K is a 125 W part");
+Check(PowerModel.LookupCpuTdp("11th Gen Intel(R) Core(TM) i9-11900") == 65, "The i9-11900 without the K is 65 W");
+Check(PowerModel.LookupCpuTdp("Intel(R) Core(TM) i5-11400T") == 35, "A T part is a 35 W part");
+// Suffix rows must be tested before the bare model, since every suffixed name contains it.
+// This used to be wrong in the other direction: a bare i9-14900 was rated as its own K.
+Check(PowerModel.LookupCpuTdp("Intel(R) Core(TM) i9-14900K") == 125, "A K part must not be read as its base model");
+Check(PowerModel.LookupCpuTdp("Intel(R) Core(TM) i9-14900") == 65, "A base model must not be read as its K part");
+Check(PowerModel.LookupCpuTdp("Intel(R) Core(TM) i9-13900KS") == 125, "KS is covered by the K row");
+Check(PowerModel.LookupCpuTdp("Intel(R) Core(TM) i7-12700KF") == 125, "KF is covered by the K row");
+Check(PowerModel.LookupCpuTdp("Intel(R) Core(TM) i7-14700") == 65, "The i7-14700 without the K is 65 W");
+Check(PowerModel.LookupCpuTdp("Intel(R) Core(TM) i5-13600K") == 125, "The i5-13600K is a 125 W part");
+Check(PowerModel.LookupCpuTdp("Intel(R) Core(TM) i3-12100T") == 35, "A T i3 is a 35 W part");
+// An unknown CPU still falls back rather than reading zero, because a CPU always draws power.
+Check(PowerModel.LookupCpuTdp("Some Future Intel Thing") == 65, "An unknown CPU must fall back, not read zero");
+
+// ---- fans ----
+// Fans were counted as nothing while visibly turning. This is the one piece of board overhead
+// with a measurement under it: the tachometers are already read for the Fans page.
+Check(PowerModel.FanWatts(0) == 0, "A stopped fan costs nothing");
+Check(Math.Abs(PowerModel.FanWatts(1900) - 1.7) < 0.001, "A 120 mm fan at full tilt is the anchor");
+// The affinity laws, which are the whole reason a quiet fan is nearly free.
+double slow = PowerModel.FanWatts(600), fast = PowerModel.FanWatts(1200);
+Check(Math.Abs(fast / slow - 8.0) < 0.01, $"Fan power must go with the cube of speed, got {fast / slow:N2}x for double the speed");
+Check(slow < 0.1, $"A fan loafing at 600 rpm must be nearly free, got {slow:N3} W");
+// A tachometer does not say how big the fan is, and a small one spins fast while drawing
+// little, so the cube law has to be stopped somewhere.
+Check(PowerModel.FanWatts(5000) <= 4.0, "A small fast fan must not run away with the cube law");
+
+// ---- the board ----
+// The regulator loss is the CPU's alone. A card's rating is measured at its own connectors, so
+// its regulators are already inside the figure used for it - the same double count the
+// integrated GPU rule exists to prevent.
+Check(Math.Abs(PowerModel.VrmLossWatts(50) - 5.0) < 0.001, "A tenth of what reaches the CPU is lost on the way");
+Check(PowerModel.VrmLossWatts(0) == 0 && PowerModel.VrmLossWatts(-5) == 0, "Regulator loss must never be negative");
+
+// ---- the power supply ----
+// Nothing is applied without a rating: an unknown supply returns zero, which the caller must
+// read as "leave the figure alone", not as "loses everything".
+Check(PowerModel.PsuEfficiency("bronze", 30, 0) == 0, "An undescribed supply must not produce a loss");
+Check(PowerModel.WallWatts(30, 0) == 30, "With no efficiency the figure passes through untouched");
+Check(Math.Abs(PowerModel.WallWatts(40, 0.80) - 50) < 0.001, "The wall sees the draw divided by the efficiency");
+// The rated load points, which are what a badge actually promises.
+Check(Math.Abs(PowerModel.PsuEfficiency("bronze", 100, 500) - 0.82) < 0.001, "Bronze is 82% at a fifth load");
+Check(Math.Abs(PowerModel.PsuEfficiency("gold", 250, 500) - 0.90) < 0.001, "Gold is 90% at half load");
+Check(Math.Abs(PowerModel.PsuEfficiency("titanium", 50, 500) - 0.90) < 0.001, "Titanium is the one rated down at a tenth load");
+// The point of the curve: the same unit is far worse where a desktop actually idles.
+double midLoad = PowerModel.PsuEfficiency("bronze", 250, 500);
+double idleLoad = PowerModel.PsuEfficiency("bronze", 25, 500);
+Check(idleLoad < midLoad - 0.05,
+    $"Idling at 5% load must cost far more than mid load, got {idleLoad:P0} against {midLoad:P0}");
+Check(idleLoad < 0.75, $"A 500 W bronze unit at 25 W must be well under its badge, got {idleLoad:P0}");
+// A better badge must be better everywhere, or the ordering means nothing.
+foreach (double draw in new[] { 10.0, 25.0, 50.0, 100.0, 250.0, 500.0 })
+    Check(PowerModel.PsuEfficiency("titanium", draw, 500) > PowerModel.PsuEfficiency("gold", draw, 500) &&
+          PowerModel.PsuEfficiency("gold", draw, 500) > PowerModel.PsuEfficiency("bronze", draw, 500) &&
+          PowerModel.PsuEfficiency("bronze", draw, 500) > PowerModel.PsuEfficiency("white", draw, 500),
+        $"The badges must rank in order at {draw} W");
+// An unknown class must not throw or zero the figure; it falls back to the commonest badge.
+Check(Math.Abs(PowerModel.PsuEfficiency("chrome", 100, 500) - PowerModel.PsuEfficiency("bronze", 100, 500)) < 0.001,
+    "An unrecognised badge must fall back rather than produce nothing");
+// Every class, every load: an efficiency outside these bounds would be a bug, not a supply.
+foreach (string cls in PowerModel.EfficiencyClasses)
+    for (int draw = 5; draw <= 605; draw += 40)
+    {
+        double e = PowerModel.PsuEfficiency(cls, draw, 500);
+        Check(e > 0.4 && e < 1.0, $"{cls} at {draw} W produced an impossible efficiency of {e:P0}");
+        Check(PowerModel.WallWatts(draw, e) > draw, $"{cls} at {draw} W must cost more at the wall than at the parts");
+    }
+
+// ---- a card nobody recognises ----
+// The table is always behind the market, and asking the driver does not rescue it: a card that
+// cannot report its power cannot report its power limit either. So the owner can supply the
+// number, and that answer has to outlast a restart and refuse nonsense.
+var tdpSettings = new AppSettings();
+int saves = 0;
+var tdpRow = new GpuTdpVm("Some Unreleased Card 9999", tdpSettings, () => saves++);
+Check(tdpRow.Watts == "", "A card with no figure yet must show an empty box, not a zero");
+
+tdpRow.Watts = "150";
+Check(tdpSettings.GpuTdpWatts["Some Unreleased Card 9999"] == 150 && saves == 1,
+    "A board power the owner types must be stored and saved");
+Check(tdpRow.Watts == "150", "The box must show back what was stored");
+
+tdpRow.Watts = "0";
+Check(tdpRow.Watts == "150", "Zero watts is a typo, not a card, and must not replace a good figure");
+tdpRow.Watts = "5000";
+Check(tdpRow.Watts == "150", "A figure above any board on sale must be refused");
+tdpRow.Watts = "not a number";
+Check(tdpRow.Watts == "150", "Text must be refused rather than silently clearing the figure");
+
+// Blank is a real answer: it puts the card back outside the total rather than meaning zero.
+tdpRow.Watts = "";
+Check(tdpRow.Watts == "" && !tdpSettings.GpuTdpWatts.ContainsKey("Some Unreleased Card 9999"),
+    "Clearing the box must remove the figure, not store a zero");
+
+tdpRow.Watts = "47";
+var tdpRestored = JsonSerializer.Deserialize<AppSettings>(JsonSerializer.Serialize(tdpSettings))!;
+Check(tdpRestored.GpuTdpWatts.TryGetValue("Some Unreleased Card 9999", out double keptTdp) && keptTdp == 47,
+    "A board power the owner supplied must survive a restart");
+Check(oldSettings.GpuTdpWatts.Count == 0,
+    "Settings from before this existed must simply have no figures, not fail to load");
 
 Console.WriteLine($"PASS: {checks} assertions (alerts, GPU identity, bounded history, settings compatibility, fan curve, header naming, window placement, data location, power curves)");
 

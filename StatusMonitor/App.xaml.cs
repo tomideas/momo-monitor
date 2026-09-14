@@ -139,6 +139,10 @@ public partial class App : Application
         int themeIndex = Array.IndexOf(args, "--theme");
         if (themeIndex >= 0 && themeIndex + 1 < args.Length) settings.BackgroundTheme = args[themeIndex + 1];
 
+        // Counting the supply's losses is off until an owner describes their supply, so the one
+        // screen where the headline figure means something else could otherwise only be read.
+        if (args.Contains("--wall")) settings.WallPowerMode = true;
+
         // Lets the "record only starts on <date>" state be captured, not just reasoned about.
         int periodIndex = Array.IndexOf(args, "--period");
         if (periodIndex >= 0 && periodIndex + 1 < args.Length &&
@@ -234,6 +238,11 @@ public partial class App : Application
                 {
                     window.ShowFansPanel();
                     if (args.Contains("--fan-custom")) window.PreviewFanCustom();
+                    window.UpdateLayout();
+                }
+                if (args.Contains("--unrated-gpu"))
+                {
+                    window.PreviewUnratedGpu("Some Unreleased Card 9999");
                     window.UpdateLayout();
                 }
                 if (args.Contains("--monitoring"))

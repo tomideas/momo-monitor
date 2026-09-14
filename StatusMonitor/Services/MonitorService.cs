@@ -145,11 +145,16 @@ public sealed class MonitorService : IDisposable
                 continue;
             }
 
-            double gpuTdp = PowerModel.LookupGpuTdp(i < snap.GpuNames.Count ? snap.GpuNames[i] : "");
+            string gpuName = i < snap.GpuNames.Count ? snap.GpuNames[i] : "";
+            // What the owner entered outranks the table: they can read the number off the card.
+            double gpuTdp = Settings.GpuTdpWatts.TryGetValue(gpuName, out double given) && given > 0
+                ? given
+                : PowerModel.LookupGpuTdp(gpuName);
             if (gpuTdp <= 0)
             {
                 gpu.PowerWatts = null;
                 snap.PowerIncomplete = true;
+                if (gpuName.Length > 0 && !snap.UnratedGpus.Contains(gpuName)) snap.UnratedGpus.Add(gpuName);
                 continue;
             }
 
@@ -169,10 +174,44 @@ public sealed class MonitorService : IDisposable
         double netMb = (snap.NetDownBytesPerSec + snap.NetUpBytesPerSec) / 1048576.0;
         snap.NetWatts = PowerModel.NetworkWatts(netMb);
 
-        snap.TotalWatts = snap.CpuWatts + snap.GpuWatts + snap.RamWatts + snap.DiskWatts + snap.NetWatts;
-        // RAM is a flat constant and the disk and network models are curves, so strictly the
-        // total is never wholly measured. What is worth flagging is the part big enough to
-        // change the answer: an unmeasured CPU or graphics card.
+        // Fans draw from the supply like everything else and were counted as nothing. Only
+        // motherboard tachometers are collected, so a card's fans cannot land here as well as
+        // inside the card's own figure.
+        double fanWatts = 0.0;
+        foreach (var fan in snap.Fans) fanWatts += PowerModel.FanWatts(fan.Rpm);
+        snap.FanWatts = fanWatts;
+
+        // The board under all of it: chipset, controllers, USB, and the loss in the regulators
+        // that feed the CPU. The card is not in that loss - its rating is measured at its own
+        // connectors, so its regulators are already inside it.
+        snap.BoardWatts = Math.Max(0.0, Settings.BoardBaseWatts) + PowerModel.VrmLossWatts(cpuWatts);
+
+        double dcWatts = snap.CpuWatts + snap.GpuWatts + snap.RamWatts + snap.DiskWatts
+                       + snap.NetWatts + snap.FanWatts + snap.BoardWatts;
+
+        // Direct current is what the parts draw; the wall sees that plus whatever the supply
+        // burns converting. Which one the headline figure means is the owner's to decide, and
+        // it stays on direct current until they describe their supply, because the conversion
+        // cannot be estimated without a rating to measure the load against.
+        snap.WallMode = Settings.WallPowerMode && Settings.PsuRatedWatts > 0;
+        if (snap.WallMode)
+        {
+            double efficiency = PowerModel.PsuEfficiency(
+                Settings.PsuEfficiencyClass, dcWatts, Settings.PsuRatedWatts);
+            double wall = PowerModel.WallWatts(dcWatts, efficiency);
+            snap.PsuLossWatts = wall - dcWatts;
+            snap.TotalWatts = wall;
+        }
+        else
+        {
+            snap.PsuLossWatts = 0.0;
+            snap.TotalWatts = dcWatts;
+        }
+
+        // RAM, the board and the supply are constants and curves, so strictly the total is
+        // never wholly measured. What is worth flagging is the part big enough to change the
+        // answer and specific to this machine: an unmeasured CPU or graphics card. A term every
+        // machine carries is not news, which is why the flat RAM figure has never raised it.
         snap.PowerEstimated = snap.Cpu.PowerEstimated || snap.Gpus.Any(g => g.PowerEstimated);
 
         PowerModel.AttributeProcessPower(rows, cpuLoad, gpuLoad, cpuWatts, gpuWatts, snap.TotalWatts);

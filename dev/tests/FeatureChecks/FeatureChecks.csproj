@@ -20,5 +20,8 @@
     <!-- The wattage curves. They decide the hero figure, the running total, the carbon figure
          and the cost, and they are pure arithmetic, so they belong under test. -->
     <Compile Include="../../../StatusMonitor/Power/PowerModel.cs" Link="PowerModel.cs" />
+    <!-- The box the owner types a board power into. It guards the one figure nothing else on
+         the machine can supply, so what it accepts and rejects is worth pinning. -->
+    <Compile Include="../../../StatusMonitor/ViewModels/GpuTdpVm.cs" Link="GpuTdpVm.cs" />
   </ItemGroup>
 </Project>

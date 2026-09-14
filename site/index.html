@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Momo System Monitor v0.1.0 — User Guide</title>
+<title>Momo System Monitor v0.1.2 — User Guide</title>
 <link rel="stylesheet" href="docs.css">
 </head>
 <body>
@@ -48,7 +48,7 @@
 <main class="main-content">
 
 <h1 id="intro">Momo System Monitor — User Guide</h1>
-<p class="page-desc">Windows 11 desktop widget v0.1.0 — live CPU / GPU / RAM / network / storage, fans, wattage, energy &amp; carbon footprint · 2026-09-14</p>
+<p class="page-desc">Windows 11 desktop widget v0.1.2 — live CPU / GPU / RAM / network / storage, fans, wattage, energy &amp; carbon footprint · 2026-09-14</p>
 
 <div class="callout info">
   <p><strong>Momo System Monitor</strong> is a little Windows 11 widget that keeps an eye on your whole machine every second: CPU / GPU / RAM / network / storage, motherboard fans &amp; AIO pumps, wattage, cumulative energy, carbon footprint, electricity cost, and per-process power.</p>
@@ -178,6 +178,8 @@
     <li>Country — one pick applies electricity price, currency and carbon intensity (France / Germany / UK / USA / China / India / Sweden / Poland / World average / Custom); fine-tune afterwards and the country flips to Custom</li>
     <li>Displayed process count, reset cumulative energy</li>
     <li>Monitoring &amp; Alerts — main GPU (auto = prefer discrete), hide integrated GPU, thresholds, recent-alert log</li>
+    <li>Wall power — optional: count the PSU's losses so the hero number shows what a wall meter would read (needs the supply's rated W and 80 PLUS class, both printed on its label); off by default</li>
+    <li>Unrecognised cards — when a GPU can't report its power limit, a box appears here to type its board power from the spec sheet, so it joins the total instead of being left out</li>
     <li>General — background skin, reduce motion, run-in-tray behavior</li>
   </ul>
   <figure class="doc-figure">

@@ -84,6 +84,10 @@ public partial class MainWindow
         MiniTopmostBox.IsChecked = _settings.MiniTopmost;
         RunInTrayBox.IsChecked = _settings.RunInTray;
         AskOnCloseBox.IsChecked = _settings.AskOnClose;
+        WallModeBox.IsChecked = _settings.WallPowerMode;
+        PsuWattsBox.Text = _settings.PsuRatedWatts.ToString(CultureInfo.InvariantCulture);
+        PsuClassCombo.ItemsSource = MainViewModel.PsuClassOptions();
+        PsuClassCombo.SelectedValue = _settings.PsuEfficiencyClass;
         EnableAlertsBox.IsChecked = _settings.AlertsEnabled;
         CpuLimitBox.Text = _settings.CpuTemperatureLimit.ToString(CultureInfo.InvariantCulture);
         GpuLimitBox.Text = _settings.GpuTemperatureLimit.ToString(CultureInfo.InvariantCulture);
@@ -129,7 +133,36 @@ public partial class MainWindow
         _settings.MiniTopmost = MiniTopmostBox.IsChecked == true;
         _mini?.ApplyTopmost();
         _settings.AlertsEnabled = EnableAlertsBox.IsChecked == true;
+        _settings.WallPowerMode = WallModeBox.IsChecked == true;
         SaveFeatureSettings(true);
+    }
+
+    private void SelectPsuClass(object sender, SelectionChangedEventArgs e)
+    {
+        if (_featureLoading || PsuClassCombo.SelectedValue is not string id) return;
+        _settings.PsuEfficiencyClass = id;
+        SaveFeatureSettings(false);
+    }
+
+    /// <summary>
+    /// A rating outside the range a desktop supply comes in is refused, and the box is put back
+    /// to the stored figure rather than left holding something that was not accepted. Silently
+    /// keeping a bad entry would leave the wall figure divided by an efficiency read off the
+    /// wrong part of the curve, with nothing on screen to say so.
+    /// </summary>
+    private void ApplyPsuWatts(object sender, RoutedEventArgs e)
+    {
+        if (_featureLoading) return;
+        if (int.TryParse(PsuWattsBox.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out int watts)
+            && watts is >= 100 and <= 2000)
+        {
+            _settings.PsuRatedWatts = watts;
+            MonitoringFeedback.Text = "";
+            SaveFeatureSettings(false);
+            return;
+        }
+        PsuWattsBox.Text = _settings.PsuRatedWatts.ToString(CultureInfo.InvariantCulture);
+        MonitoringFeedback.Text = Loc.Instance["invalid_psu"];
     }
     private void SelectTrendMetric(object sender, SelectionChangedEventArgs e)
     {

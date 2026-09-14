@@ -136,6 +136,33 @@ public sealed class AppSettings
     public double? WindowWidth { get; set; }
     public double? WindowHeight { get; set; }
     public bool WindowMaximized { get; set; }
+
+    /// <summary>
+    /// Board power in watts for cards this build does not recognise, keyed by the name the
+    /// driver reports. The table of models can never cover everything on machines this is
+    /// handed to, and the driver is no help — a card that cannot report its power cannot
+    /// report its power limit either. The one party who reliably knows the number is the
+    /// person who owns the card, so they can supply it, and then it is exact rather than
+    /// approximated.
+    /// </summary>
+    public Dictionary<string, double> GpuTdpWatts { get; set; } = new();
+    /// <summary>
+    /// The chipset, controllers, USB and regulator loss that no sensor reports. Counted on
+    /// every machine because every machine has them, and settable because a board with three
+    /// add-in cards is not a board with none. Seven watts is the middle of a desktop's range.
+    /// </summary>
+    public double BoardBaseWatts { get; set; } = 7.0;
+
+    /// <summary>
+    /// Off by default, and deliberately: turning it on changes what the headline figure claims,
+    /// from what the parts draw to what the wall sees, and it cannot be answered at all without
+    /// the two facts below. A default of "on" would mean guessing the supply of every machine
+    /// this is handed to.
+    /// </summary>
+    public bool WallPowerMode { get; set; }
+    public int PsuRatedWatts { get; set; } = 500;
+    public string PsuEfficiencyClass { get; set; } = "bronze";
+
     public int TrendSeconds { get; set; } = 60;
     public string TrendMetric { get; set; } = "cpu";
     public bool AlertsEnabled { get; set; } = true;

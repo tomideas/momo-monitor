@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Momo 系統監測 v0.1.0 — 使用指南</title>
+<title>Momo 系統監測 v0.1.2 — 使用指南</title>
 <link rel="stylesheet" href="docs.css">
 </head>
 <body>
@@ -48,7 +48,7 @@
 <main class="main-content">
 
 <h1 id="intro">Momo 系統監測 — 使用指南</h1>
-<p class="page-desc">Windows 11 桌面小工具 v0.1.0 — CPU / GPU / RAM / 網路 / 儲存、風扇、瓦數、用電與碳足跡 · 2026-09-14</p>
+<p class="page-desc">Windows 11 桌面小工具 v0.1.2 — CPU / GPU / RAM / 網路 / 儲存、風扇、瓦數、用電與碳足跡 · 2026-09-14</p>
 
 <div class="callout info">
   <p><strong>Momo 系統監測</strong>是一個 Windows 11 桌面小工具，每秒監測整機狀態：CPU / GPU / RAM / 網路 / 儲存、主機板風扇與水冷幫浦、瓦數、累計用電、碳足跡、電費，以及每程式分攤功耗。</p>
@@ -178,6 +178,8 @@
     <li>國家／地區——一次套用電價、幣別與碳強度（France / Germany / UK / USA / China / India / Sweden / Poland / World average / Custom）；事後手動微調會自動變為 Custom</li>
     <li>顯示程序數、重置累計用電</li>
     <li>監控與提醒——主 GPU（自動＝優先獨立顯卡）、隱藏內顯、門檻、提醒記錄</li>
+    <li>牆插功耗——選配：計入電源供應器損耗，讓英雄數字變成牆上功率計會讀到的值（需要電源的額定瓦數與 80 PLUS 等級，都印在電源標籤上）；預設關閉</li>
+    <li>未識別顯示卡——讀不到功耗極限的 GPU 會出現輸入格，依規格書填入額定功耗即納入總計，不再被排除</li>
     <li>一般——背景配色、減少動效、系統匣行為</li>
   </ul>
   <figure class="doc-figure">

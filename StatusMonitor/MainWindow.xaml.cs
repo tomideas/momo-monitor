@@ -217,6 +217,9 @@ public partial class MainWindow : Window
         UpdateLayout();
     }
 
+    /// <summary>Shows the unrated-card settings block (used by the --render test hook).</summary>
+    public void PreviewUnratedGpu(string name) => _vm.PreviewUnratedGpu(name);
+
     /// <summary>Opens the Fans page (used by the --render test hook).</summary>
     public void ShowFansPanel() => SelectView(Page.Fans);
 

@@ -82,6 +82,19 @@ public sealed class Snapshot
     public double RamWatts { get; set; }
     public double DiskWatts { get; set; }
     public double NetWatts { get; set; }
+
+    /// <summary>Motherboard fans and pumps, from their own tachometers. Card fans are not here.</summary>
+    public double FanWatts { get; set; }
+
+    /// <summary>Chipset, controllers, USB and the regulator loss feeding the CPU.</summary>
+    public double BoardWatts { get; set; }
+
+    /// <summary>What the supply burns converting, and zero unless the owner described the supply.</summary>
+    public double PsuLossWatts { get; set; }
+
+    /// <summary>True when <see cref="TotalWatts"/> is what the wall sees rather than what the parts draw.</summary>
+    public bool WallMode { get; set; }
+
     public double TotalWatts { get; set; }
 
     /// <summary>
@@ -97,6 +110,13 @@ public sealed class Snapshot
     /// then known to be low, and says so.
     /// </summary>
     public bool PowerIncomplete { get; set; }
+
+    /// <summary>
+    /// The cards left out of the total: no power sensor, and no board power to estimate from.
+    /// Named so the settings page can offer to be told, rather than leaving the figure quietly
+    /// short with nothing the owner can do about it.
+    /// </summary>
+    public List<string> UnratedGpus { get; set; } = new();
 
     public double TotalEnergyWh { get; set; }
     public double CarbonGrams { get; set; }
