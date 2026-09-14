@@ -2,39 +2,39 @@
 
 ## [0.1.2] — 2026-09-14
 
-### 新增
-- **牆插功耗（power at the wall）**：英雄數字可改為「牆上功率計會看到的數值」——在零件耗電上計入電源供應器損耗（80 PLUS 等級＋額定瓦數，印在電源標籤上）；預設關閉。
-- **未識別顯示卡的手動額定功耗**：讀不到功耗極限的 GPU 原先被排除在總瓦數外；現在設定會在其出現時提供輸入格，依規格書填入 board power 即納入總計。
+### Added
+- **Power at the wall** — optional "wall meter" mode for the hero number: adds the PSU's own losses (80 PLUS class + rated wattage, both printed on the supply's label) on top of component draw. Off by default.
+- **Manual board power for unrecognised GPUs** — a card that can't report its power limit used to be excluded from the total; a settings field now appears exactly when one is detected, so you can type its board power from the spec sheet and have it counted.
 
-### 改善
-- **GPU idle 功耗模型重寫**：由「額定的 10%」改為固定基底＋斜率模型——高端卡（如 450 W 級）先前閒置會被高估約一倍；新模型跟隨已發表閒置數據（47 W 卡約 5–7 W、450 W 卡約 20–25 W）。
-- **新應用程式圖示**：`momo.png` 取代 `momo_pop.png`。
-- FeatureChecks 回歸測試擴充（＋130 行）。
+### Changed
+- **GPU idle-power model rewritten** — the flat "10% of rating" floor is replaced by a fixed base + slope that follows published idle figures (≈5–7 W for a 47 W card, ≈20–25 W for a 450 W card); top-end cards were previously overstated by about 2× at idle.
+- **New app icon** — `momo.png` replaces `momo_pop.png`.
+- FeatureChecks regression suite extended (+130 lines).
 
 ## [0.1.1] — 2026-09-14
 
-### 改善
-- **語言標簽統一為「中文」**：README 與使用指南的語言切換標簽由「繁體中文」改為「中文」。
+### Changed
+- **Language label unified to "中文"** — the language-switch label in the README and user guide now reads "中文" instead of "繁體中文".
 
 ## [0.1.0] — 2026-09-14
 
-### 新增
-- **初版發布**：Windows 11 桌面監測小工具（WPF .NET 8，管理員執行）——CPU／GPU／RAM／網路／儲存、風扇與水冷幫浦、瓦數、累計用電、碳足跡、電費、Top Processes，每秒更新。
-- **VOLT / PAPER POP 雙皮**：英雄數字（目前功耗）＋共用基準線的粗條列表；顏色只標示超標。舊版七個背景設定自動映射。
-- **趨勢圖**：60 秒／15 分鐘範圍，CPU／GPU 負載、RAM、VRAM、溫度與估算功耗，顯示最低／平均／最高。
-- **迷你浮窗**：258 × 238 速覽面板，面板任意處可拖曳，雙擊回主視窗，可置頂。
-- **超標提醒**：預設 CPU 90°C、主 GPU 85°C、RAM／VRAM 90%、磁碟剩餘 10%，持續 15 秒觸發、300 秒冷卻；程式內保留最近 20 筆提醒記錄。
-- **雙語**：English / 繁體中文，設定內切換。
-- **可攜模式**：exe 旁建 `momo-data` 資料夾，設定與累計資料隨程式搬移；首次啟動自動遷移 `%APPDATA%` 既有資料。
-- **資訊頁**：WMI 硬體與系統資訊，固定磁碟收進同一張卡（每顆一列），詳情面板可複製完整規格。
+### Added
+- **Initial release** — Windows 11 system-monitoring widget (WPF .NET 8, runs as administrator): CPU / GPU / RAM / network / storage, fans and AIO pumps, wattage, cumulative energy, carbon footprint, electricity cost and top processes, updated every second.
+- **VOLT / PAPER POP skins** — hero number (current power draw) + a shared-baseline bar list; color only ever means "over budget". Old 7-background configs map automatically.
+- **Trends** — 60 s / 15 min ranges for CPU/GPU load, RAM, VRAM, temperatures and estimated power, with min / avg / max.
+- **Mini window** — 258 × 238 glance panel, draggable from anywhere, double-click to return to the main window, optional pin.
+- **Over-limit alerts** — defaults: CPU 90 °C, main GPU 85 °C, RAM/VRAM 90 %, fixed disk under 10 % free; 15 s sustained to fire, 300 s cooldown; in-app log keeps the last 20 alerts.
+- **Bilingual** — English / 中文, switchable in settings.
+- **Portable mode** — a `momo-data` folder next to the exe keeps settings and energy totals with the app; first launch migrates existing `%APPDATA%` data automatically.
+- **Info page** — hardware & system details via WMI; fixed drives in one card (one row per disk), copyable spec sheet.
 
-### 改善
-- **DISK 列改為空間佔用率**：每顆硬碟各自一格（已用 / 總量），取代易誤解的 `% Disk Time`。
-- **次要文字對比度**提升至 WCAG AA 小字門檻以上（兩套皮 6.73:1 / 6.59:1）。
-- **原生標題列染色**：隨配色即時上色，保留 Windows 11 Snap Layouts 與 DPI 行為。
-- **每列 24 DIP 兩色向量圖示**（CPU／GPU／RAM／DISK／NET），兩套皮自動換色。
-- 嵌入 Barlow Condensed Black Italic 顯示字體（tabular figures，每秒更新不位移）。
+### Improved
+- **DISK row now shows space used per drive** (used / total) instead of the misleading `% Disk Time`.
+- **Secondary text contrast** raised above the WCAG AA small-text floor (6.73:1 / 6.59:1 across the two skins).
+- **Native title bar tinting** — recolours with the skin instantly, keeping Windows 11 Snap Layouts and DPI behavior.
+- **24 DIP two-tone vector icons** per row (CPU / GPU / RAM / DISK / NET), recolored automatically per skin.
+- Embedded **Barlow Condensed Black Italic** display font (tabular figures — no jitter on per-second updates).
 
-### 修復
-- 淺色主題 accent 與 ink 同色（無強調色）、資訊卡標題黑色遮蔽條、`PopPaper` 網點被純色覆蓋、`TextBox`／`ComboBox`／`TabItem` 顏色寫死、自訂 ComboBox 模板顯示匿名物件、分頁 hover 狀態被本地值蓋掉等問題。
-- 設定欄位電價／碳強度／程序數未接上儲存事件。
+### Fixed
+- Light-skin accent identical to ink (no accent), info-card title rendered as a black bar, `PopPaper` dot grid covered by a solid fill, hardcoded colors in `TextBox` / `ComboBox` / `TabItem`, custom ComboBox template showing anonymous objects, selected-tab hover making text invisible, and related issues.
+- Settings fields (electricity price / carbon intensity / process count) not wired to save events.
