@@ -1,0 +1,35 @@
+# macOS
+.DS_Store
+._*
+.AppleDouble
+.LSOverride
+
+# IDE / AI
+.vscode/
+.idea/
+.claude/
+*.swp
+*.swo
+
+# .NET build artifacts（建置產物）
+bin/
+obj/
+*.user
+*.sln.dotnet
+
+# Build output（產出 exe）
+*.exe
+*.new.exe
+
+# Design system（設計系統編輯器：node_modules 與 host 產物）
+design-system/node_modules/
+design-system/app/
+
+# Portable data（可攜模式使用者資料：設定、累計用電、每日歷史）
+momo-data/
+
+# 構建產物（build artifacts）
+*.zip
+
+# Logs
+*.log

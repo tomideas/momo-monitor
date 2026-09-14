@@ -1,0 +1,60 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <!-- WPF owns DPI awareness; WinForms is used only for the tray icon. -->
+    <NoWarn>$(NoWarn);WFAC010</NoWarn>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>app.ico</ApplicationIcon>
+    <AssemblyName>MomoMonitor</AssemblyName>
+    <RootNamespace>StatusMonitor</RootNamespace>
+    <AssemblyTitle>Momo System Monitor</AssemblyTitle>
+    <Product>Momo System Monitor · Momo 系統監測</Product>
+    <Version>0.1.0</Version>
+    <PlatformTarget>x64</PlatformTarget>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Using Remove="System.Windows.Forms" />
+    <Using Remove="System.Drawing" />
+    <!-- LibreHardwareMonitorLib built from upstream master (adds NCT6701D / B850-I support).
+         It uses the signed PawnIO driver instead of the blocklisted WinRing0. -->
+    <Reference Include="LibreHardwareMonitorLib"><HintPath>libs\LibreHardwareMonitorLib.dll</HintPath></Reference>
+    <Reference Include="Mono.Posix.NETStandard"><HintPath>libs\Mono.Posix.NETStandard.dll</HintPath></Reference>
+    <Reference Include="BlackSharp.Core"><HintPath>libs\BlackSharp.Core.dll</HintPath></Reference>
+    <Reference Include="DiskInfoToolkit"><HintPath>libs\DiskInfoToolkit.dll</HintPath></Reference>
+    <Reference Include="HidSharp"><HintPath>libs\HidSharp.dll</HintPath></Reference>
+    <Reference Include="RAMSPDToolkit-NDD"><HintPath>libs\RAMSPDToolkit-NDD.dll</HintPath></Reference>
+    <Reference Include="System.CodeDom"><HintPath>libs\System.CodeDom.dll</HintPath></Reference>
+    <Reference Include="System.IO.Ports"><HintPath>libs\System.IO.Ports.dll</HintPath></Reference>
+    <Reference Include="System.Management"><HintPath>libs\System.Management.dll</HintPath></Reference>
+    <Reference Include="System.Threading.AccessControl"><HintPath>libs\System.Threading.AccessControl.dll</HintPath></Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="app.ico" />
+    <Resource Include="Assets\momo_pop.png" />
+    <Resource Include="Fonts\Geist-Regular.ttf" />
+    <Resource Include="Fonts\Geist-Medium.ttf" />
+    <Resource Include="Fonts\Geist-SemiBold.ttf" />
+    <Resource Include="Fonts\Geist-Bold.ttf" />
+    <Resource Include="Fonts\GeistMono-Regular.ttf" />
+    <Resource Include="Fonts\GeistMono-Medium.ttf" />
+    <Resource Include="Fonts\GeistMono-SemiBold.ttf" />
+    <Resource Include="Fonts\GeistMono-Bold.ttf" />
+    <Resource Include="Fonts\BarlowCondensed-Black.ttf" />
+    <Resource Include="Fonts\BarlowCondensed-BlackItalic.ttf" />
+    <Resource Include="Fonts\BarlowCondensed-BoldItalic.ttf" />
+    <Resource Include="Fonts\NotoSansTC-Regular.otf" />
+    <Resource Include="Fonts\NotoSansTC-Medium.otf" />
+    <Resource Include="Fonts\NotoSansTC-Bold.otf" />
+  </ItemGroup>
+
+</Project>

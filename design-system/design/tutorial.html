@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>新手教程 · Momo Design System</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#faf9f6;color:#292d32;font:15px/1.7 system-ui,"Microsoft YaHei",sans-serif}main{max-width:720px;margin:auto;padding:28px 22px 64px}a{color:#087c70;text-underline-offset:4px}a:focus-visible,summary:focus-visible{outline:3px solid #087c70;outline-offset:4px}header{padding:18px 0 10px}h1{margin:8px 0 10px;font-size:clamp(28px,5vw,38px);line-height:1.2}h2{margin:0 0 10px;font-size:19px;line-height:1.4}p{margin:7px 0}.eyebrow{margin:0;color:#087c70;font-size:13px;font-weight:700}.lead{max-width:610px;color:#56605b}.steps{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0}.step{min-width:0;padding:20px;border:1px solid #dce5e1;border-radius:11px;background:#fff}.number{display:grid;place-items:center;width:28px;height:28px;margin-bottom:12px;border-radius:50%;background:#087c70;color:#fff;font-weight:750}.step strong{display:block;margin-bottom:5px;font-size:16px}.step p{color:#56605b}.choice{margin:14px 0 22px;padding:16px 18px;border-left:3px solid #14b8a6;border-radius:5px;background:#eef8f5}.choice strong{display:block;margin-bottom:5px}.when{margin:22px 0;padding:20px;border:1px solid #e0e4e1;border-radius:11px;background:#fff}.when ul{margin:10px 0 0;padding-left:20px}.when li+li{margin-top:7px}.note{font-size:13px;color:#5d6661}.action{display:inline-flex;align-items:center;gap:7px;margin-top:8px;padding:9px 14px;border:1px solid #087c70;border-radius:7px;color:#087c70;font-weight:700;text-decoration:none}.help{margin-top:26px}.help h2{margin-bottom:2px}.help details{padding:13px 0;border-bottom:1px solid #e0e4e1}.help summary{cursor:pointer;font-weight:650}.help details p{padding-top:6px;color:#56605b}.footer{margin-top:24px;font-size:13px;color:#68716c}@media(max-width:560px){main{padding:20px 16px 48px}.steps{grid-template-columns:1fr}.step{padding:17px}h1{font-size:28px}}
+</style>
+</head>
+<body><main>
+<header>
+  <h1>复制给 AI，就可以开始。</h1>
+  <p class="lead">AI 会直接读取项目里的设计资料，你只要复制和粘贴。</p>
+</header>
+<div class="steps" aria-label="开始使用的两个步骤">
+  <section class="step"><span class="number">1</span><strong>点击「复制给 AI」</strong><p>提示词会立即显示。点击右上角的复制图示。</p></section>
+  <section class="step"><span class="number">2</span><strong>贴到 Claude 或 Codex</strong><p>回到开发这个项目的对话，粘贴并发送。</p></section>
+</div>
+<div class="choice"><strong>如果项目已经有 UI</strong><p>AI 会先问你想做哪一种：<b>按设计系统修改项目</b>，或<b>按当前项目更新设计系统</b>。选择你这次需要的方向即可。</p></div>
+<section class="when">
+  <h2>什么时候再打开这个 App？</h2>
+  <ul><li>想查看或调整颜色、字体、间距时。</li><li>AI 大幅修改界面后，想检查最新设计时。</li></ul>
+  <p>你在 App 修改后，点击保存，再复制给 AI 一次。之后可以直接关闭 App。</p>
+  <p class="note">AI 平时直接读写 <code>design-system/design/design-system.json</code>，App 不需要保持开启。</p>
+  <a class="action" href="./index.html">回到设计页</a>
+</section>
+<section class="help" id="help">
+  <h2>遇到问题</h2>
+  <details><summary>复制后为什么没有自动开始？</summary><p>复制只会把提示词放进剪贴板。请回到 Claude 或 Codex，粘贴并发送。</p></details>
+  <details><summary>AI 看不到设计资料怎么办？</summary><p>确认 AI 正在这个软件的项目文件夹中工作，并请它查找已有的 <code>design-system</code> 文件夹。</p></details>
+  <details><summary>保存后为什么软件没有变化？</summary><p>保存只更新设计资料。再点击「复制给 AI」，让 AI 修改项目代码并重新构建软件。</p></details>
+  <details><summary>以后不想自动显示教程</summary><p>勾选窗口上方的「不要再提示」。之后仍可从「更多 → 设置 → 打开新手教程」查看。</p></details>
+</section>
+<p class="footer">每个项目各有一份 design-system，设计资料会跟着项目保存。</p>
+</main></body></html>

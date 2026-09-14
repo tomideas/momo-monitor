@@ -1,0 +1,751 @@
+<Application x:Class="StatusMonitor.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:vm="clr-namespace:StatusMonitor.ViewModels"
+             xmlns:views="clr-namespace:StatusMonitor.Views"
+             xmlns:ctrl="clr-namespace:StatusMonitor.Controls"
+             xmlns:i18n="clr-namespace:StatusMonitor.I18n"
+             xmlns:converters="clr-namespace:StatusMonitor.Converters">
+    <Application.Resources>
+        <!-- Hero numerals: heavy + condensed + a real italic (not a SkewX fake). Has tnum. -->
+        <FontFamily x:Key="DisplayFont">pack://application:,,,/Fonts/#Barlow Condensed, Noto Sans TC</FontFamily>
+        <!-- Inputs follow the skin. Hardcoding these is what left a white combo box sitting
+             on the dark dashboard. -->
+        <Style TargetType="TextBox">
+            <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource CardBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource HairBrush}"/>
+            <Setter Property="CaretBrush" Value="{DynamicResource InkBrush}"/>
+            <Setter Property="SelectionBrush" Value="{DynamicResource AccentBrush}"/>
+            <Setter Property="Padding" Value="8,5"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="1" CornerRadius="6">
+                            <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}"
+                                          VerticalAlignment="Center" Focusable="False"
+                                          HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!-- The stock Aero template paints its own light chrome and ignores Background,
+             which is why setting Foreground alone made the text disappear. -->
+        <Style TargetType="ComboBox">
+            <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource CardBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource HairBrush}"/>
+            <Setter Property="Padding" Value="10,4,26,4"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <ToggleButton Focusable="False" ClickMode="Press"
+                                          IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
+                                <ToggleButton.Template>
+                                    <ControlTemplate TargetType="ToggleButton">
+                                        <Border Background="{DynamicResource CardBrush}" BorderBrush="{DynamicResource HairBrush}"
+                                                BorderThickness="1" CornerRadius="6">
+                                            <Path HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,11,0"
+                                                  Data="M0,0 L4,4 L8,0" Stroke="{DynamicResource MutedBrush}"
+                                                  StrokeThickness="1.4" StrokeEndLineCap="Round" StrokeStartLineCap="Round" />
+                                        </Border>
+                                    </ControlTemplate>
+                                </ToggleButton.Template>
+                            </ToggleButton>
+                            <ContentPresenter IsHitTestVisible="False" Margin="{TemplateBinding Padding}"
+                                              VerticalAlignment="Center" HorizontalAlignment="Left"
+                                              Content="{TemplateBinding SelectionBoxItem}"
+                                              ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" />
+                            <Popup x:Name="PART_Popup" AllowsTransparency="True" Placement="Bottom" Focusable="False"
+                                   IsOpen="{TemplateBinding IsDropDownOpen}" PopupAnimation="None">
+                                <Border Background="{DynamicResource CardBrush}" BorderBrush="{DynamicResource HairBrush}"
+                                        BorderThickness="1" CornerRadius="6" Margin="0,3,0,0"
+                                        MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}"
+                                        MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                                    <ScrollViewer><ItemsPresenter /></ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!-- An explicit ItemTemplate flows into SelectionBoxItemTemplate; a bare DisplayMemberPath
+             does not survive a custom ComboBox template, which is what leaked "{ Id = volt, ... }". -->
+        <DataTemplate x:Key="NameItemT">
+            <TextBlock Text="{Binding Name}" />
+        </DataTemplate>
+        <Style TargetType="ComboBoxItem">
+            <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
+            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBoxItem">
+                        <Border x:Name="bd" Background="Transparent" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="{DynamicResource HoverBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="{DynamicResource AccentBrush}" />
+                                <Setter Property="Foreground" Value="{DynamicResource OnAccentBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!-- On the dashboard colour means "past the threshold"; in a dialog there are no
+             readings, so accent means "this is the chosen one". A checked box is the clearest
+             case of that. The stock chrome was a white plate with a dark tick — the same
+             fixed-light problem the other inputs had. -->
+        <Style TargetType="CheckBox">
+            <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="CheckBox">
+                        <StackPanel Orientation="Horizontal" Background="Transparent">
+                            <Border x:Name="box" Width="16" Height="16" CornerRadius="4" VerticalAlignment="Center"
+                                    Background="Transparent" BorderBrush="{DynamicResource MutedBrush}" BorderThickness="1.5">
+                                <Path x:Name="tick" Data="M2.2,6 L5.1,8.9 L9.9,3.1" Visibility="Collapsed"
+                                      Stroke="{DynamicResource OnAccentBrush}" StrokeThickness="2"
+                                      StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" />
+                            </Border>
+                            <ContentPresenter Margin="8,0,0,0" VerticalAlignment="Center" />
+                        </StackPanel>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="box" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="box" Property="Background" Value="{DynamicResource AccentBrush}"/>
+                                <Setter TargetName="box" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+                                <Setter TargetName="tick" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="box" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!-- Settings tabs reuse the header's chip language rather than the stock tab chrome. -->
+        <Style TargetType="TabControl">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabControl">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TabPanel IsItemsHost="True" Panel.ZIndex="1" Margin="0,0,0,2"/>
+                            <ContentPresenter Grid.Row="1" ContentSource="SelectedContent"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="TabItem">
+            <Setter Property="Foreground" Value="{DynamicResource MutedBrush}"/>
+            <Setter Property="Padding" Value="13,6"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <!-- Same underline language as the dashboard's own tabs, so "selected"
+                         looks like one thing across the app rather than a filled chip here
+                         and a rule there. Hover is declared first so selection wins the
+                         foreground and can never end up dark-on-dark. -->
+                    <ControlTemplate TargetType="TabItem">
+                        <Grid Margin="0,0,8,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Border x:Name="bd" Background="Transparent" CornerRadius="5" Padding="{TemplateBinding Padding}">
+                                <ContentPresenter ContentSource="Header"/>
+                            </Border>
+                            <Border x:Name="rule" Grid.Row="1" Height="2.5" CornerRadius="2" Margin="4,2,4,0"
+                                    Background="{DynamicResource AccentBrush}" Visibility="Collapsed"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="{DynamicResource HoverBrush}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
+                                <Setter Property="FontWeight" Value="SemiBold"/>
+                                <Setter TargetName="rule" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="Expander"><Setter Property="Foreground" Value="{DynamicResource InkBrush}"/></Style>
+        <Style TargetType="ToolTip">
+            <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource CardBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource HairBrush}"/>
+        </Style>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+        <converters:BoolToHiddenConverter x:Key="BoolToHidden" />
+
+        <!-- Quiet vertical scrollbar: a 4 DIP thumb within a 10 DIP drag target. -->
+        <Style x:Key="QuietScrollThumb" TargetType="Thumb">
+            <Setter Property="MinHeight" Value="28" />
+            <Setter Property="Template">
+                <Setter.Value><ControlTemplate TargetType="Thumb">
+                    <Grid Background="Transparent">
+                        <Border x:Name="Grip" Margin="3,0" CornerRadius="2" Background="{DynamicResource HairBrush}" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Grip" Property="Background" Value="{DynamicResource MutedBrush}" /></Trigger>
+                        <Trigger Property="IsDragging" Value="True"><Setter TargetName="Grip" Property="Background" Value="{DynamicResource InkBrush}" /></Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate></Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="ScrollBar">
+            <Style.Triggers>
+                <Trigger Property="Orientation" Value="Vertical">
+                    <Setter Property="Width" Value="10" />
+                    <Setter Property="MinWidth" Value="10" />
+                    <Setter Property="Template">
+                        <Setter.Value><ControlTemplate TargetType="ScrollBar">
+                            <Track x:Name="PART_Track" Orientation="Vertical" IsDirectionReversed="True"
+                                   Minimum="{TemplateBinding Minimum}" Maximum="{TemplateBinding Maximum}"
+                                   Value="{TemplateBinding Value}" ViewportSize="{TemplateBinding ViewportSize}">
+                                <Track.DecreaseRepeatButton><RepeatButton Command="ScrollBar.PageUpCommand" Focusable="False" Opacity="0" /></Track.DecreaseRepeatButton>
+                                <Track.Thumb><Thumb Style="{StaticResource QuietScrollThumb}" /></Track.Thumb>
+                                <Track.IncreaseRepeatButton><RepeatButton Command="ScrollBar.PageDownCommand" Focusable="False" Opacity="0" /></Track.IncreaseRepeatButton>
+                            </Track>
+                        </ControlTemplate></Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- PAPER POP defaults. Theme.Apply overwrites every key below at startup; these
+             values only have to be self-consistent so the designer preview renders. -->
+        <SolidColorBrush x:Key="PaperBrush" Color="#EDEAE1" />
+        <SolidColorBrush x:Key="CardBrush" Color="#FFFFFF" />
+        <SolidColorBrush x:Key="HairBrush" Color="#D5D1C5" />
+        <SolidColorBrush x:Key="InkBrush" Color="#0D0D0C" />
+        <SolidColorBrush x:Key="MutedBrush" Color="#545149" />
+        <SolidColorBrush x:Key="TrackBrush" Color="#D5D1C5" />
+        <SolidColorBrush x:Key="AccentBrush" Color="#0A3CFF" />
+        <SolidColorBrush x:Key="AmberBrush" Color="#0A3CFF" />
+        <SolidColorBrush x:Key="OnAccentBrush" Color="#FFFFFF" />
+        <SolidColorBrush x:Key="AlarmBrush" Color="#FF2E00" />
+        <SolidColorBrush x:Key="HoverBrush" Color="#14000000" />
+        <SolidColorBrush x:Key="RedBrush" Color="#FF2E00" />
+        <DrawingBrush x:Key="PopPaper" TileMode="Tile" Viewport="0,0,20,20" ViewportUnits="Absolute">
+            <DrawingBrush.Drawing><DrawingGroup>
+                <GeometryDrawing Brush="{StaticResource PaperBrush}" Geometry="M0,0 H20 V20 H0 Z" />
+                <GeometryDrawing Brush="#E2DED3"><GeometryDrawing.Geometry><EllipseGeometry Center="10,10" RadiusX="0.8" RadiusY="0.8" /></GeometryDrawing.Geometry></GeometryDrawing>
+            </DrawingGroup></DrawingBrush.Drawing>
+        </DrawingBrush>
+
+        <!-- Type scale. The point of the redesign is the size jump between them. -->
+        <system:Double x:Key="SizeHero">92</system:Double>
+        <system:Double x:Key="SizeRowValue">34</system:Double>
+        <system:Double x:Key="SizeSideValue">28</system:Double>
+        <system:Double x:Key="SizeLabel">9</system:Double>
+        <system:Double x:Key="SizeSub">10</system:Double>
+        <system:Double x:Key="TrackLabel">1.6</system:Double>
+
+        <!-- Embedded Geist / Geist Mono / Noto Sans TC (see StatusMonitor.csproj Resource items) -->
+        <FontFamily x:Key="MonoFont">pack://application:,,,/Fonts/#Geist Mono, Noto Sans TC</FontFamily>
+        <FontFamily x:Key="AppFontFamily">pack://application:,,,/Fonts/#Geist, Noto Sans TC</FontFamily>
+
+    <converters:ToneBrushConverter x:Key="ToneBrush" />
+    <!-- 24-unit two-tone icons: heavy ink outline plus one accent element, per the reference.
+         The grid is 24 rather than 16 so a 2.0 stroke is only ~8% of the box - at 16 the pins
+         and memory bars sat 0.3 units apart and merged into a blob. -->
+    <Geometry x:Key="IcoCpu">M6,6 H18 V18 H6 Z M9,6 V2.4 M12,6 V2.4 M15,6 V2.4 M9,18 V21.6 M12,18 V21.6 M15,18 V21.6 M6,9 H2.4 M6,12 H2.4 M6,15 H2.4 M18,9 H21.6 M18,12 H21.6 M18,15 H21.6</Geometry>
+    <Geometry x:Key="IcoCpuTop">M10.6,12 A1.4,1.4 0 1 1 13.4,12 A1.4,1.4 0 1 1 10.6,12</Geometry>
+
+    <Geometry x:Key="IcoGpu">M4,4 V20.4 M4,6.6 H21 V17 H4</Geometry>
+    <Geometry x:Key="IcoGpuTop">M9.6,11.8 A3,3 0 1 1 15.6,11.8 A3,3 0 1 1 9.6,11.8</Geometry>
+    <!-- The fallback fan, for a header whose name says nothing more specific: housing ring and
+         three spokes on the same 24-unit grid as the rest, with the accent layer as the hub.
+         Swept curved blades were tried first and rendered as a blob at 20 DIP — the same density
+         problem the row icons hit on a 16-unit grid. Three straight spokes with a hub survive. -->
+    <Geometry x:Key="IcoFan">M3.5,12 A8.5,8.5 0 1 1 20.5,12 A8.5,8.5 0 1 1 3.5,12 M12,10.2 V4.6 M12,13.6 L16.9,16.4 M12,13.6 L7.1,16.4</Geometry>
+    <Geometry x:Key="IcoFanTop">M10.2,12 A1.8,1.8 0 1 1 13.8,12 A1.8,1.8 0 1 1 10.2,12</Geometry>
+
+    <!-- A chassis fan: the square housing is the whole distinction from the bare fan above, so
+         the ring is dropped rather than nested inside it — a ring 1.7 units inside a square is
+         two strokes 2 wide with nothing between them at 22 DIP. Spokes reach the housing the
+         way they do on the plain fan. -->
+    <Geometry x:Key="IcoChassis">M3.4,3.4 H20.6 V20.6 H3.4 Z M12,9.8 V5.2 M10.1,13.1 L6.1,15.4 M13.9,13.1 L17.9,15.4</Geometry>
+    <Geometry x:Key="IcoChassisTop">M10.3,12 A1.7,1.7 0 1 1 13.7,12 A1.7,1.7 0 1 1 10.3,12</Geometry>
+
+    <!-- A CPU fan: a fan with a chip badge beside it. Everything in this column has to look like
+         a fan, so the CPU mark had to leave the wheel rather than crowd it — three attempts to
+         put it inside failed at 22 DIP (a square hub was indistinguishable from a round one;
+         pins on the diagonals read as an X struck through the ring, because the eye joins them
+         across it). Outside and below, the badge is a separate shape at a size that survives, and
+         the wheel stays a wheel. -->
+    <Geometry x:Key="IcoCpuFan">M3.6,10 A6.4,6.4 0 1 1 16.4,10 A6.4,6.4 0 1 1 3.6,10 M10,7.8 V4.5 M8.1,11.1 L5.24,12.75 M11.9,11.1 L14.76,12.75 M17.2,17.2 H21.6 V21.6 H17.2 Z</Geometry>
+    <Geometry x:Key="IcoCpuFanTop">M8.4,10 A1.6,1.6 0 1 1 11.6,10 A1.6,1.6 0 1 1 8.4,10</Geometry>
+
+
+    <!-- Extra flow: the fan moves left to make room for the airflow arrow, which is the accent so
+         the added meaning is what carries the colour. Two stacked arrows were drawn first and
+         merged into one shape at 22 DIP; one arrow at full size reads. -->
+    <Geometry x:Key="IcoFlow">M2.4,12 A6,6 0 1 1 14.4,12 A6,6 0 1 1 2.4,12 M8.4,9.9 V6.6 M6.6,13.1 L3.7,14.7 M10.2,13.1 L13.1,14.7</Geometry>
+    <Geometry x:Key="IcoFlowTop">M16.8,12 H22 M19.6,9.4 L22,12 L19.6,14.6</Geometry>
+
+    <!-- An AIO pump: two hoses leaving the body is the silhouette that separates it from every
+         fan in the column. Drawn vertically first, where they merged into one stem and the whole
+         thing read as a light bulb; angled apart they are unmistakably two. -->
+    <Geometry x:Key="IcoPump">M6.6,15.6 A5.4,5.4 0 1 1 17.4,15.6 A5.4,5.4 0 1 1 6.6,15.6 M8.6,11.4 L5.6,3.6 M15.4,11.4 L18.4,3.6</Geometry>
+    <Geometry x:Key="IcoPumpTop">M12,12.6 C12,12.6 14.2,14.8 14.2,16.3 A2.2,2.2 0 1 1 9.8,16.3 C9.8,14.8 12,12.6 12,12.6 Z</Geometry>
+
+    <Geometry x:Key="IcoRam">M3,6.4 H21 V16.4 H3 Z M7,16.4 V20.6 M12,16.4 V20.6 M17,16.4 V20.6</Geometry>
+    <Geometry x:Key="IcoRamTop">M9,9.4 V13.4 M12,9.4 V13.4 M15,9.4 V13.4</Geometry>
+
+    <Geometry x:Key="IcoDisk">M12,2.8 C6.9,2.8 3.2,4.3 3.2,6.1 C3.2,7.9 6.9,9.4 12,9.4 C17.1,9.4 20.8,7.9 20.8,6.1 C20.8,4.3 17.1,2.8 12,2.8 Z M3.2,6.1 V17.9 C3.2,19.7 6.9,21.2 12,21.2 C17.1,21.2 20.8,19.7 20.8,17.9 V6.1</Geometry>
+    <Geometry x:Key="IcoDiskTop">M5.6,13.3 C7.1,14.3 9.4,14.9 12,14.9 C14.6,14.9 16.9,14.3 18.4,13.3</Geometry>
+
+    <!-- A real toothed gear, the shape people actually read as "settings". The previous version
+         was eight radial spokes around a ring (the Feather style), which reads closer to a sun.
+         Outline generated on the 24-unit grid: 8 teeth, outer r 10.6, inner r 7.9. -->
+    <Geometry x:Key="IcoGear">M22.29,9.44 L22.29,14.56 L19.49,14.51 L19.07,15.52 L21.09,17.46 L17.46,21.09 L15.52,19.07 L14.51,19.49 L14.56,22.29 L9.44,22.29 L9.49,19.49 L8.48,19.07 L6.54,21.09 L2.91,17.46 L4.93,15.52 L4.51,14.51 L1.71,14.56 L1.71,9.44 L4.51,9.49 L4.93,8.48 L2.91,6.54 L6.54,2.91 L8.48,4.93 L9.49,4.51 L9.44,1.71 L14.56,1.71 L14.51,4.51 L15.52,4.93 L17.46,2.91 L21.09,6.54 L19.07,8.48 L19.49,9.49 Z</Geometry>
+    <Geometry x:Key="IcoGearTop">M8.4,12 A3.6,3.6 0 1 1 15.6,12 A3.6,3.6 0 1 1 8.4,12</Geometry>
+
+    <!-- Mini: the picture-in-picture convention — a frame with a smaller pane in one corner. -->
+    <Geometry x:Key="IcoMini">M2.6,4.4 H21.4 V19.6 H2.6 Z</Geometry>
+    <Geometry x:Key="IcoMiniTop">M12.4,12.6 H18.8 V17 H12.4 Z</Geometry>
+
+    <Geometry x:Key="IcoNet">M16.8,21.3 V3.9 M16.8,3.9 L12.9,8.4 M16.8,3.9 L20.7,8.4</Geometry>
+    <Geometry x:Key="IcoNetTop">M7.2,2.7 V20.1 M7.2,20.1 L3.3,15.6 M7.2,20.1 L11.1,15.6</Geometry>
+
+    <Style x:Key="RowIcon" TargetType="Path">
+      <Setter Property="Stroke" Value="{DynamicResource InkBrush}" />
+      <Setter Property="StrokeThickness" Value="2" />
+      <Setter Property="StrokeLineJoin" Value="Round" />
+      <Setter Property="StrokeStartLineCap" Value="Round" />
+      <Setter Property="StrokeEndLineCap" Value="Round" />
+      <!-- Stretch must stay None: Uniform normalises each Path to its OWN bounds, which blows
+           the small accent element up to fill the box. Both layers share the 24-unit grid. -->
+      <Setter Property="Stretch" Value="None" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="VerticalAlignment" Value="Stretch" />
+    </Style>
+    <!-- The icon's one coloured element, always on the skin's accent so the icon column reads as
+         one consistent set: blue on Paper Pop, volt on the dark skin. -->
+    <Style x:Key="RowIconTop" TargetType="Path" BasedOn="{StaticResource RowIcon}">
+      <Setter Property="Stroke" Value="{DynamicResource AccentBrush}" />
+    </Style>
+    <!-- Period selector. RadioButton gives single-choice semantics and keyboard arrows for
+         free; the template is the same quiet chip language as the rest of the header. -->
+    <!-- The checkbox above, as a radio: same 16 DIP indicator, same accent fill when chosen,
+         round instead of square. The stock WPF radio would be the only unthemed control left
+         in the settings dialog. -->
+    <Style x:Key="SettingRadio" TargetType="RadioButton">
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="FontSize" Value="12" />
+      <Setter Property="Margin" Value="0,0,0,4" />
+      <Setter Property="Foreground" Value="{DynamicResource InkBrush}" />
+      <Setter Property="FocusVisualStyle" Value="{StaticResource AccentFocusVisual}" />
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="RadioButton">
+            <StackPanel Orientation="Horizontal" Background="Transparent">
+              <Border x:Name="box" Width="16" Height="16" CornerRadius="8" VerticalAlignment="Center"
+                      Background="Transparent" BorderBrush="{DynamicResource MutedBrush}" BorderThickness="1.5">
+                <Ellipse x:Name="dot" Width="6" Height="6" Visibility="Collapsed"
+                         Fill="{DynamicResource OnAccentBrush}" />
+              </Border>
+              <ContentPresenter Margin="8,0,0,0" VerticalAlignment="Center" />
+            </StackPanel>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="box" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+              </Trigger>
+              <Trigger Property="IsChecked" Value="True">
+                <Setter TargetName="box" Property="Background" Value="{DynamicResource AccentBrush}" />
+                <Setter TargetName="box" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                <Setter TargetName="dot" Property="Visibility" Value="Visible" />
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+    <Style x:Key="PeriodChip" TargetType="RadioButton">
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="FontSize" Value="10" />
+      <Setter Property="FontWeight" Value="Bold" />
+      <Setter Property="Foreground" Value="{DynamicResource MutedBrush}" />
+      <Setter Property="Margin" Value="0,0,4,0" />
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="RadioButton">
+            <Border x:Name="bd" Background="Transparent" CornerRadius="4" Padding="7,2">
+              <ContentPresenter VerticalAlignment="Center" />
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="bd" Property="Background" Value="{DynamicResource HoverBrush}" />
+              </Trigger>
+              <Trigger Property="IsChecked" Value="True">
+                <Setter TargetName="bd" Property="Background" Value="{DynamicResource AccentBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource OnAccentBrush}" />
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+    <!-- The mini panel has no room for the selector; it follows whatever the dashboard is set to. -->
+    <Style x:Key="FullOnlyPanel" TargetType="FrameworkElement">
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
+          <Setter Property="Visibility" Value="Collapsed" />
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+    <!-- A focus ring should appear when you tab to something, not when you click it. WPF
+         already makes that distinction for FocusVisualStyle — it renders only when the most
+         recent input was the keyboard — but an IsKeyboardFocused trigger does not, which is
+         why clicking the mini button left an accent ring parked on it after returning from
+         mini mode. Buttons therefore carry this and no focus trigger; text fields keep their
+         trigger, because there focus on click is the point. -->
+    <Style x:Key="AccentFocusVisual">
+      <Setter Property="Control.Template">
+        <Setter.Value>
+          <ControlTemplate>
+            <Rectangle Margin="-2" RadiusX="8" RadiusY="8" StrokeThickness="1.5"
+                       Stroke="{DynamicResource AccentBrush}" SnapsToDevicePixels="True" />
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+    <Style x:Key="MicroLabel" TargetType="TextBlock">
+      <!-- Grayscale AA: ClearType fringes thin light glyphs on a near-black ground, which reads
+           as a colour cast. All secondary text renders the same way so the tier looks uniform. -->
+      <Setter Property="TextOptions.TextRenderingMode" Value="Grayscale" />
+      <!-- 9 DIP was below the size where grayscale AA leaves enough solid pixels to read as
+           a colour rather than a smudge. See the note on RowSub. -->
+      <Setter Property="FontSize" Value="10" />
+      <Setter Property="FontWeight" Value="Bold" />
+      <Setter Property="Foreground" Value="{DynamicResource MutedBrush}" />
+    </Style>
+    <Style x:Key="HeroValue" TargetType="TextBlock">
+      <Setter Property="FontFamily" Value="{StaticResource DisplayFont}" />
+      <Setter Property="FontSize" Value="92" />
+      <Setter Property="FontWeight" Value="Black" />
+      <Setter Property="FontStyle" Value="Italic" />
+      <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+      <Setter Property="Typography.NumeralAlignment" Value="Tabular" />
+      <Setter Property="LineHeight" Value="76" />
+      <Setter Property="LineStackingStrategy" Value="BlockLineHeight" />
+    </Style>
+    <Style x:Key="HeroUnit" TargetType="TextBlock">
+      <Setter Property="FontFamily" Value="{StaticResource DisplayFont}" />
+      <Setter Property="FontSize" Value="26" />
+      <Setter Property="FontWeight" Value="Bold" />
+      <Setter Property="FontStyle" Value="Italic" />
+      <Setter Property="Foreground" Value="{DynamicResource InkBrush}" />
+      <Setter Property="VerticalAlignment" Value="Bottom" />
+      <Setter Property="Margin" Value="5,0,0,6" />
+    </Style>
+    <Style x:Key="SideValue" TargetType="TextBlock">
+      <Setter Property="FontFamily" Value="{StaticResource DisplayFont}" />
+      <Setter Property="FontSize" Value="28" />
+      <Setter Property="FontWeight" Value="Black" />
+      <Setter Property="FontStyle" Value="Italic" />
+      <Setter Property="Foreground" Value="{DynamicResource InkBrush}" />
+      <Setter Property="Typography.NumeralAlignment" Value="Tabular" />
+    </Style>
+    <Style x:Key="RowTag" TargetType="TextBlock">
+      <Setter Property="FontSize" Value="12" />
+      <Setter Property="FontWeight" Value="Black" />
+      <Setter Property="Foreground" Value="{DynamicResource InkBrush}" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="Margin" Value="8,0,0,0" />
+    </Style>
+    <Style x:Key="RowName" TargetType="TextBlock">
+      <!-- Grayscale AA: ClearType fringes thin light glyphs on a near-black ground, which reads
+           as a colour cast. All secondary text renders the same way so the tier looks uniform. -->
+      <Setter Property="TextOptions.TextRenderingMode" Value="Grayscale" />
+      <Setter Property="FontFamily" Value="{StaticResource MonoFont}" />
+      <Setter Property="FontSize" Value="10" />
+      <Setter Property="Foreground" Value="{DynamicResource MutedBrush}" />
+      <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="Margin" Value="0,0,12,0" />
+    </Style>
+    <Style x:Key="RowValue" TargetType="TextBlock">
+      <Setter Property="FontFamily" Value="{StaticResource DisplayFont}" />
+      <Setter Property="FontSize" Value="34" />
+      <Setter Property="FontWeight" Value="Black" />
+      <Setter Property="FontStyle" Value="Italic" />
+      <Setter Property="Typography.NumeralAlignment" Value="Tabular" />
+      <Setter Property="TextAlignment" Value="Right" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <!-- Two drives share the width a single value would have had, so the per-drive figure
+         steps down one size from RowValue. -->
+    <Style x:Key="RowValueSmall" TargetType="TextBlock" BasedOn="{StaticResource RowValue}">
+      <Setter Property="FontSize" Value="25" />
+    </Style>
+    <Style x:Key="RowSub" TargetType="TextBlock">
+      <!-- Grayscale AA: ClearType fringes thin light glyphs on a near-black ground, which reads
+           as a colour cast. All secondary text renders the same way so the tier looks uniform.
+           The cost of grayscale AA is thinner glyphs, and at 10 DIP that bill came due: of the
+           pixels making up this line, 21 reached the full colour and 99 were antialiased edge.
+           Nominal contrast was fine (6.73:1) while the text still read as faint, because most
+           of each glyph never got there. Size and weight put ink back; the colour alone could
+           not fix a coverage problem. -->
+      <Setter Property="TextOptions.TextRenderingMode" Value="Grayscale" />
+      <Setter Property="FontFamily" Value="{StaticResource MonoFont}" />
+      <Setter Property="FontSize" Value="11" />
+      <Setter Property="FontWeight" Value="Medium" />
+      <Setter Property="Foreground" Value="{DynamicResource MutedBrush}" />
+      <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+      <Setter Property="Margin" Value="0,3,0,0" />
+    </Style>
+    <!-- The mini panel sets Window.Tag = True to ask for the dense rhythm. Same template,
+         same content — only the breathing room differs, so the two modes cannot diverge. -->
+    <Style x:Key="LoadRow" TargetType="Border">
+      <Setter Property="BorderBrush" Value="{DynamicResource HairBrush}" />
+      <Setter Property="BorderThickness" Value="0,0,0,1" />
+      <Setter Property="Padding" Value="2,10,2,11" />
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
+          <Setter Property="Padding" Value="2,6,2,6" />
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+
+    <!-- Every load reads against the same baseline, so the five bars are directly comparable. -->
+    <DataTemplate x:Key="GpuCardT" DataType="{x:Type vm:GpuCard}">
+      <Border Style="{StaticResource LoadRow}">
+        <Grid>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+          </Grid.RowDefinitions>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="74" />
+            <ColumnDefinition Width="0.9*" MinWidth="60" />
+            <ColumnDefinition Width="1.6*" MinWidth="70" />
+            <ColumnDefinition Width="Auto" MinWidth="92" />
+          </Grid.ColumnDefinitions>
+          <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"><Grid Width="24" Height="24" VerticalAlignment="Center"><Path Style="{StaticResource RowIcon}" Data="{StaticResource IcoGpu}" /><Path Style="{StaticResource RowIconTop}" Data="{StaticResource IcoGpuTop}" /></Grid><TextBlock Text="GPU" Style="{StaticResource RowTag}" /></StackPanel>
+          <TextBlock Grid.Column="1" Text="{Binding Name}" Style="{StaticResource RowName}" />
+          <views:MetricBar Grid.Column="2" Height="11" BarHeight="11" ShowText="False" VerticalAlignment="Center"
+                           Margin="0,0,16,0" Fraction="{Binding LoadFraction}" Tone="{Binding Tone}" />
+          <TextBlock Grid.Column="3" Text="{Binding LoadText}" Style="{StaticResource RowValue}"
+                     Foreground="{Binding Tone, Converter={StaticResource ToneBrush}}" />
+          <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Text="{Binding SubText}"
+                     Style="{StaticResource RowSub}" />
+        </Grid>
+      </Border>
+    </DataTemplate>
+
+        <!-- ============ Shared dashboard body ============
+             Both the main window and the mini panel render this one template, so the two
+             modes cannot drift apart. The Viewboxes let the hero shrink for the narrower
+             mini panel without a second layout. -->
+        <DataTemplate x:Key="StatBody" DataType="{x:Type vm:MainViewModel}">
+          <StackPanel>
+<!-- Hero: the one figure this tool owns. Watts, energy, carbon and cost are what
+     separates it from every other monitor; CPU% is not. -->
+<Grid Margin="2,8,2,4">
+  <Grid.ColumnDefinitions>
+    <!-- Star, not Auto. An Auto column never gives width back, so the 92px hero held its
+         full size all the way down and shoved the energy / carbon / cost block off the
+         right edge — which is why the window could not be dragged below 720. A capped
+         star column keeps the hero at full size while there is room and yields when
+         there isn't; the Viewbox below is DownOnly, so it only ever scales down. -->
+    <ColumnDefinition Width="*" MinWidth="104" MaxWidth="236" />
+    <ColumnDefinition Width="2.4*" MinWidth="190" />
+  </Grid.ColumnDefinitions>
+  <StackPanel Grid.Column="0">
+    <TextBlock Text="{Binding Source={x:Static i18n:Loc.Instance}, Path=[power_now]}" Style="{StaticResource MicroLabel}" Margin="0,0,0,8" />
+    <Viewbox Stretch="Uniform" StretchDirection="DownOnly" HorizontalAlignment="Left">
+      <StackPanel Orientation="Horizontal">
+        <TextBlock Text="{Binding TotalWattsValue}" Style="{StaticResource HeroValue}" />
+        <TextBlock Text="W" Style="{StaticResource HeroUnit}" />
+      </StackPanel>
+    </Viewbox>
+  </StackPanel>
+  <Grid Grid.Column="1" VerticalAlignment="Bottom" Margin="18,0,0,8">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="*" />
+      <ColumnDefinition Width="*" />
+      <ColumnDefinition Width="*" />
+    </Grid.ColumnDefinitions>
+    <!-- One selector for all three figures: energy, carbon and cost are the same measurement
+         expressed three ways, so they must never disagree about which period they cover. -->
+    <StackPanel Grid.Row="0" Grid.ColumnSpan="3" Orientation="Horizontal" Margin="12,0,0,7"
+                Style="{StaticResource FullOnlyPanel}">
+      <RadioButton Style="{StaticResource PeriodChip}" Content="{Binding Source={x:Static i18n:Loc.Instance}, Path=[period_today]}" IsChecked="{Binding IsPeriodToday, Mode=TwoWay}" />
+      <RadioButton Style="{StaticResource PeriodChip}" Content="{Binding Source={x:Static i18n:Loc.Instance}, Path=[period_week]}" IsChecked="{Binding IsPeriodWeek, Mode=TwoWay}" />
+      <RadioButton Style="{StaticResource PeriodChip}" Content="{Binding Source={x:Static i18n:Loc.Instance}, Path=[period_month]}" IsChecked="{Binding IsPeriodMonth, Mode=TwoWay}" />
+      <RadioButton Style="{StaticResource PeriodChip}" Content="{Binding Source={x:Static i18n:Loc.Instance}, Path=[period_all]}" IsChecked="{Binding IsPeriodAll, Mode=TwoWay}" />
+      <!-- Explains a short figure honestly instead of letting it look like a broken total. -->
+      <TextBlock Text="{Binding EnergyNote}" Style="{StaticResource RowSub}" VerticalAlignment="Center"
+                 Margin="8,0,0,0" Visibility="{Binding HasEnergyNote, Converter={StaticResource BoolToVisibility}}" />
+    </StackPanel>
+    <Border Grid.Row="1" Grid.Column="0" BorderBrush="{DynamicResource HairBrush}" BorderThickness="1,0,0,0" Padding="12,0,8,0">
+      <StackPanel>
+        <TextBlock Text="{Binding EnergyPeriodLabel}" Style="{StaticResource MicroLabel}" Margin="0,0,0,2" />
+        <Viewbox Stretch="Uniform" StretchDirection="DownOnly" HorizontalAlignment="Left"><TextBlock Text="{Binding EnergyText}" Style="{StaticResource SideValue}" /></Viewbox>
+      </StackPanel>
+    </Border>
+    <Border Grid.Row="1" Grid.Column="1" BorderBrush="{DynamicResource HairBrush}" BorderThickness="1,0,0,0" Padding="12,0,8,0">
+      <StackPanel>
+        <TextBlock Text="{Binding Source={x:Static i18n:Loc.Instance}, Path=[carbon]}" Style="{StaticResource MicroLabel}" Margin="0,0,0,2" />
+        <Viewbox Stretch="Uniform" StretchDirection="DownOnly" HorizontalAlignment="Left"><TextBlock Text="{Binding CarbonText}" Style="{StaticResource SideValue}" /></Viewbox>
+      </StackPanel>
+    </Border>
+    <Border Grid.Row="1" Grid.Column="2" BorderBrush="{DynamicResource HairBrush}" BorderThickness="1,0,0,0" Padding="12,0,0,0">
+      <StackPanel>
+        <TextBlock Text="{Binding Source={x:Static i18n:Loc.Instance}, Path=[cost]}" Style="{StaticResource MicroLabel}" Margin="0,0,0,2" />
+        <Viewbox Stretch="Uniform" StretchDirection="DownOnly" HorizontalAlignment="Left"><TextBlock Text="{Binding CostText}" Style="{StaticResource SideValue}" /></Viewbox>
+      </StackPanel>
+    </Border>
+  </Grid>
+</Grid>
+<!-- One column of load rows. RowUniformPanel is kept (Columns=1) so the render
+     harness still finds DashboardCards and the GPU ContentControls inside it. -->
+<ctrl:RowUniformPanel FillLastRow="False" Gap="0" Columns="1" Margin="0,6,0,16">
+  <Border Style="{StaticResource LoadRow}" BorderThickness="0,1,0,1">
+    <Grid>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+      </Grid.RowDefinitions>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="74" />
+        <ColumnDefinition Width="0.9*" MinWidth="60" />
+        <ColumnDefinition Width="1.6*" MinWidth="70" />
+        <ColumnDefinition Width="Auto" MinWidth="92" />
+      </Grid.ColumnDefinitions>
+      <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"><Grid Width="24" Height="24" VerticalAlignment="Center"><Path Style="{StaticResource RowIcon}" Data="{StaticResource IcoCpu}" /><Path Style="{StaticResource RowIconTop}" Data="{StaticResource IcoCpuTop}" /></Grid><TextBlock Text="CPU" Style="{StaticResource RowTag}" /></StackPanel>
+      <TextBlock Grid.Column="1" Text="{Binding CpuName}" Style="{StaticResource RowName}" />
+      <views:MetricBar Grid.Column="2" Height="11" BarHeight="11" ShowText="False" VerticalAlignment="Center"
+                       Margin="0,0,16,0" Fraction="{Binding CpuFraction}" Tone="{Binding CpuTone}" />
+      <TextBlock Grid.Column="3" Text="{Binding CpuLoadText}" Style="{StaticResource RowValue}"
+                 Foreground="{Binding CpuTone, Converter={StaticResource ToneBrush}}" />
+      <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Text="{Binding CpuSubText}" Style="{StaticResource RowSub}" />
+    </Grid>
+  </Border>
+  <ContentControl Content="{Binding GpuCard1}" ContentTemplate="{StaticResource GpuCardT}" Visibility="{Binding Gpu1Visible, Converter={StaticResource BoolToVisibility}}" />
+  <ContentControl Content="{Binding GpuCard2}" ContentTemplate="{StaticResource GpuCardT}" Visibility="{Binding Gpu2Visible, Converter={StaticResource BoolToVisibility}}" />
+  <Border Style="{StaticResource LoadRow}">
+    <Grid>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+      </Grid.RowDefinitions>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="74" />
+        <ColumnDefinition Width="0.9*" MinWidth="60" />
+        <ColumnDefinition Width="1.6*" MinWidth="70" />
+        <ColumnDefinition Width="Auto" MinWidth="92" />
+      </Grid.ColumnDefinitions>
+      <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"><Grid Width="24" Height="24" VerticalAlignment="Center"><Path Style="{StaticResource RowIcon}" Data="{StaticResource IcoRam}" /><Path Style="{StaticResource RowIconTop}" Data="{StaticResource IcoRamTop}" /></Grid><TextBlock Text="RAM" Style="{StaticResource RowTag}" /></StackPanel>
+      <TextBlock Grid.Column="1" Text="{Binding RamDetailText}" Style="{StaticResource RowName}" />
+      <views:MetricBar Grid.Column="2" Height="11" BarHeight="11" ShowText="False" VerticalAlignment="Center"
+                       Margin="0,0,16,0" Fraction="{Binding RamFraction}" Tone="{Binding RamTone}" />
+      <TextBlock Grid.Column="3" Text="{Binding RamLoadText}" Style="{StaticResource RowValue}"
+                 Foreground="{Binding RamTone, Converter={StaticResource ToneBrush}}" />
+      <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Text="{Binding RamSubText}" Style="{StaticResource RowSub}" />
+    </Grid>
+  </Border>
+  <Border Style="{StaticResource LoadRow}">
+    <Grid>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+      </Grid.RowDefinitions>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="74" />
+        <ColumnDefinition Width="0.9*" MinWidth="60" />
+        <ColumnDefinition Width="1.6*" MinWidth="70" />
+        <ColumnDefinition Width="Auto" MinWidth="92" />
+      </Grid.ColumnDefinitions>
+      <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"><Grid Width="24" Height="24" VerticalAlignment="Center"><Path Style="{StaticResource RowIcon}" Data="{StaticResource IcoDisk}" /><Path Style="{StaticResource RowIconTop}" Data="{StaticResource IcoDiskTop}" /></Grid><TextBlock Text="DISK" Style="{StaticResource RowTag}" /></StackPanel>
+      <!-- Each fixed volume gets its own bar and percentage, side by side in the one
+           row. An aggregate figure would hide a nearly-full drive behind a roomy one. -->
+      <ItemsControl Grid.Column="1" Grid.ColumnSpan="3" Grid.RowSpan="2" ItemsSource="{Binding DiskRows}">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <UniformGrid Rows="1" />
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+          <DataTemplate>
+            <Grid Margin="0,0,22,0">
+              <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+              </Grid.RowDefinitions>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" MinWidth="26" />
+                <ColumnDefinition Width="*" MinWidth="40" />
+                <ColumnDefinition Width="Auto" MinWidth="58" />
+              </Grid.ColumnDefinitions>
+              <TextBlock Grid.Column="0" Text="{Binding Label}" Style="{StaticResource RowName}" Margin="0,0,8,0" />
+              <views:MetricBar Grid.Column="1" Height="11" BarHeight="11" ShowText="False" VerticalAlignment="Center"
+                               Margin="0,0,12,0" Fraction="{Binding Fraction}" Tone="{Binding Tone}" />
+              <TextBlock Grid.Column="2" Text="{Binding PercentText}" Style="{StaticResource RowValueSmall}"
+                         Foreground="{Binding Tone, Converter={StaticResource ToneBrush}}" />
+              <TextBlock Grid.Row="1" Grid.ColumnSpan="3" Text="{Binding CapacityText}" Style="{StaticResource RowSub}" />
+            </Grid>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </Grid>
+  </Border>
+  <Border Style="{StaticResource LoadRow}">
+    <Grid>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="74" />
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="Auto" />
+      </Grid.ColumnDefinitions>
+      <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"><Grid Width="24" Height="24" VerticalAlignment="Center"><Path Style="{StaticResource RowIcon}" Data="{StaticResource IcoNet}" /><Path Style="{StaticResource RowIconTop}" Data="{StaticResource IcoNetTop}" /></Grid><TextBlock Text="NET" Style="{StaticResource RowTag}" /></StackPanel>
+      <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+        <TextBlock Text="↓" Style="{StaticResource MicroLabel}" VerticalAlignment="Center" Margin="0,0,5,0" />
+        <TextBlock Text="{Binding NetDownText}" FontFamily="{StaticResource MonoFont}" FontSize="15" Foreground="{DynamicResource InkBrush}" VerticalAlignment="Center" />
+        <TextBlock Text="↑" Style="{StaticResource MicroLabel}" VerticalAlignment="Center" Margin="18,0,5,0" />
+        <TextBlock Text="{Binding NetUpText}" FontFamily="{StaticResource MonoFont}" FontSize="15" Foreground="{DynamicResource InkBrush}" VerticalAlignment="Center" />
+      </StackPanel>
+    </Grid>
+  </Border>
+</ctrl:RowUniformPanel>
+          </StackPanel>
+        </DataTemplate>
+    </Application.Resources>
+</Application>
+
+

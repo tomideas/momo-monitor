@@ -1,0 +1,816 @@
+<Window xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Class="StatusMonitor.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:i18n="clr-namespace:StatusMonitor.I18n" xmlns:views="clr-namespace:StatusMonitor.Views" xmlns:vm="clr-namespace:StatusMonitor.ViewModels" xmlns:converters="clr-namespace:StatusMonitor.Converters" xmlns:ctrl="clr-namespace:StatusMonitor.Controls" Title="{Binding Source={x:Static i18n:Loc.Instance}, Path=[app_title]}" Width="1040" Height="760" MinWidth="460" MinHeight="330" Icon="pack://application:,,,/app.ico" Background="{DynamicResource PaperBrush}" FontFamily="{StaticResource AppFontFamily}" Foreground="{DynamicResource InkBrush}" FontSize="12" WindowStartupLocation="CenterScreen">
+  <Window.Resources>
+    <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+    <DropShadowEffect x:Key="HardShadow" BlurRadius="0" ShadowDepth="0" Color="#111111" Opacity="0" />
+    <converters:InfoCardColumnsConverter x:Key="InfoCardColumnsConverter" />
+    <ControlTemplate x:Key="ChipTemplate" TargetType="Button">
+      <Border x:Name="bd" RenderTransformOrigin="0.5,0.5" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+        <Border.RenderTransform>
+          <TranslateTransform />
+        </Border.RenderTransform>
+        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+      </Border>
+      <ControlTemplate.Triggers>
+        <!-- No Foreground override here: it used to stomp DangerButton's alarm text back to ink
+             on hover. Every consumer of this template already sets a readable foreground. -->
+        <Trigger Property="IsMouseOver" Value="True">
+          <Setter TargetName="bd" Property="Background" Value="{DynamicResource HoverBrush}" />
+        </Trigger>
+        <Trigger Property="IsPressed" Value="True">
+          <Setter TargetName="bd" Property="RenderTransform">
+            <Setter.Value>
+              <TranslateTransform X="2" Y="2" />
+            </Setter.Value>
+          </Setter>
+        </Trigger>
+      </ControlTemplate.Triggers>
+    </ControlTemplate>
+    <!-- Filled buttons dim on hover instead of having their fill replaced: swapping the
+         background would throw away the accent that identifies the primary action. -->
+    <ControlTemplate x:Key="SolidChipTemplate" TargetType="Button">
+      <Border x:Name="bd" RenderTransformOrigin="0.5,0.5" Background="{TemplateBinding Background}"
+              BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
+              CornerRadius="6" Padding="{TemplateBinding Padding}">
+        <Border.RenderTransform>
+          <TranslateTransform />
+        </Border.RenderTransform>
+        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+      </Border>
+      <ControlTemplate.Triggers>
+        <Trigger Property="IsMouseOver" Value="True">
+          <Setter TargetName="bd" Property="Opacity" Value="0.86" />
+        </Trigger>
+        <Trigger Property="IsPressed" Value="True">
+          <Setter TargetName="bd" Property="RenderTransform">
+            <Setter.Value>
+              <TranslateTransform X="2" Y="2" />
+            </Setter.Value>
+          </Setter>
+        </Trigger>
+      </ControlTemplate.Triggers>
+    </ControlTemplate>
+    <!-- Selection is an underline, not a filled block: a solid chip shouted louder than the
+         readings it sits above. State is driven by Tag rather than by assigning local
+         Background/Foreground in code — local values and the hover trigger used to fight,
+         which is how the selected tab turned dark-on-dark (invisible) while hovered. -->
+    <ControlTemplate x:Key="NavChipTemplate" TargetType="Button">
+      <Grid>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="*" />
+          <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Border x:Name="bd" Background="Transparent" BorderBrush="Transparent" BorderThickness="1"
+                CornerRadius="5" Padding="{TemplateBinding Padding}">
+          <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </Border>
+        <Border x:Name="rule" Grid.Row="1" Height="2.5" CornerRadius="2" Margin="5,2,5,0"
+                Background="{DynamicResource AccentBrush}" Visibility="Collapsed" />
+      </Grid>
+      <ControlTemplate.Triggers>
+        <!-- Hover first, so the selected state below always wins the foreground. -->
+        <Trigger Property="IsMouseOver" Value="True">
+          <Setter TargetName="bd" Property="Background" Value="{DynamicResource HoverBrush}" />
+          <Setter Property="Foreground" Value="{DynamicResource InkBrush}" />
+        </Trigger>
+        <Trigger Property="Tag" Value="on">
+          <Setter Property="Foreground" Value="{DynamicResource InkBrush}" />
+          <Setter Property="FontWeight" Value="SemiBold" />
+          <Setter TargetName="rule" Property="Visibility" Value="Visible" />
+        </Trigger>
+      </ControlTemplate.Triggers>
+    </ControlTemplate>
+    <Style x:Key="NavButton" TargetType="Button">
+      <Setter Property="FocusVisualStyle" Value="{StaticResource AccentFocusVisual}" />
+      <Setter Property="Template" Value="{StaticResource NavChipTemplate}" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+      <Setter Property="Padding" Value="9,3" />
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="Foreground" Value="{DynamicResource MutedBrush}" />
+      <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <!-- Header icon buttons sit on the page, not on a chip: a filled plate around them stood
+         out more than the readings. Hover supplies the only backing they need. -->
+    <Style x:Key="IconButton" TargetType="Button">
+      <Setter Property="FocusVisualStyle" Value="{StaticResource AccentFocusVisual}" />
+      <Setter Property="Template" Value="{StaticResource ChipTemplate}" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="Padding" Value="5,3" />
+      <Setter Property="FontSize" Value="11" />
+      <Setter Property="Foreground" Value="{DynamicResource InkBrush}" />
+      <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <!-- The primary action carries the accent. Ink read as just another dark rectangle next to
+         the danger outline; accent is what tells you which button is the way out. -->
+    <Style x:Key="PrimaryButton" TargetType="Button">
+      <Setter Property="FocusVisualStyle" Value="{StaticResource AccentFocusVisual}" />
+      <Setter Property="Template" Value="{StaticResource SolidChipTemplate}" />
+      <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Foreground" Value="{DynamicResource OnAccentBrush}" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="FontSize" Value="11" />
+      <Setter Property="Padding" Value="14,5" />
+      <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <Style x:Key="SecondaryButton" TargetType="Button">
+      <Setter Property="FocusVisualStyle" Value="{StaticResource AccentFocusVisual}" />
+      <Setter Property="Template" Value="{StaticResource ChipTemplate}" />
+      <Setter Property="Background" Value="{DynamicResource CardBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource HairBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="Foreground" Value="{DynamicResource InkBrush}" />
+      <Setter Property="FontSize" Value="11" />
+      <Setter Property="Padding" Value="12,5" />
+      <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <Style x:Key="Card" TargetType="Border">
+      <Setter Property="Background" Value="{DynamicResource CardBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource HairBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="2" />
+      <Setter Property="Padding" Value="16" />
+      <Setter Property="Effect" Value="{StaticResource HardShadow}" /><Style.Triggers><DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource AncestorType=Window}}" Value="True"><Setter Property="Padding" Value="6"/></DataTrigger></Style.Triggers>
+    </Style>
+    <!-- ============ Settings primitives ============
+         Every setting was its own 4-line Grid with its own ColumnDefinitions, so the label
+         column and the control widths drifted row to row. One templated row fixes the
+         geometry in a single place and makes each setting one line of markup. -->
+    <Style x:Key="SettingRow" TargetType="HeaderedContentControl">
+      <Setter Property="Margin" Value="0,0,0,10" />
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="HeaderedContentControl">
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="128" />
+                <ColumnDefinition Width="*" MaxWidth="260" />
+              </Grid.ColumnDefinitions>
+              <TextBlock Text="{TemplateBinding Header}" FontSize="12" VerticalAlignment="Center"
+                         Foreground="{DynamicResource InkBrush}" TextWrapping="Wrap" Margin="0,0,12,0" />
+              <ContentPresenter Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Stretch" />
+            </Grid>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+    <!-- Group heading: the flat list of nine unrelated controls had nothing to navigate by. -->
+    <Style x:Key="SettingGroup" TargetType="TextBlock" BasedOn="{StaticResource MicroLabel}">
+      <Setter Property="Margin" Value="0,18,0,9" />
+    </Style>
+    <!-- BasedOn matters: a keyed style with no base replaces the implicit CheckBox style
+         outright, so these boxes kept the stock white-plate chrome while every other
+         checkbox picked up the accent template. -->
+    <Style x:Key="SettingCheck" TargetType="CheckBox" BasedOn="{StaticResource {x:Type CheckBox}}">
+      <Setter Property="Margin" Value="0,0,0,8" />
+      <Setter Property="FontSize" Value="12" />
+    </Style>
+    <!-- Reset is irreversible but not an emergency, so it recedes rather than shouts. The
+         safeguard is the two-step confirm in ResetTotals_Click, not alarm colour. -->
+    <Style x:Key="QuietButton" TargetType="Button" BasedOn="{StaticResource SecondaryButton}">
+      <Setter Property="Foreground" Value="{DynamicResource MutedBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource HairBrush}" />
+      <Setter Property="Background" Value="Transparent" />
+    </Style>
+
+    <!-- Sections below the load rows are separated by a rule, never a fill. -->
+    <Style x:Key="SectionRule" TargetType="Border">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="{DynamicResource HairBrush}" />
+      <Setter Property="BorderThickness" Value="0,1,0,0" />
+      <Setter Property="Padding" Value="2,16,2,4" />
+    </Style>
+    <Style x:Key="MetricCard" TargetType="Border" BasedOn="{StaticResource Card}">
+      <Setter Property="MinHeight" Value="220"/>
+      <Style.Triggers><DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource AncestorType=Window}}" Value="True"><Setter Property="MinHeight" Value="0"/></DataTrigger></Style.Triggers>
+    </Style>
+    <Style x:Key="CardTitle" TargetType="TextBlock">
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Foreground" Value="{DynamicResource InkBrush}" />
+    </Style>
+    <Style x:Key="Label" TargetType="TextBlock">
+      <Setter Property="FontSize" Value="12" />
+      <Setter Property="Foreground" Value="{DynamicResource MutedBrush}" />
+    </Style>
+    <Style x:Key="SummaryValue" TargetType="TextBlock">
+      <Setter Property="FontSize" Value="30" />
+      <Setter Property="FontFamily" Value="{StaticResource DisplayFont}" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Foreground" Value="{DynamicResource InkBrush}" />
+    </Style>
+    <Style x:Key="ColHeader" TargetType="DataGridColumnHeader">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0,0,0,1" />
+      <Setter Property="BorderBrush" Value="{DynamicResource HairBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource MutedBrush}" />
+      <Setter Property="FontFamily" Value="{StaticResource DisplayFont}" />
+      <Setter Property="FontSize" Value="10" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Padding" Value="6,5" />
+    </Style>
+    <Style x:Key="Cell" TargetType="DataGridCell">
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Foreground" Value="{DynamicResource InkBrush}" />
+      <Setter Property="Padding" Value="6,3" />
+      <Style.Triggers>
+        <Trigger Property="IsSelected" Value="True">
+          <Setter Property="Background" Value="#1A2563EB" />
+        </Trigger>
+      </Style.Triggers>
+    </Style>
+    <Style x:Key="NumText" TargetType="TextBlock">
+      <Setter Property="FontFamily" Value="{StaticResource DisplayFont}" />
+      <Setter Property="TextAlignment" Value="Right" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+    </Style>
+    <!-- ==================== VOLT skeleton ====================
+         One type scale, one row shape. The jump from MicroLabel (9) to HeroValue (92)
+         is the design; everything else is spacing around it. -->
+  </Window.Resources>
+  <Grid Background="{DynamicResource PopPaper}">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+    <!-- Header / navigation -->
+    <Grid Grid.Row="0" Margin="18,16,18,10">
+      <!-- Header carries navigation only. Identity lives in the title bar and, at full size,
+           in Settings — this strip is for things you press. -->
+      <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+        <Button x:Name="NavDashboard" Style="{StaticResource NavButton}" Click="ShowDashboard" Content="{Binding Source={x:Static i18n:Loc.Instance}, Path=[nav_dashboard]}" />
+        <Button x:Name="NavInfo" Style="{StaticResource NavButton}" Click="ShowInfo" Content="{Binding Source={x:Static i18n:Loc.Instance}, Path=[nav_info]}" Margin="6,0,0,0" />
+        <!-- Hidden on machines with no controllable fan rather than shown leading nowhere. -->
+        <Button x:Name="NavFans" Style="{StaticResource NavButton}" Click="ShowFans" Content="{Binding Source={x:Static i18n:Loc.Instance}, Path=[nav_fans]}" Margin="6,0,0,0" Visibility="Collapsed" />
+      </StackPanel>
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+        <Button Style="{StaticResource IconButton}" Click="OpenMini" Margin="0,0,4,0"
+                ToolTip="{Binding Source={x:Static i18n:Loc.Instance}, Path=[mini]}">
+          <Viewbox Width="20" Height="20"><Grid Width="24" Height="24"><Path Style="{StaticResource RowIcon}" Data="{StaticResource IcoMini}" /><Path Style="{StaticResource RowIconTop}" Data="{StaticResource IcoMiniTop}" /></Grid></Viewbox>
+        </Button>
+        <!-- Language moved into Settings; the gear is a vector so it matches the row icons
+             instead of rendering as a text glyph in whatever font happens to resolve. -->
+        <Button Style="{StaticResource IconButton}" Click="OpenSettings" Padding="5,3"
+                ToolTip="{Binding Source={x:Static i18n:Loc.Instance}, Path=[settings]}">
+          <Viewbox Width="20" Height="20"><Grid Width="24" Height="24"><Path Style="{StaticResource RowIcon}" Data="{StaticResource IcoGear}" /><Path Style="{StaticResource RowIconTop}" Data="{StaticResource IcoGearTop}" /></Grid></Viewbox>
+        </Button>
+      </StackPanel>
+    </Grid>
+    <!-- Views -->
+    <Grid Grid.Row="1">
+      <!-- Dashboard -->
+      <ScrollViewer x:Name="DashboardView" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Margin="12">
+          <Border Background="#FEF3C7" BorderBrush="{DynamicResource InkBrush}" BorderThickness="1.5" CornerRadius="8" Padding="10,7" Margin="0,0,0,9" Visibility="{Binding HasWarning, Converter={StaticResource BoolToVisibility}}">
+            <TextBlock Text="{Binding Source={x:Static i18n:Loc.Instance}, Path=[admin_required]}" Foreground="#101513" FontSize="11" TextWrapping="Wrap" />
+          </Border>
+          <ContentControl ContentTemplate="{StaticResource StatBody}" Content="{Binding}" Margin="0,0,0,16" />
+          <Border x:Name="TrendsCard" Margin="0,0,0,16">
+            <StackPanel>
+              <Grid>
+                <TextBlock Text="{Binding Source={x:Static i18n:Loc.Instance}, Path=[trends]}" Style="{StaticResource CardTitle}" VerticalAlignment="Center" />
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                  <ComboBox x:Name="TrendMetricCombo" Width="172" ItemTemplate="{StaticResource NameItemT}" SelectedValuePath="Id" SelectionChanged="SelectTrendMetric" Margin="0,0,10,0" />
+                  <Button x:Name="Range60" Content="60 s" Tag="60" Style="{StaticResource SecondaryButton}" Click="SelectTrendRange" Margin="0,0,6,0" />
+                  <Button x:Name="Range900" Content="15 min" Tag="900" Style="{StaticResource SecondaryButton}" Click="SelectTrendRange" />
+                </StackPanel>
+              </Grid>
+              <TextBlock Text="{Binding Source={x:Static i18n:Loc.Instance}, Path=[trend_hint]}" Style="{StaticResource Label}" Margin="0,8,0,0" TextWrapping="Wrap" />
+              <TextBlock Text="{Binding TrendSource}" Style="{StaticResource Label}" Margin="0,4,0,0" TextTrimming="CharacterEllipsis" />
+              <views:TrendChart Height="152" Margin="0,12,0,0" Points="{Binding TrendPoints}" Seconds="{Binding TrendSeconds}" Ceiling="{Binding TrendCeiling}" Unit="{Binding TrendUnit}" />
+              <TextBlock Text="{Binding TrendSummary}" FontFamily="{StaticResource MonoFont}" FontSize="12" TextWrapping="Wrap" Margin="0,6,0,0" />
+              <TextBlock Text="{Binding ReadingStatus}" Foreground="{DynamicResource AccentBrush}" FontSize="11" Margin="0,6,0,0" />
+            </StackPanel>
+            <Border.Style>
+              <!-- A hairline rule instead of a filled card. The fill was near-invisible on the
+                   dark skin and a bright white slab on the light one — the same element reading
+                   as two different things. A rule reads identically in both, and matches the
+                   load rows above it. -->
+              <Style TargetType="Border" BasedOn="{StaticResource SectionRule}">
+                <Style.Triggers>
+                  <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                  </DataTrigger>
+                </Style.Triggers>
+              </Style>
+            </Border.Style>
+          </Border>
+          <!-- Fans & Pump -->
+          <Border Margin="0,0,0,9">
+            <StackPanel>
+              <TextBlock Text="{Binding Source={x:Static i18n:Loc.Instance}, Path=[hdr_fans]}" Style="{StaticResource CardTitle}" Margin="0,0,0,6" />
+              <TextBlock Text="{Binding FansText}" FontFamily="{StaticResource MonoFont}" FontSize="12" Foreground="{DynamicResource InkBrush}" TextWrapping="Wrap" />
+            </StackPanel>
+            <Border.Style>
+              <!-- A hairline rule instead of a filled card. The fill was near-invisible on the
+                   dark skin and a bright white slab on the light one — the same element reading
+                   as two different things. A rule reads identically in both, and matches the
+                   load rows above it. -->
+              <Style TargetType="Border" BasedOn="{StaticResource SectionRule}">
+                <Style.Triggers>
+                  <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                  </DataTrigger>
+                </Style.Triggers>
+              </Style>
+            </Border.Style>
+          </Border>
+          <!-- Top Processes -->
+          <Border>
+            <StackPanel>
+              <TextBlock Text="{Binding Source={x:Static i18n:Loc.Instance}, Path=[hdr_top]}" Style="{StaticResource CardTitle}" Margin="0,0,0,7" />
+              <DataGrid ItemsSource="{Binding Processes}" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" HeadersVisibility="Column" GridLinesVisibility="Horizontal" Background="Transparent" BorderThickness="0" RowBackground="Transparent" AlternatingRowBackground="Transparent" HorizontalGridLinesBrush="{DynamicResource HairBrush}" ColumnHeaderStyle="{StaticResource ColHeader}" CellStyle="{StaticResource Cell}" FontSize="11.5" RowHeight="22" VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto">
+                <DataGrid.Columns>
+                  <!-- The five reading columns are fixed, so the star name column absorbs every
+                       pixel the window loses. A floor plus a scrollbar that only appears when
+                       it is needed keeps the name readable at the new minimum width and
+                       changes nothing at full width. -->
+                  <DataGridTextColumn Header="{Binding Source={x:Static i18n:Loc.Instance}, Path=[col_process]}" Binding="{Binding Name}" Width="*" MinWidth="120" />
+                  <DataGridTextColumn Header="CPU" Binding="{Binding Cpu}" Width="62" ElementStyle="{StaticResource NumText}" />
+                  <DataGridTextColumn Header="GPU" Binding="{Binding Gpu}" Width="62" ElementStyle="{StaticResource NumText}" />
+                  <DataGridTextColumn Header="{Binding Source={x:Static i18n:Loc.Instance}, Path=[col_ram]}" Binding="{Binding Ram}" Width="92" ElementStyle="{StaticResource NumText}" />
+                  <DataGridTextColumn Header="{Binding Source={x:Static i18n:Loc.Instance}, Path=[col_power]}" Binding="{Binding Power}" Width="80" ElementStyle="{StaticResource NumText}" />
+                  <DataGridTextColumn Header="{Binding Source={x:Static i18n:Loc.Instance}, Path=[col_disk]}" Binding="{Binding Disk}" Width="104" ElementStyle="{StaticResource NumText}" />
+                </DataGrid.Columns>
+              </DataGrid>
+            </StackPanel>
+            <Border.Style>
+              <!-- A hairline rule instead of a filled card. The fill was near-invisible on the
+                   dark skin and a bright white slab on the light one — the same element reading
+                   as two different things. A rule reads identically in both, and matches the
+                   load rows above it. -->
+              <Style TargetType="Border" BasedOn="{StaticResource SectionRule}">
+                <Style.Triggers>
+                  <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                  </DataTrigger>
+                </Style.Triggers>
+              </Style>
+            </Border.Style>
+          </Border>
+        </StackPanel>
+      </ScrollViewer>
+      <!-- Fixed-height hardware cards; full specifications live in the detail panel. -->
+      <ScrollViewer x:Name="InfoView" Visibility="Collapsed" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Margin="18,8,18,20">
+          <Grid Margin="0,0,0,18">
+            <StackPanel>
+              <TextBlock Text="{Binding Source={x:Static i18n:Loc.Instance}, Path=[nav_info]}" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource InkBrush}" />
+              <Rectangle Height="6" Width="64" Fill="{DynamicResource AmberBrush}" HorizontalAlignment="Left" Margin="0,3,0,8" />
+              <TextBlock Text="{Binding Source={x:Static i18n:Loc.Instance}, Path=[info_hint]}" Style="{StaticResource Label}" Margin="0,0,110,0" TextWrapping="Wrap" />
+            </StackPanel>
+            <Button Style="{StaticResource SecondaryButton}" Content="{Binding Source={x:Static i18n:Loc.Instance}, Path=[refresh]}" HorizontalAlignment="Right" VerticalAlignment="Top" Click="RefreshInfo_Click" />
+          </Grid>
+          <ItemsControl ItemsSource="{Binding InfoCards}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <ctrl:RowUniformPanel Gap="16" Columns="{Binding ActualWidth, RelativeSource={RelativeSource Self}, Converter={StaticResource InfoCardColumnsConverter}}" />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Border Style="{StaticResource Card}" Height="280">
+                  <Grid>
+                    <Grid.RowDefinitions>
+                      <RowDefinition Height="38" />
+                      <RowDefinition Height="*" />
+                      <RowDefinition Height="36" />
+                    </Grid.RowDefinitions>
+                    <Border Background="{DynamicResource AmberBrush}" BorderBrush="{DynamicResource InkBrush}" BorderThickness="1.5" CornerRadius="5" Padding="9,3" HorizontalAlignment="Left" VerticalAlignment="Top">
+                      <TextBlock Text="{Binding Title}" Style="{StaticResource CardTitle}" Foreground="{DynamicResource OnAccentBrush}" />
+                    </Border>
+                    <ItemsControl Grid.Row="1" ItemsSource="{Binding SummaryItems}">
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                          <Grid Height="56">
+                            <Grid.RowDefinitions>
+                              <RowDefinition Height="18" />
+                              <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="{Binding Label}" Style="{StaticResource MicroLabel}" />
+                            <TextBlock Grid.Row="1" Text="{Binding Value}" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource InkBrush}" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" ToolTip="{Binding Value}" VerticalAlignment="Top" />
+                            <!-- Proportional items (drive capacity, GPU memory) also get a bar. -->
+                            <views:MetricBar Grid.Row="1" Height="8" BarHeight="8" ShowText="False"
+                                             VerticalAlignment="Bottom" Margin="0,0,0,4"
+                                             Fraction="{Binding Fraction, FallbackValue=0, TargetNullValue=0}"
+                                             Visibility="{Binding HasBar, Converter={StaticResource BoolToVisibility}}" />
+                          </Grid>
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <Button Grid.Row="2" Style="{StaticResource SecondaryButton}" HorizontalContentAlignment="Left" Content="{Binding Source={x:Static i18n:Loc.Instance}, Path=[details]}" Click="OpenInfoDetails" />
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </ScrollViewer>
+      <!-- ============ Fans ============
+           A page of its own next to Info, not a tab inside Settings. It is the only screen that
+           writes to hardware and the only one with live readings you sit and watch, neither of
+           which belongs behind a modal dialog you opened to change a preference. -->
+      <ScrollViewer x:Name="FansView" Visibility="Collapsed" Foreground="{DynamicResource InkBrush}"
+                    VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Margin="18,4,18,18">
+            <!-- Shown when the machine exposes no controllable fan, which is common on
+                 OEM and laptop boards. Saying why beats an empty page. -->
+            <TextBlock x:Name="NoFansNote" TextWrapping="Wrap" Style="{StaticResource Label}"
+                       Text="{Binding Source={x:Static i18n:Loc.Instance}, Path=[fans_none]}"
+                       Visibility="Collapsed" Margin="0,0,0,6" />
+            <TextBlock x:Name="FansIntro" TextWrapping="Wrap" Style="{StaticResource Label}"
+                       Text="{Binding Source={x:Static i18n:Loc.Instance}, Path=[fans_intro]}"
+                       Visibility="Collapsed" Margin="0,0,0,12" />
+            <ItemsControl x:Name="FanList">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <!-- One compact line per fan, so a board with six of them is still one
+                       screen: name, what it is doing now, its range, and the two buttons. The
+                       detail only unfolds for the fan actually being changed. -->
+                  <Border Style="{StaticResource SectionRule}" Padding="0,9,0,7">
+                    <StackPanel>
+                      <Grid>
+                        <Grid.ColumnDefinitions>
+                          <ColumnDefinition Width="Auto" />
+                          <ColumnDefinition Width="*" MinWidth="86" />
+                          <ColumnDefinition Width="Auto" />
+                          <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <!-- Which hardware this fan cools, at the left edge where the eye enters
+                             the row: a board with six fans is otherwise six lines of near-identical
+                             text. Sitting after the name it was decoration; sitting before it, it
+                             is what you scan down the column to find the fan you came for. -->
+                        <Viewbox Grid.Column="0" Width="22" Height="22" VerticalAlignment="Center" Margin="0,0,11,0">
+                          <Grid Width="24" Height="24">
+                            <Path x:Name="FanIcon" Style="{StaticResource RowIcon}" Data="{DynamicResource IcoFan}" />
+                            <Path x:Name="FanIconTop" Style="{StaticResource RowIconTop}" Data="{DynamicResource IcoFanTop}" />
+                          </Grid>
+                        </Viewbox>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,12,0">
+                          <TextBlock Text="{Binding Title}" FontSize="12" FontWeight="SemiBold"
+                                     TextTrimming="CharacterEllipsis" />
+                          <TextBlock Text="{Binding SubText}" Style="{StaticResource RowSub}" Margin="0,2,0,0" />
+                        </StackPanel>
+                        <!-- The speed is the reason this page exists, so it is the one bold number
+                             in the row, with RPM and temperature ranked under it. -->
+                        <StackPanel x:Name="SpeedBlock" Grid.Column="2" VerticalAlignment="Center" Margin="0,0,14,0">
+                          <TextBlock x:Name="SpeedValue" Text="{Binding SpeedText}" FontSize="20" FontWeight="Bold"
+                                     HorizontalAlignment="Right" Foreground="{DynamicResource InkBrush}" />
+                          <TextBlock Text="{Binding LiveText}" FontSize="12" FontWeight="SemiBold" Margin="0,1,0,0"
+                                     HorizontalAlignment="Right" Foreground="{DynamicResource InkBrush}" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
+                          <RadioButton Style="{StaticResource PeriodChip}"
+                                       Content="{Binding Source={x:Static i18n:Loc.Instance}, Path=[fan_auto]}"
+                                       IsChecked="{Binding IsAuto, Mode=TwoWay}" />
+                          <!-- One-way, with a Click handler: a radio that is already lit raises
+                               Click but changes nothing, which is exactly what re-opening the
+                               panel on an already-configured fan needs. -->
+                          <RadioButton x:Name="FanCustomChip" Style="{StaticResource PeriodChip}"
+                                       Content="{Binding Source={x:Static i18n:Loc.Instance}, Path=[fan_custom]}"
+                                       IsChecked="{Binding IsCustom, Mode=OneWay}" Click="EditFanCustom" />
+                        </StackPanel>
+                      </Grid>
+                      <!-- Set right here, not in a dialog. A sheet was tried and it covered the
+                           very rows you compare against — on a board with seven fans that is most
+                           of the page. Indented to start under the name, so an open panel reads as
+                           belonging to its row rather than to the list. -->
+                      <Grid x:Name="CustomPanel" Margin="33,9,0,2"
+                            Visibility="{Binding IsEditing, Converter={StaticResource BoolToVisibility}}">
+                        <Grid.ColumnDefinitions>
+                          <ColumnDefinition Width="*" />
+                          <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                          <RadioButton Style="{StaticResource SettingRadio}" IsChecked="{Binding IsSensor, Mode=TwoWay}"
+                                       Content="{Binding Source={x:Static i18n:Loc.Instance}, Path=[fan_by_sensor]}" />
+                          <!-- One line where it fits, not stacked label/field rows: the two
+                               temperatures are read together as a span, and seven fans cannot each
+                               afford four lines. A WrapPanel because they do not fit on one line at
+                               460 DIP in English — a horizontal stack simply ran the second field
+                               off the edge of the window.
+                               Hidden rather than collapsed, and the fixed-speed field sits on the
+                               same line as its own radio: between them the panel is exactly as tall
+                               in either mode, so choosing one does not shift the other out from
+                               under the pointer. -->
+                          <WrapPanel Margin="24,3,0,4"
+                                     Visibility="{Binding IsSensor, Converter={StaticResource BoolToHidden}}">
+                            <StackPanel Orientation="Horizontal" Margin="0,0,18,3">
+                              <TextBlock Text="{Binding Source={x:Static i18n:Loc.Instance}, Path=[fan_start]}"
+                                         Style="{StaticResource RowSub}" VerticalAlignment="Center" Margin="0,0,7,0" />
+                              <TextBox Text="{Binding StartTemperature, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Width="52" />
+                              <TextBlock Text="°C" VerticalAlignment="Center" Margin="6,0,0,0"
+                                         Foreground="{DynamicResource MutedBrush}" FontSize="11" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,3">
+                              <TextBlock Text="{Binding Source={x:Static i18n:Loc.Instance}, Path=[fan_max]}"
+                                         Style="{StaticResource RowSub}" VerticalAlignment="Center" Margin="0,0,7,0" />
+                              <TextBox Text="{Binding MaxTemperature, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Width="52" />
+                              <TextBlock Text="°C" VerticalAlignment="Center" Margin="6,0,0,0"
+                                         Foreground="{DynamicResource MutedBrush}" FontSize="11" />
+                            </StackPanel>
+                          </WrapPanel>
+                          <StackPanel Orientation="Horizontal">
+                            <RadioButton Style="{StaticResource SettingRadio}" VerticalAlignment="Center"
+                                         IsChecked="{Binding IsConstant, Mode=TwoWay}" Margin="0,0,12,0"
+                                         Content="{Binding Source={x:Static i18n:Loc.Instance}, Path=[fan_constant]}" />
+                            <TextBox Text="{Binding ConstantPercent, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Width="52"
+                                     Visibility="{Binding IsConstant, Converter={StaticResource BoolToHidden}}" />
+                            <TextBlock Text="%" VerticalAlignment="Center" Margin="6,0,0,0"
+                                       Foreground="{DynamicResource MutedBrush}" FontSize="11"
+                                       Visibility="{Binding IsConstant, Converter={StaticResource BoolToHidden}}" />
+                          </StackPanel>
+                        </StackPanel>
+                        <!-- Nothing reaches the fan until this is pressed. It sits in its own
+                             column, centred, so adding it cost the panel no height at all. -->
+                        <Button x:Name="FanApplyButton" Grid.Column="1" Style="{StaticResource PrimaryButton}"
+                                VerticalAlignment="Center" Margin="16,0,16,0" Click="ApplyFanCustom"
+                                Content="{Binding Source={x:Static i18n:Loc.Instance}, Path=[fan_apply]}" />
+                      </Grid>
+                    </StackPanel>
+                  </Border>
+                  <DataTemplate.Triggers>
+                    <DataTrigger Binding="{Binding Target.Icon}" Value="gpu">
+                      <Setter TargetName="FanIcon" Property="Data" Value="{DynamicResource IcoGpu}" />
+                      <Setter TargetName="FanIconTop" Property="Data" Value="{DynamicResource IcoGpuTop}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Target.Icon}" Value="cpufan">
+                      <Setter TargetName="FanIcon" Property="Data" Value="{DynamicResource IcoCpuFan}" />
+                      <Setter TargetName="FanIconTop" Property="Data" Value="{DynamicResource IcoCpuFanTop}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Target.Icon}" Value="chassis">
+                      <Setter TargetName="FanIcon" Property="Data" Value="{DynamicResource IcoChassis}" />
+                      <Setter TargetName="FanIconTop" Property="Data" Value="{DynamicResource IcoChassisTop}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Target.Icon}" Value="flow">
+                      <Setter TargetName="FanIcon" Property="Data" Value="{DynamicResource IcoFlow}" />
+                      <Setter TargetName="FanIconTop" Property="Data" Value="{DynamicResource IcoFlowTop}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Target.Icon}" Value="pump">
+                      <Setter TargetName="FanIcon" Property="Data" Value="{DynamicResource IcoPump}" />
+                      <Setter TargetName="FanIconTop" Property="Data" Value="{DynamicResource IcoPumpTop}" />
+                    </DataTrigger>
+                  </DataTemplate.Triggers>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+      </ScrollViewer>
+    </Grid>
+    <Grid x:Name="DetailsOverlay" KeyboardNavigation.TabNavigation="Cycle" Grid.RowSpan="2" Background="#66000000" Visibility="Collapsed">
+      <Border x:Name="DetailsPanel" Style="{StaticResource Card}" Width="460" MaxWidth="{Binding ActualWidth, ElementName=DetailsOverlay}" HorizontalAlignment="Right" Margin="16">
+        <Grid>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+          </Grid.RowDefinitions>
+          <StackPanel Margin="0,0,0,20">
+            <TextBlock Text="{Binding Title}" FontSize="25" FontWeight="Bold" />
+            <TextBlock Text="{Binding Subtitle}" Style="{StaticResource Label}" />
+          </StackPanel>
+          <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{Binding Items}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <StackPanel Margin="0,0,0,18">
+                    <TextBlock Text="{Binding Label}" Style="{StaticResource Label}" />
+                    <TextBlock Text="{Binding Value}" TextWrapping="Wrap" FontSize="16" FontWeight="SemiBold" />
+                  </StackPanel>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </ScrollViewer>
+          <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+            <Button x:Name="CopySpecsButton" Style="{StaticResource SecondaryButton}" Content="{Binding Source={x:Static i18n:Loc.Instance}, Path=[copy_specs]}" Click="CopySpecs" Margin="0,0,10,0" />
+            <Button x:Name="CloseDetailsButton" Style="{StaticResource PrimaryButton}" Content="{Binding Source={x:Static i18n:Loc.Instance}, Path=[close]}" Click="CloseDetails" />
+          </StackPanel>
+        </Grid>
+      </Border>
+    </Grid>
+    <!-- Settings overlay -->
+    <!-- Asked when the window is closed: hiding and quitting look identical from the title bar,
+         and getting it wrong either loses the running totals or leaves a process nobody can find.
+         The checkbox is what keeps it from becoming a toll on every close. -->
+    <Grid x:Name="CloseOverlay" KeyboardNavigation.TabNavigation="Cycle" Grid.RowSpan="2" Background="#66000000" Visibility="Collapsed">
+      <Border Background="{DynamicResource PopPaper}" BorderBrush="{DynamicResource HairBrush}" BorderThickness="1"
+              CornerRadius="12" MaxWidth="400" Padding="24,20,24,18" Margin="24"
+              HorizontalAlignment="Center" VerticalAlignment="Center">
+        <Border.Effect>
+          <DropShadowEffect BlurRadius="24" ShadowDepth="5" Direction="270" Color="#000000" Opacity="0.40" />
+        </Border.Effect>
+        <StackPanel>
+          <TextBlock Text="{Binding Source={x:Static i18n:Loc.Instance}, Path=[close_title]}"
+                     FontSize="17" FontWeight="Bold" TextWrapping="Wrap" />
+          <TextBlock Text="{Binding Source={x:Static i18n:Loc.Instance}, Path=[close_body]}"
+                     Style="{StaticResource Label}" TextWrapping="Wrap" Margin="0,8,0,16" />
+          <CheckBox x:Name="CloseDontAskBox" Style="{StaticResource SettingCheck}"
+                    Content="{Binding Source={x:Static i18n:Loc.Instance}, Path=[close_dont_ask]}" />
+          <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,18,0,0">
+            <Button x:Name="CloseExitButton" Style="{StaticResource SecondaryButton}" Margin="0,0,10,0"
+                    Click="CloseAndExit"
+                    Content="{Binding Source={x:Static i18n:Loc.Instance}, Path=[close_exit]}" />
+            <!-- Hiding is the safe answer, so it is the one Enter takes: it keeps the totals
+                 running and is undone by double-clicking the tray icon. -->
+            <Button x:Name="CloseHideButton" Style="{StaticResource PrimaryButton}" IsDefault="True"
+                    Click="CloseKeepRunning"
+                    Content="{Binding Source={x:Static i18n:Loc.Instance}, Path=[close_hide]}" />
+          </StackPanel>
+        </StackPanel>
+      </Border>
+    </Grid>
+    <Grid x:Name="SettingsOverlay" KeyboardNavigation.TabNavigation="Cycle" Grid.RowSpan="2" Background="#66000000" Visibility="Collapsed">
+      <!-- Sized to its content rather than stretched: the dialog used to fill the window height
+           and leave a large void between the last setting and the buttons. -->
+      <!-- Ground, not CardBrush. CardBrush is pure white on the light skin while the app ground
+           is #EDEAE1, so the dialog read as a brighter, cooler slab than the mode around it.
+           Using the same ground as the dashboard, the mini panel and the splash makes every
+           surface in a skin agree, and it gives the inputs somewhere to sit: fields and
+           secondary buttons stay on CardBrush and now read as raised on the dialog rather
+           than dissolving into it.
+           No outline either, for the same reason the mini panel and splash lost theirs — a
+           2 DIP Ink frame is a black box on one skin and a white one on the other. The scrim
+           behind plus a shadow already separate the dialog from the page. -->
+      <Border Background="{DynamicResource PopPaper}" BorderBrush="{DynamicResource HairBrush}" BorderThickness="1" CornerRadius="12"
+              MaxWidth="520" MaxHeight="620" Padding="22,18,22,16" Margin="24"
+              HorizontalAlignment="Center" VerticalAlignment="Center">
+        <Border.Effect>
+          <DropShadowEffect BlurRadius="24" ShadowDepth="5" Direction="270" Color="#000000" Opacity="0.40" />
+        </Border.Effect>
+        <Grid>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <!-- Star, not Auto: with MaxHeight set, an Auto middle row pushes the footer past
+                 the clip and the buttons vanish. Star lets the tab area absorb the shortfall
+                 and scroll, so the title and footer are always on screen. -->
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+          </Grid.RowDefinitions>
+          <!-- A dialog's title says what the dialog is. The brand lockup that used to sit here
+               competed with it; identity belongs in the footer, the way an About line reads. -->
+          <TextBlock Text="{Binding Source={x:Static i18n:Loc.Instance}, Path=[settings]}"
+                     FontSize="20" FontWeight="Bold" Margin="0,0,0,12" />
+          <TabControl Grid.Row="1" Background="Transparent" BorderThickness="0">
+            <TabItem Header="{Binding Source={x:Static i18n:Loc.Instance}, Path=[general]}" Padding="12,7">
+              <ScrollViewer Foreground="{DynamicResource InkBrush}" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="0,10,0,0">
+                <StackPanel>
+
+                  <TextBlock Text="{Binding Source={x:Static i18n:Loc.Instance}, Path=[group_appearance]}" Style="{StaticResource SettingGroup}" Margin="0,0,0,9" />
+                  <HeaderedContentControl Style="{StaticResource SettingRow}" Header="{Binding Source={x:Static i18n:Loc.Instance}, Path=[theme]}">
+                    <ComboBox x:Name="ThemeCombo" ItemTemplate="{StaticResource NameItemT}" SelectedValuePath="Id" SelectionChanged="ThemeChanged" />
+                  </HeaderedContentControl>
+                  <HeaderedContentControl Style="{StaticResource SettingRow}" Header="{Binding Source={x:Static i18n:Loc.Instance}, Path=[language]}">
+                    <ComboBox x:Name="LanguageCombo" SelectionChanged="LanguageCombo_SelectionChanged" />
+                  </HeaderedContentControl>
+                  <HeaderedContentControl Style="{StaticResource SettingRow}" Header="{Binding Source={x:Static i18n:Loc.Instance}, Path=[font]}">
+                    <ComboBox x:Name="FontCombo" SelectionChanged="FontCombo_SelectionChanged" />
+                  </HeaderedContentControl>
+                  <CheckBox x:Name="ReduceMotionBox" Style="{StaticResource SettingCheck}" Content="{Binding Source={x:Static i18n:Loc.Instance}, Path=[reduce_motion]}" Checked="MotionChanged" Unchecked="MotionChanged" />
+
+                  <TextBlock Text="{Binding Source={x:Static i18n:Loc.Instance}, Path=[group_energy]}" Style="{StaticResource SettingGroup}" />
+                  <HeaderedContentControl Style="{StaticResource SettingRow}" Header="{Binding Source={x:Static i18n:Loc.Instance}, Path=[country]}">
+                    <ComboBox x:Name="CountryCombo" SelectionChanged="CountryCombo_SelectionChanged" />
+                  </HeaderedContentControl>
+                  <HeaderedContentControl Style="{StaticResource SettingRow}" Header="{Binding Source={x:Static i18n:Loc.Instance}, Path=[electric_price]}">
+                    <Grid>
+                      <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                      </Grid.ColumnDefinitions>
+                      <TextBox x:Name="PriceBox" TextChanged="PriceBox_TextChanged" />
+                      <ComboBox x:Name="CurrencyCombo" Grid.Column="1" Width="88" Margin="6,0,0,0" SelectionChanged="CurrencyCombo_SelectionChanged" />
+                      <TextBlock Grid.Column="2" Text="{Binding Source={x:Static i18n:Loc.Instance}, Path=[per_kwh]}" VerticalAlignment="Center" Margin="7,0,0,0" Foreground="{DynamicResource MutedBrush}" FontSize="11" />
+                    </Grid>
+                  </HeaderedContentControl>
+                  <HeaderedContentControl Style="{StaticResource SettingRow}" Header="{Binding Source={x:Static i18n:Loc.Instance}, Path=[carbon_intensity]}">
+                    <Grid>
+                      <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                      </Grid.ColumnDefinitions>
+                      <TextBox x:Name="CarbonBox" TextChanged="CarbonBox_TextChanged" />
+                      <TextBlock Grid.Column="1" Text="{Binding Source={x:Static i18n:Loc.Instance}, Path=[g_per_kwh]}" VerticalAlignment="Center" Margin="7,0,0,0" Foreground="{DynamicResource MutedBrush}" FontSize="11" />
+                    </Grid>
+                  </HeaderedContentControl>
+
+                  <TextBlock Text="{Binding Source={x:Static i18n:Loc.Instance}, Path=[group_window]}" Style="{StaticResource SettingGroup}" />
+                  <!-- The app's own draw is almost entirely this interval: one round of sensors
+                       measures at ~82 ms and the GPU query is most of it, so the rate is the
+                       setting that matters for a tool left running all day. -->
+                  <HeaderedContentControl Style="{StaticResource SettingRow}" Header="{Binding Source={x:Static i18n:Loc.Instance}, Path=[refresh_interval]}">
+                    <ComboBox x:Name="RefreshCombo" ItemTemplate="{StaticResource NameItemT}" SelectedValuePath="Id" SelectionChanged="RefreshIntervalChanged" />
+                  </HeaderedContentControl>
+                  <TextBlock Text="{Binding Source={x:Static i18n:Loc.Instance}, Path=[refresh_hint]}" Style="{StaticResource Label}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,10" />
+                  <HeaderedContentControl Style="{StaticResource SettingRow}" Header="{Binding Source={x:Static i18n:Loc.Instance}, Path=[process_count]}">
+                    <TextBox x:Name="ProcessCountBox" TextChanged="ProcessCountBox_TextChanged" Width="88" HorizontalAlignment="Left" />
+                  </HeaderedContentControl>
+                  <CheckBox x:Name="StartMiniBox" Style="{StaticResource SettingCheck}" Content="{Binding Source={x:Static i18n:Loc.Instance}, Path=[start_mini]}" Click="ChangeFeatureCheck" />
+                  <CheckBox x:Name="MiniTopmostBox" Style="{StaticResource SettingCheck}" Content="{Binding Source={x:Static i18n:Loc.Instance}, Path=[mini_topmost]}" Click="ChangeFeatureCheck" />
+                  <CheckBox x:Name="AskOnCloseBox" Style="{StaticResource SettingCheck}" Margin="0,0,0,4" Content="{Binding Source={x:Static i18n:Loc.Instance}, Path=[ask_on_close]}" Click="ChangeFeatureCheck" />
+                  <CheckBox x:Name="RunInTrayBox" Style="{StaticResource SettingCheck}" Margin="0,0,0,4" Content="{Binding Source={x:Static i18n:Loc.Instance}, Path=[run_in_tray]}" Click="ChangeFeatureCheck" />
+                  <TextBlock Text="{Binding Source={x:Static i18n:Loc.Instance}, Path=[tray_hint]}" Style="{StaticResource Label}" FontSize="11" TextWrapping="Wrap" Margin="24,0,0,8" />
+
+                </StackPanel>
+              </ScrollViewer>
+            </TabItem>
+            <TabItem x:Name="MonitoringTab" Header="{Binding Source={x:Static i18n:Loc.Instance}, Path=[monitoring]}" Padding="12,7">
+              <ScrollViewer Foreground="{DynamicResource InkBrush}" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="0,12,0,0">
+                <StackPanel>
+                  <TextBlock Text="{Binding Source={x:Static i18n:Loc.Instance}, Path=[primary_gpu]}" FontSize="17" FontWeight="Bold" Margin="0,0,0,8" />
+                  <ComboBox x:Name="GpuCombo" ItemTemplate="{StaticResource NameItemT}" SelectedValuePath="Id" SelectionChanged="SelectGpu" Margin="0,0,0,10" />
+                  <CheckBox x:Name="HideIntegratedBox" Content="{Binding Source={x:Static i18n:Loc.Instance}, Path=[hide_integrated]}" Click="ChangeFeatureCheck" Margin="0,0,0,24" />
+                  <TextBlock Text="{Binding Source={x:Static i18n:Loc.Instance}, Path=[monitoring]}" FontSize="17" FontWeight="Bold" Margin="0,0,0,8" />
+                  <CheckBox x:Name="EnableAlertsBox" Content="{Binding Source={x:Static i18n:Loc.Instance}, Path=[alerts_enabled]}" Click="ChangeFeatureCheck" Margin="0,0,0,12" />
+                  <UniformGrid Columns="2">
+                    <StackPanel Margin="0,0,12,12">
+                      <TextBlock Text="{Binding Source={x:Static i18n:Loc.Instance}, Path=[cpu_limit]}" Style="{StaticResource Label}" />
+                      <TextBox x:Name="CpuLimitBox" Padding="6,4" />
+                    </StackPanel>
+                    <StackPanel Margin="0,0,12,12">
+                      <TextBlock Text="{Binding Source={x:Static i18n:Loc.Instance}, Path=[gpu_limit]}" Style="{StaticResource Label}" />
+                      <TextBox x:Name="GpuLimitBox" Padding="6,4" />
+                    </StackPanel>
+                    <StackPanel Margin="0,0,12,12">
+                      <TextBlock Text="{Binding Source={x:Static i18n:Loc.Instance}, Path=[ram_limit]}" Style="{StaticResource Label}" />
+                      <TextBox x:Name="RamLimitBox" Padding="6,4" />
+                    </StackPanel>
+                    <StackPanel Margin="0,0,12,12">
+                      <TextBlock Text="{Binding Source={x:Static i18n:Loc.Instance}, Path=[vram_limit]}" Style="{StaticResource Label}" />
+                      <TextBox x:Name="VramLimitBox" Padding="6,4" />
+                    </StackPanel>
+                    <StackPanel Margin="0,0,12,12">
+                      <TextBlock Text="{Binding Source={x:Static i18n:Loc.Instance}, Path=[disk_limit]}" Style="{StaticResource Label}" />
+                      <TextBox x:Name="DiskLimitBox" Padding="6,4" />
+                    </StackPanel>
+                    <StackPanel Margin="0,0,12,12">
+                      <TextBlock Text="{Binding Source={x:Static i18n:Loc.Instance}, Path=[hold_seconds]}" Style="{StaticResource Label}" />
+                      <TextBox x:Name="HoldBox" Padding="6,4" />
+                    </StackPanel>
+                    <StackPanel Margin="0,0,12,12">
+                      <TextBlock Text="{Binding Source={x:Static i18n:Loc.Instance}, Path=[cooldown_seconds]}" Style="{StaticResource Label}" />
+                      <TextBox x:Name="CooldownBox" Padding="6,4" />
+                    </StackPanel>
+                  </UniformGrid>
+                  <TextBlock Text="{Binding Source={x:Static i18n:Loc.Instance}, Path=[alert_hint]}" Style="{StaticResource Label}" TextWrapping="Wrap" Margin="0,0,0,10" />
+                  <Button Style="{StaticResource SecondaryButton}" Content="{Binding Source={x:Static i18n:Loc.Instance}, Path=[apply_monitoring]}" Click="ApplyAlertSettings" HorizontalAlignment="Left" />
+                  <TextBlock x:Name="MonitoringFeedback" TextWrapping="Wrap" Margin="0,8,0,16" Foreground="{DynamicResource AccentBrush}" />
+                  <!-- The alert log lives with the thresholds, not on the dashboard where it sat
+                       collapsed and empty most of the time. Windows can suppress tray notices
+                       (Do Not Disturb), so this stays the in-app record of what fired. -->
+                  <Border BorderBrush="{DynamicResource HairBrush}" BorderThickness="0,1,0,0" Padding="0,14,0,0">
+                    <StackPanel>
+                      <TextBlock Text="{Binding Source={x:Static i18n:Loc.Instance}, Path=[alerts]}" Style="{StaticResource MicroLabel}" Margin="0,0,0,6" />
+                      <TextBlock Text="{Binding AlertSummary}" TextWrapping="Wrap" Margin="0,0,0,8" Foreground="{DynamicResource MutedBrush}" />
+                      <ItemsControl ItemsSource="{Binding RecentAlerts}">
+                        <ItemsControl.ItemTemplate>
+                          <DataTemplate>
+                            <TextBlock Text="{Binding}" TextWrapping="Wrap" Margin="0,0,0,6" FontSize="11" />
+                          </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                      </ItemsControl>
+                    </StackPanel>
+                  </Border>
+                </StackPanel>
+              </ScrollViewer>
+            </TabItem>
+          </TabControl>
+          <!-- Footer: identity on the left the way an About line reads, actions on the right.
+               Reset is destructive and irreversible, so it is set apart from Close. -->
+          <Grid Grid.Row="2" Margin="0,18,0,0">
+            <Border BorderBrush="{DynamicResource HairBrush}" BorderThickness="0,1,0,0" Margin="0,0,0,12" VerticalAlignment="Top" />
+            <!-- A brand lockup, not a caption: at 18px the mark was decoration nobody could
+                 identify. 34px with the name and version stacked beside it reads as the app. -->
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="0,12,0,0">
+              <Image Source="pack://application:,,,/Assets/momo_pop.png" Width="34" Height="34"
+                     RenderOptions.BitmapScalingMode="HighQuality" VerticalAlignment="Center" />
+              <StackPanel VerticalAlignment="Center" Margin="9,0,0,0">
+                <TextBlock Text="{Binding Source={x:Static i18n:Loc.Instance}, Path=[app_brand]}"
+                           FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource InkBrush}" />
+                <TextBlock Text="v0.1.0" FontFamily="{StaticResource MonoFont}" FontSize="10"
+                           Foreground="{DynamicResource MutedBrush}" Margin="0,1,0,0" />
+              </StackPanel>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,12,0,0">
+              <Button x:Name="ResetTotalsButton" Style="{StaticResource QuietButton}" Content="{Binding Source={x:Static i18n:Loc.Instance}, Path=[reset_totals]}" Click="ResetTotals_Click" Margin="0,0,10,0" />
+              <Button Style="{StaticResource PrimaryButton}" Content="{Binding Source={x:Static i18n:Loc.Instance}, Path=[close]}" Click="CloseSettings" />
+            </StackPanel>
+          </Grid>
+        </Grid>
+      </Border>
+    </Grid>
+  </Grid>
+</Window>
+
+
+
+
+
+
+
+
+

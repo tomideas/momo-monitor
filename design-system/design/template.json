@@ -1,0 +1,378 @@
+{
+  "schemaVersion": 5,
+  "project": {
+    "projectName": "你的项目",
+    "projectContext": "产品界面基础规范",
+    "projectId": "replace-with-project-id"
+  },
+  "tokens": {
+    "--ds-primary": "#14b8a6",
+    "--ds-primary-hover": "#0d9488",
+    "--ds-primary-soft": "#e1f5f3",
+    "--ds-processing": "#d97706",
+    "--ds-processing-border": "#f59e0b",
+    "--ds-processing-soft": "#fff7ed",
+    "--ds-workspace": "#f3f3f3",
+    "--ds-background": "#faf9f6",
+    "--ds-surface": "#fcfcfc",
+    "--ds-heading": "#171615",
+    "--ds-text": "#5a5751",
+    "--ds-muted": "#8e8e8e",
+    "--ds-tertiary": "#b0aba5",
+    "--ds-border-soft": "#f2f1ef",
+    "--ds-border": "#ebebeb",
+    "--ds-border-strong": "#d7d4cf",
+    "--ds-success": "#087a5b",
+    "--ds-warning": "#d97706",
+    "--ds-danger": "#dc2626",
+    "--ds-font-ui": "Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"PingFang SC\", \"Microsoft YaHei\", sans-serif",
+    "--ds-font-mono": "\"JetBrains Mono\", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
+    "--ds-display-size": "28px",
+    "--ds-title-size": "20px",
+    "--ds-font-size": "13px",
+    "--ds-label-size": "12px",
+    "--ds-micro-size": "10px",
+    "--ds-display-weight": "800",
+    "--ds-title-weight": "800",
+    "--ds-font-weight": "600",
+    "--ds-line-height": "1.55",
+    "--ds-space-unit": "2px",
+    "--ds-control-height": "36px",
+    "--ds-radius-control": "7px",
+    "--ds-radius-card": "10px",
+    "--ds-radius-modal": "14px",
+    "--ds-radius-pill": "999px",
+    "--ds-content-width": "830px",
+    "--ds-column-width": "260px",
+    "--ds-shadow-dropdown": "0 8px 24px rgba(46,45,42,.10)",
+    "--ds-shadow-modal": "0 24px 64px rgba(46,45,42,.18)"
+  },
+  "definitions": {
+    "--ds-primary": {
+      "label": "强调色（Accent）",
+      "type": "color",
+      "group": "colors-brand",
+      "description": "主要交互、选中与强调状态使用的颜色。",
+      "source": "起步默认值",
+      "mapping": ""
+    },
+    "--ds-primary-hover": {
+      "label": "悬停色（Hover）",
+      "type": "color",
+      "group": "colors-brand",
+      "description": "强调控件在悬停与高强调互动时使用。",
+      "source": "起步默认值",
+      "mapping": ""
+    },
+    "--ds-primary-soft": {
+      "label": "选中背景（Selection）",
+      "type": "color",
+      "group": "colors-brand",
+      "description": "选中背景使用强调色的浅色版本，避免与主要动作争夺注意力。",
+      "source": "起步默认值",
+      "mapping": ""
+    },
+    "--ds-workspace": {
+      "label": "工作区（Workspace）",
+      "type": "color",
+      "group": "colors-surfaces",
+      "description": "用于编辑区、侧栏分区或第二层背景。",
+      "source": "起步默认值",
+      "mapping": ""
+    },
+    "--ds-background": {
+      "label": "画布（Canvas）",
+      "type": "color",
+      "group": "colors-surfaces",
+      "description": "页面最底层背景，应该和内容表面形成可辨识层级。",
+      "source": "起步默认值",
+      "mapping": ""
+    },
+    "--ds-surface": {
+      "label": "应用背景（App）",
+      "type": "color",
+      "group": "colors-surfaces",
+      "description": "应用主体、卡片和主要内容容器使用的暖白表面。",
+      "source": "起步默认值",
+      "mapping": ""
+    },
+    "--ds-border-soft": {
+      "label": "浅线条（Soft Border）",
+      "type": "color",
+      "group": "colors-borders",
+      "description": "用于正文分隔或低干扰区域边界，比普通线条更轻。",
+      "source": "起步默认值",
+      "mapping": ""
+    },
+    "--ds-border": {
+      "label": "线条（Border）",
+      "type": "color",
+      "group": "colors-borders",
+      "description": "用于卡片、分区与控件的一般边界，保持低对比，不抢夺内容注意力。",
+      "source": "起步默认值",
+      "mapping": ""
+    },
+    "--ds-border-strong": {
+      "label": "强调线条（Strong Border）",
+      "type": "color",
+      "group": "colors-borders",
+      "description": "用于需要更清楚分隔的边界、选区轮廓或较强结构线。",
+      "source": "起步默认值",
+      "mapping": ""
+    },
+    "--ds-heading": {
+      "label": "标题（Heading）",
+      "type": "color",
+      "group": "colors-text",
+      "description": "标题与高强调信息使用最深的文字颜色。",
+      "source": "起步默认值",
+      "mapping": ""
+    },
+    "--ds-text": {
+      "label": "次要文字（Secondary）",
+      "type": "color",
+      "group": "colors-text",
+      "description": "正文说明和次要信息使用的暖灰文字。",
+      "source": "起步默认值",
+      "mapping": ""
+    },
+    "--ds-muted": {
+      "label": "辅助文字（Tertiary）",
+      "type": "color",
+      "group": "colors-text",
+      "description": "元数据、提示和弱化说明使用的文字颜色。",
+      "source": "起步默认值",
+      "mapping": ""
+    },
+    "--ds-tertiary": {
+      "label": "禁用文字（Disabled）",
+      "type": "color",
+      "group": "colors-text",
+      "description": "不可操作或最低强调信息使用的文字颜色。",
+      "source": "起步默认值",
+      "mapping": ""
+    },
+    "--ds-processing": {
+      "label": "处理中（Processing）",
+      "type": "color",
+      "group": "colors-semantic",
+      "description": "用于生成、等待和异步任务，不与警告含义混用。",
+      "source": "起步默认值",
+      "mapping": ""
+    },
+    "--ds-processing-border": {
+      "label": "处理边框（Processing Border）",
+      "type": "color",
+      "group": "colors-semantic",
+      "description": "用于处理中状态的边框、进度与较轻强调。",
+      "source": "起步默认值",
+      "mapping": ""
+    },
+    "--ds-processing-soft": {
+      "label": "处理浅色（Processing Soft）",
+      "type": "color",
+      "group": "colors-semantic",
+      "description": "用于处理中提示的浅色背景。",
+      "source": "起步默认值",
+      "mapping": ""
+    },
+    "--ds-success": {
+      "label": "成功（Success）",
+      "type": "color",
+      "group": "colors-semantic",
+      "description": "用于完成、通过和可用状态。",
+      "source": "起步默认值",
+      "mapping": ""
+    },
+    "--ds-warning": {
+      "label": "警告（Warning）",
+      "type": "color",
+      "group": "colors-semantic",
+      "description": "用于注意、等待和可能影响结果的状态。",
+      "source": "起步默认值",
+      "mapping": ""
+    },
+    "--ds-danger": {
+      "label": "危险（Danger）",
+      "type": "color",
+      "group": "colors-semantic",
+      "description": "用于删除、错误和不可逆操作。",
+      "source": "起步默认值",
+      "mapping": ""
+    },
+    "--ds-font-ui": {
+      "label": "界面字体（UI Font）",
+      "type": "text",
+      "group": "展示标题排版",
+      "description": "展示标题只用于页面主标题或品牌级信息。",
+      "source": "起步默认值",
+      "mapping": ""
+    },
+    "--ds-display-size": {
+      "label": "展示字号（Display Size）",
+      "type": "text",
+      "group": "展示标题排版",
+      "description": "展示标题只用于页面主标题或品牌级信息。",
+      "source": "起步默认值",
+      "mapping": ""
+    },
+    "--ds-display-weight": {
+      "label": "展示字重（Weight）",
+      "type": "text",
+      "group": "展示标题排版",
+      "description": "展示标题只用于页面主标题或品牌级信息。",
+      "source": "起步默认值",
+      "mapping": ""
+    },
+    "--ds-title-size": {
+      "label": "标题字号（Heading Size）",
+      "type": "text",
+      "group": "标题排版",
+      "description": "标题通过字号与字重建立层级，不只依赖颜色。",
+      "source": "起步默认值",
+      "mapping": ""
+    },
+    "--ds-title-weight": {
+      "label": "标题字重（Weight）",
+      "type": "text",
+      "group": "标题排版",
+      "description": "标题通过字号与字重建立层级，不只依赖颜色。",
+      "source": "起步默认值",
+      "mapping": ""
+    },
+    "--ds-font-size": {
+      "label": "基础字号（Body Size）",
+      "type": "text",
+      "group": "正文排版",
+      "description": "正文需要兼顾中文密度、长标签与不同屏幕宽度。",
+      "source": "起步默认值",
+      "mapping": ""
+    },
+    "--ds-line-height": {
+      "label": "正文行高（Line Height）",
+      "type": "text",
+      "group": "正文排版",
+      "description": "正文需要兼顾中文密度、长标签与不同屏幕宽度。",
+      "source": "起步默认值",
+      "mapping": ""
+    },
+    "--ds-label-size": {
+      "label": "标签字号（Label Size）",
+      "type": "text",
+      "group": "标签与辅助字",
+      "description": "标签保持紧凑清晰；微型文字只用于元数据和短提示。",
+      "source": "起步默认值",
+      "mapping": ""
+    },
+    "--ds-micro-size": {
+      "label": "辅助字号（Micro Size）",
+      "type": "text",
+      "group": "标签与辅助字",
+      "description": "标签保持紧凑清晰；微型文字只用于元数据和短提示。",
+      "source": "起步默认值",
+      "mapping": ""
+    },
+    "--ds-font-weight": {
+      "label": "标签字重（Weight）",
+      "type": "text",
+      "group": "标签与辅助字",
+      "description": "标签保持紧凑清晰；微型文字只用于元数据和短提示。",
+      "source": "起步默认值",
+      "mapping": ""
+    },
+    "--ds-font-mono": {
+      "label": "等宽字体（Mono Font）",
+      "type": "text",
+      "group": "字体家族",
+      "description": "界面文字与代码数据分别使用无衬线和等宽字体栈。",
+      "source": "起步默认值",
+      "mapping": ""
+    },
+    "--ds-space-unit": {
+      "label": "基础间距（Space Unit）",
+      "type": "text",
+      "group": "间距刻度",
+      "description": "参考项目采用紧凑的 2px 基础单位，再用倍数建立层级。",
+      "source": "起步默认值",
+      "mapping": ""
+    },
+    "--ds-radius-control": {
+      "label": "控件圆角（Control）",
+      "type": "text",
+      "group": "圆角层级",
+      "description": "控件、卡片和弹窗分别调整；胶囊固定使用 999px，不会受控件高度上限限制。",
+      "source": "起步默认值",
+      "mapping": ""
+    },
+    "--ds-radius-card": {
+      "label": "卡片圆角（Card）",
+      "type": "text",
+      "group": "圆角层级",
+      "description": "控件、卡片和弹窗分别调整；胶囊固定使用 999px，不会受控件高度上限限制。",
+      "source": "起步默认值",
+      "mapping": ""
+    },
+    "--ds-radius-modal": {
+      "label": "弹窗圆角（Modal）",
+      "type": "text",
+      "group": "圆角层级",
+      "description": "控件、卡片和弹窗分别调整；胶囊固定使用 999px，不会受控件高度上限限制。",
+      "source": "起步默认值",
+      "mapping": ""
+    },
+    "--ds-shadow-dropdown": {
+      "label": "下拉阴影（Dropdown）",
+      "type": "text",
+      "group": "阴影层级",
+      "description": "静态卡片保持平面；下拉和弹窗才使用浮起阴影。",
+      "source": "起步默认值",
+      "mapping": ""
+    },
+    "--ds-shadow-modal": {
+      "label": "弹窗阴影（Modal）",
+      "type": "text",
+      "group": "阴影层级",
+      "description": "静态卡片保持平面；下拉和弹窗才使用浮起阴影。",
+      "source": "起步默认值",
+      "mapping": ""
+    },
+    "--ds-control-height": {
+      "label": "控件高度（Control Height）",
+      "type": "text",
+      "group": "控件尺寸",
+      "description": "按钮、输入框和下拉框共享基础高度与控件圆角。",
+      "source": "起步默认值",
+      "mapping": ""
+    },
+    "--ds-content-width": {
+      "label": "内容最大宽度（Max Width）",
+      "type": "text",
+      "group": "布局与对齐",
+      "description": "先校准内容宽度与栏宽，再检查页面边距、表单基线和响应式变化。",
+      "source": "起步默认值",
+      "mapping": ""
+    },
+    "--ds-column-width": {
+      "label": "辅助栏宽度（Side Column）",
+      "type": "text",
+      "group": "布局与对齐",
+      "description": "先校准内容宽度与栏宽，再检查页面边距、表单基线和响应式变化。",
+      "source": "起步默认值",
+      "mapping": ""
+    },
+    "--ds-radius-pill": {
+      "label": "--ds-radius-pill",
+      "type": "text",
+      "group": "其他基础",
+      "description": "",
+      "source": "起步默认值",
+      "mapping": ""
+    }
+  },
+  "themes": {},
+  "components": [],
+  "guidelines": [],
+  "application": null,
+  "updatedAt": null,
+  "updatedBy": "starter"
+}

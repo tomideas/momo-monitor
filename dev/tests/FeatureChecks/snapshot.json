@@ -1,0 +1,195 @@
+{
+  "Disks": [
+    {
+      "Name": "C:\\",
+      "Label": "Windows",
+      "UsedGb": 140.7058219909668,
+      "TotalGb": 476.7171058654785,
+      "FreeGb": 336.0112838745117,
+      "UsedFraction": 0.2951558067871632,
+      "FreePercent": 70.48441932128368
+    },
+    {
+      "Name": "D:\\",
+      "Label": "Data",
+      "UsedGb": 171.9840545654297,
+      "TotalGb": 1863.0009727478027,
+      "FreeGb": 1691.016918182373,
+      "UsedFraction": 0.09231560105508943,
+      "FreePercent": 90.76843989449105
+    }
+  ],
+  "DiskFreePercent": {
+    "C:\\": 70.48441932128368,
+    "D:\\": 90.76843989449105
+  },
+  "Cpu": {
+    "Id": "",
+    "IsIntegrated": false,
+    "UsesSharedMemory": false,
+    "LoadPercent": 21.989999771118164,
+    "TemperatureC": null,
+    "ClockMhz": 3581.619873046875,
+    "FanRpm": null,
+    "PowerWatts": 19.04871351412191,
+    "PowerEstimated": true,
+    "MemoryUsedMb": null,
+    "MemoryTotalMb": null
+  },
+  "Gpus": [
+    {
+      "Id": "/gpu-intel-integrated/%5C%5C%3F%5CPCI%23VEN_8086%26DEV_4C8B%26SUBSYS_32DD17AA%26REV_04%233%2611583659%260%2610%23%7B1ca05180-a699-450a-9a0c-de4fbe3ddd89%7D",
+      "IsIntegrated": true,
+      "UsesSharedMemory": true,
+      "LoadPercent": 26.89786720275879,
+      "TemperatureC": null,
+      "ClockMhz": null,
+      "FanRpm": null,
+      "PowerWatts": 0,
+      "PowerEstimated": false,
+      "MemoryUsedMb": 839.8125,
+      "MemoryTotalMb": 16214.86328125
+    },
+    {
+      "Id": "/gpu-nvidia/0",
+      "IsIntegrated": false,
+      "UsesSharedMemory": false,
+      "LoadPercent": 0,
+      "TemperatureC": 31,
+      "ClockMhz": 139,
+      "FanRpm": null,
+      "PowerWatts": null,
+      "PowerEstimated": false,
+      "MemoryUsedMb": 92,
+      "MemoryTotalMb": 4096
+    }
+  ],
+  "GpuNames": [
+    "Intel(R) UHD Graphics 730",
+    "NVIDIA Quadro P1000"
+  ],
+  "GpuPresent": true,
+  "RamLoadPercent": 46,
+  "RamUsedGb": 14.662067413330078,
+  "RamTotalGb": 31.669654846191406,
+  "RamTempC": null,
+  "StorageLoadPercent": 0.5539066195487976,
+  "DiskReadBytesPerSec": 14276.7431640625,
+  "DiskWriteBytesPerSec": 157050.90625,
+  "StorageIsSsd": true,
+  "NetDownBytesPerSec": 5057.855947529915,
+  "NetUpBytesPerSec": 12150.858747335806,
+  "CpuWatts": 19.04871351412191,
+  "GpuWatts": 0,
+  "RamWatts": 5,
+  "DiskWatts": 0.05245086168404669,
+  "NetWatts": 0.20016411509222856,
+  "TotalWatts": 24.301328490898186,
+  "TotalEnergyWh": 52.35641593894402,
+  "CarbonGrams": 29.057810846113927,
+  "CostAmount": 0.026701772128861448,
+  "CostCurrency": "\u00A5",
+  "Processes": [
+    {
+      "Name": "System",
+      "CpuPercent": 1.2931977156034344,
+      "GpuPercent": 0.030400626361370087,
+      "RamMb": 6.41796875,
+      "RamPercent": 0.01979038811083099,
+      "PowerWatts": 1.429123365969012,
+      "DiskReadBytesPerSec": 0,
+      "DiskWriteBytesPerSec": 0
+    },
+    {
+      "Name": "rustdesk",
+      "CpuPercent": 1.1807457403335706,
+      "GpuPercent": 20.481282487511635,
+      "RamMb": 253.24609375,
+      "RamPercent": 0.780907274262498,
+      "PowerWatts": 1.304851768928228,
+      "DiskReadBytesPerSec": 343.7252056888767,
+      "DiskWriteBytesPerSec": 343.7252056888767
+    },
+    {
+      "Name": "dwm",
+      "CpuPercent": 0.843389814523979,
+      "GpuPercent": 6.204319000244141,
+      "RamMb": 137.48828125,
+      "RamPercent": 0.42395757172058335,
+      "PowerWatts": 0.9320369778058774,
+      "DiskReadBytesPerSec": 0,
+      "DiskWriteBytesPerSec": 0
+    },
+    {
+      "Name": "claude",
+      "CpuPercent": 0.843389814523979,
+      "GpuPercent": 2.1081924438476562,
+      "RamMb": 2406.01953125,
+      "RamPercent": 7.419179210817621,
+      "PowerWatts": 0.9320369778058774,
+      "DiskReadBytesPerSec": 731046.512843016,
+      "DiskWriteBytesPerSec": 731046.512843016
+    },
+    {
+      "Name": "svchost",
+      "CpuPercent": 0.2811299381746597,
+      "GpuPercent": 0,
+      "RamMb": 1432.1796875,
+      "RamPercent": 4.416255822385182,
+      "PowerWatts": 0.31067899260195914,
+      "DiskReadBytesPerSec": 1283.7877343128523,
+      "DiskWriteBytesPerSec": 42582.63028718241
+    },
+    {
+      "Name": "vmmemWSL",
+      "CpuPercent": 0.28112993817465964,
+      "GpuPercent": 0,
+      "RamMb": 720.29296875,
+      "RamPercent": 2.221088627934681,
+      "PowerWatts": 0.3106789926019591,
+      "DiskReadBytesPerSec": 0,
+      "DiskWriteBytesPerSec": 0
+    },
+    {
+      "Name": "MsMpEng",
+      "CpuPercent": 0.22490395053972773,
+      "GpuPercent": 0,
+      "RamMb": 395.54296875,
+      "RamPercent": 1.2196925804714762,
+      "PowerWatts": 0.24854319408156725,
+      "DiskReadBytesPerSec": 0,
+      "DiskWriteBytesPerSec": 0
+    },
+    {
+      "Name": "MomoMonitor",
+      "CpuPercent": 0.22490395053972773,
+      "GpuPercent": 0,
+      "RamMb": 100.875,
+      "RamPercent": 0.31105720181016405,
+      "PowerWatts": 0.24854319408156725,
+      "DiskReadBytesPerSec": 0,
+      "DiskWriteBytesPerSec": 0
+    },
+    {
+      "Name": "csrss",
+      "CpuPercent": 0.11245197526986386,
+      "GpuPercent": 0,
+      "RamMb": 13.1953125,
+      "RamPercent": 0.04068894159366226,
+      "PowerWatts": 0.12427159704078362,
+      "DiskReadBytesPerSec": 0,
+      "DiskWriteBytesPerSec": 0
+    },
+    {
+      "Name": "SearchIndexer",
+      "CpuPercent": 0.05622598763493193,
+      "GpuPercent": 0,
+      "RamMb": 37.50390625,
+      "RamPercent": 0.11564669278885475,
+      "PowerWatts": 0.06213579852039181,
+      "DiskReadBytesPerSec": 0,
+      "DiskWriteBytesPerSec": 0
+    }
+  ],
+  "Fans": []
+}
