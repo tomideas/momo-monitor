@@ -17,5 +17,8 @@
     <!-- The rule that decides whether a remembered window position is still on a screen.
          It has to hold for monitor layouts this machine does not have. -->
     <Compile Include="../../../StatusMonitor/Models/WindowPlacement.cs" Link="WindowPlacement.cs" />
+    <!-- The wattage curves. They decide the hero figure, the running total, the carbon figure
+         and the cost, and they are pure arithmetic, so they belong under test. -->
+    <Compile Include="../../../StatusMonitor/Power/PowerModel.cs" Link="PowerModel.cs" />
   </ItemGroup>
 </Project>

@@ -84,6 +84,20 @@ public sealed class Snapshot
     public double NetWatts { get; set; }
     public double TotalWatts { get; set; }
 
+    /// <summary>
+    /// True when any part of <see cref="TotalWatts"/> came from a curve rather than a sensor.
+    /// The figure feeds the running energy total, the carbon figure and the cost, so how it was
+    /// arrived at travels with it instead of being inferred at the point of display.
+    /// </summary>
+    public bool PowerEstimated { get; set; }
+
+    /// <summary>
+    /// True when a discrete GPU reports no power and its board power is not in the table, so
+    /// its draw is in neither the measured nor the estimated part of the total. The total is
+    /// then known to be low, and says so.
+    /// </summary>
+    public bool PowerIncomplete { get; set; }
+
     public double TotalEnergyWh { get; set; }
     public double CarbonGrams { get; set; }
     public double CostAmount { get; set; }

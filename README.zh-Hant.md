@@ -1,6 +1,6 @@
 # Momo 系統監測 · Momo System Monitor
 
-**English | [繁體中文](README.zh-Hant.md)**
+**English | [中文](README.zh-Hant.md)**
 
 完整使用指南（HTML，GitHub Pages）：
 
@@ -13,7 +13,7 @@ Windows 11 桌面小工具：即時顯示整機狀態（CPU / GPU / RAM / 網路
 [docs/2026-09-13-volt-paper-pop.md](dev/docs/2026-09-13-volt-paper-pop.md)。
 
 - 技術：WPF (.NET 8)，單一程序，以管理員身分執行
-- 語言：English / 繁體中文（可切換）
+- 語言：English / 中文（可切換）
 - 更新頻率：每 1 秒
 - 硬體感測：自行建置的 **LibreHardwareMonitor master** ＋ **PawnIO** 驅動（見下）
 - 分頁：**儀表板**（即時狀態）／**信息**（硬體與系統資訊，WMI）
@@ -158,7 +158,7 @@ powershell -ExecutionPolicy Bypass -File .\build.ps1
 
 設定（齒輪圖示）可調整：
 
-- 語言：English / 繁體中文（原本在頁首的「中／EN」按鈕已移入此處）
+- 語言：English / 中文（原本在頁首的「中／EN」按鈕已移入此處）
 - **國家／地區（單一選單）**：選一次同時套用電價、幣別與碳強度
   （France / Germany / UK / USA / China / India / Sweden / Poland / World average / Custom）
 - 電價（＋幣別）與碳強度可再手動微調；手動改值後國家自動變為 Custom

@@ -591,6 +591,10 @@
         <TextBlock Text="W" Style="{StaticResource HeroUnit}" />
       </StackPanel>
     </Viewbox>
+    <!-- What the hero figure is made of, when part of it did not come from a sensor. Shown
+         under the number rather than beside it: the number is the point, this is its footnote. -->
+    <TextBlock Text="{Binding PowerNote}" Style="{StaticResource RowSub}" TextWrapping="Wrap"
+               Margin="0,4,0,0" Visibility="{Binding HasPowerNote, Converter={StaticResource BoolToVisibility}}" />
   </StackPanel>
   <Grid Grid.Column="1" VerticalAlignment="Bottom" Margin="18,0,0,8">
     <Grid.RowDefinitions>

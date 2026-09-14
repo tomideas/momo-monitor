@@ -1,6 +1,6 @@
 # 🦫 Momo System Monitor
 
-**[繁體中文](README.zh-Hant.md) | English**
+**[中文](README.zh-Hant.md) | English**
 
 Full user guide (HTML, GitHub Pages):
 
@@ -22,7 +22,7 @@ Two skins, one rule: **color only ever means "this reading is over budget."**
 - **Info page** — full hardware & system details via WMI, one card per fixed drive, copyable spec sheets
 - **Per-process power** — wattage attributed to each process by CPU/GPU share
 - **Portable mode** — drop a `momo-data` folder next to the exe and all data travels with it
-- **Bilingual** — English / 繁體中文, switchable in settings
+- **Bilingual** — English / 中文, switchable in settings
 
 ## Requirements
 

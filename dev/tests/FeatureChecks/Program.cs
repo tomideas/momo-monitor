@@ -1,5 +1,6 @@
 using System.Text.Json;
 using StatusMonitor.Models;
+using StatusMonitor.Power;
 using StatusMonitor.Services;
 using StatusMonitor.Settings;
 
@@ -215,5 +216,33 @@ Check(AppSettings.ResolveDataDir(null, _ => true, appData) == appData,
 Check(AppSettings.ResolveDataDir("", _ => true, appData) == appData,
     "An empty executable location must fall back too");
 
-Console.WriteLine($"PASS: {checks} assertions (alerts, GPU identity, bounded history, settings compatibility, fan curve, header naming, window placement, data location)");
+// ---- estimating a graphics card that reports nothing ----
+// Plenty of cards have no power telemetry at all: a Pascal Quadro answers nvidia-smi's
+// power.draw with N/A, and the NVML energy counter that would replace it needs Volta or newer.
+// Those used to contribute zero watts, understating the total by more than the total's own
+// CPU figure on a machine like that.
+Check(PowerModel.LookupGpuTdp("NVIDIA Quadro P1000") == 47, "The P1000's board power must be known");
+Check(PowerModel.LookupGpuTdp("NVIDIA GeForce RTX 5090") == 575, "The 5090's board power must be known");
+// Longest match wins, or every Ti is quietly rated as the card below it.
+Check(PowerModel.LookupGpuTdp("NVIDIA GeForce RTX 4070 Ti") == 285, "A Ti must not match the plain card");
+Check(PowerModel.LookupGpuTdp("NVIDIA GeForce RTX 2080 Ti") == 250, "A Ti must not match the plain card");
+// An unknown card returns nothing rather than an invented rating: a guessed TDP would flow into
+// the wattage, the energy total, the carbon figure and the cost, looking exactly as solid as a
+// real reading all the way down.
+Check(PowerModel.LookupGpuTdp("Some Unreleased Card 9999") == 0, "An unknown card must not be given a rating");
+
+double idleGpu = PowerModel.EstimateGpuWatts(47, 0);
+double fullGpu = PowerModel.EstimateGpuWatts(47, 100);
+Check(Math.Abs(idleGpu - 4.7) < 0.01, $"A 47 W card must idle at a tenth of its rating, got {idleGpu:N2}");
+Check(Math.Abs(fullGpu - 47) < 0.01, $"A card must not be estimated above its board power, got {fullGpu:N2}");
+Check(PowerModel.EstimateGpuWatts(47, 50) > idleGpu && PowerModel.EstimateGpuWatts(47, 50) < fullGpu,
+    "The curve must rise between idle and full");
+// The two curves differ deliberately. A GPU idles far lower against its rating than a CPU, and
+// a card is held to its board power while a CPU boosts past its TDP.
+Check(PowerModel.EstimateGpuWatts(100, 0) < PowerModel.EstimateCpuWatts(100, 0),
+    "A GPU must be estimated to idle lower than a CPU of the same rating");
+Check(PowerModel.EstimateGpuWatts(100, 100) < PowerModel.EstimateCpuWatts(100, 100),
+    "A CPU may be estimated past its rating; a card may not");
+
+Console.WriteLine($"PASS: {checks} assertions (alerts, GPU identity, bounded history, settings compatibility, fan curve, header naming, window placement, data location, power curves)");
 

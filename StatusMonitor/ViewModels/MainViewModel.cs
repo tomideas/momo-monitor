@@ -31,6 +31,13 @@ public sealed class GpuCard
     public string FanText { get; init; } = "";
     public double FanFraction { get; init; }
     public string PowerText { get; init; } = "";
+
+    /// <summary>
+    /// Whether this GPU is on the CPU die. It decides whether the row carries a wattage at all:
+    /// an integrated GPU's draw is inside the CPU package figure, so a dash here would claim
+    /// the number is unknown when it is in fact already counted one row up.
+    /// </summary>
+    public bool IsIntegrated { get; init; }
     public double PowerFraction { get; init; }
     public string VramText { get; init; } = "";
     public double VramFraction { get; init; }
@@ -45,8 +52,9 @@ public sealed class GpuCard
     /// uses, with temperature labelled and last. It used to sit unlabelled in the middle, so a
     /// bare "33°" had to be guessed at while the CPU row spelled its own out.
     /// </summary>
-    public string SubText =>
-        $"{ClockText} · {MemoryLabel} {VramText} · {I18n.Loc.Instance["temp_short"]} {TempText}";
+    public string SubText => IsIntegrated
+        ? $"{ClockText} · {MemoryLabel} {VramText} · {I18n.Loc.Instance["temp_short"]} {TempText}"
+        : $"{ClockText} · {PowerText} · {MemoryLabel} {VramText} · {I18n.Loc.Instance["temp_short"]} {TempText}";
 }
 
 /// <summary>
@@ -118,7 +126,7 @@ public sealed partial class MainViewModel : INotifyPropertyChanged
     public string CpuTempText => Temp(_snap.Cpu.TemperatureC);
     public string CpuClockText => Clock(_snap.Cpu.ClockMhz);
     public string CpuFanText => Rpm(_snap.Cpu.FanRpm);
-    public string CpuPowerText => Watts(_snap.Cpu.PowerWatts ?? 0);
+    public string CpuPowerText => Watts(_snap.Cpu.PowerWatts ?? 0, _snap.Cpu.PowerEstimated);
     public double CpuTempFraction => Frac(_snap.Cpu.TemperatureC, 100);
     public double CpuClockFraction => Frac(_snap.Cpu.ClockMhz, 6000);
     public double CpuFanFraction => Frac(_snap.Cpu.FanRpm, 2500);
@@ -277,6 +285,18 @@ public sealed partial class MainViewModel : INotifyPropertyChanged
     }];
 
     public string TotalWattsText => Watts(_snap.TotalWatts);
+
+    /// <summary>
+    /// How the hero figure was arrived at, when it is worth saying. The unmeasured card comes
+    /// first: an estimate is a number with a known shape, while a card missing from the total
+    /// makes it plainly low, and that is the more misleading of the two to leave unsaid.
+    /// </summary>
+    public string PowerNote =>
+        _snap.PowerIncomplete ? I18n.Loc.Instance["power_missing_gpu"]
+        : _snap.PowerEstimated ? I18n.Loc.Instance["power_from_curve"]
+        : "";
+
+    public bool HasPowerNote => PowerNote.Length > 0;
 
     /// <summary>The hero numeral without its unit, so the unit can be set at its own size.</summary>
     public string TotalWattsValue => _snap.TotalWatts.ToString("0.0", Inv);
@@ -452,7 +472,8 @@ public sealed partial class MainViewModel : INotifyPropertyChanged
             ClockFraction = Frac(g.ClockMhz, 3000),
             FanText = Rpm(g.FanRpm),
             FanFraction = Frac(g.FanRpm, 3000),
-            PowerText = g.PowerWatts.HasValue ? Watts(g.PowerWatts.Value) : "—",
+            PowerText = g.PowerWatts.HasValue ? Watts(g.PowerWatts.Value, g.PowerEstimated) : "—",
+            IsIntegrated = g.IsIntegrated,
             PowerFraction = Frac(g.PowerWatts, 600),
             VramText = vramText,
             VramFraction = vramOk ? Math.Clamp(usedMb!.Value / totalMb!.Value, 0, 1) : 0,
@@ -469,6 +490,13 @@ public sealed partial class MainViewModel : INotifyPropertyChanged
     private static string Rpm(double? v) => v.HasValue ? v.Value.ToString("0", Inv) + " RPM" : "—";
     private static double Frac(double? v, double max) => v.HasValue ? Math.Clamp(v.Value / max, 0, 1) : 0;
     private static string Watts(double v) => v.ToString("0.0", Inv) + " W";
+
+    /// <summary>
+    /// The same figure, marked when it came from a curve rather than a sensor. A tilde rather
+    /// than a word: it sits inside a dense detail line, and the legend under the hero says what
+    /// it means once instead of every row repeating it.
+    /// </summary>
+    private static string Watts(double v, bool estimated) => (estimated ? "~" : "") + Watts(v);
 
     private static string Mb(double mb) =>
         mb >= 1024 ? (mb / 1024).ToString("0.0", Inv) + " GB" : mb.ToString("0", Inv) + " MB";

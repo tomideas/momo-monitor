@@ -122,7 +122,42 @@ public sealed class MonitorService : IDisposable
         snap.Cpu.PowerEstimated = snap.Cpu.PowerWatts is null;
         snap.Cpu.PowerWatts = cpuWatts;
 
-        double gpuWatts = snap.Gpus.Sum(g => g.PowerWatts ?? 0.0);
+        // A GPU that reports nothing used to contribute zero watts, which reads as a measurement
+        // of nothing rather than an absence of measurement. It is now estimated the same way the
+        // CPU already was, and what could not be established is carried forward as such.
+        double gpuWatts = 0.0;
+        for (int i = 0; i < snap.Gpus.Count; i++)
+        {
+            var gpu = snap.Gpus[i];
+            if (gpu.PowerWatts is > 0)
+            {
+                gpuWatts += gpu.PowerWatts.Value;
+                continue;
+            }
+
+            // An integrated GPU is on the CPU die and draws through the package, so the CPU
+            // figure above already contains it. Estimating it again would count the same watts
+            // twice — which is the trap on any machine with an iGPU sitting next to a card.
+            if (gpu.IsIntegrated)
+            {
+                gpu.PowerWatts = null;
+                gpu.PowerEstimated = false;
+                continue;
+            }
+
+            double gpuTdp = PowerModel.LookupGpuTdp(i < snap.GpuNames.Count ? snap.GpuNames[i] : "");
+            if (gpuTdp <= 0)
+            {
+                gpu.PowerWatts = null;
+                snap.PowerIncomplete = true;
+                continue;
+            }
+
+            double estimated = PowerModel.EstimateGpuWatts(gpuTdp, gpu.LoadPercent ?? 0.0);
+            gpu.PowerWatts = estimated;
+            gpu.PowerEstimated = true;
+            gpuWatts += estimated;
+        }
 
         snap.CpuWatts = cpuWatts;
         snap.GpuWatts = gpuWatts;
@@ -135,6 +170,10 @@ public sealed class MonitorService : IDisposable
         snap.NetWatts = PowerModel.NetworkWatts(netMb);
 
         snap.TotalWatts = snap.CpuWatts + snap.GpuWatts + snap.RamWatts + snap.DiskWatts + snap.NetWatts;
+        // RAM is a flat constant and the disk and network models are curves, so strictly the
+        // total is never wholly measured. What is worth flagging is the part big enough to
+        // change the answer: an unmeasured CPU or graphics card.
+        snap.PowerEstimated = snap.Cpu.PowerEstimated || snap.Gpus.Any(g => g.PowerEstimated);
 
         PowerModel.AttributeProcessPower(rows, cpuLoad, gpuLoad, cpuWatts, gpuWatts, snap.TotalWatts);
 
