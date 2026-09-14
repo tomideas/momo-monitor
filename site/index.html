@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Momo System Monitor v0.1.0 — User Guide</title>
+<link rel="stylesheet" href="docs.css">
+</head>
+<body>
+
+<header class="site-header">
+  <a class="logo" href="#">🦫 Momo Monitor Docs</a>
+  <nav>
+    <a href="zh.html" class="hide-mobile">繁體中文</a>
+    <a href="#quick" class="hide-mobile">Quick start</a>
+    <a href="https://github.com/tomideas/momo-monitor/releases" class="hide-mobile" target="_blank" rel="noopener">Releases</a>
+    <a href="https://github.com/tomideas/momo-monitor" class="hide-mobile" target="_blank" rel="noopener">GitHub</a>
+    <button class="menu-toggle" type="button" aria-label="Menu">☰</button>
+  </nav>
+</header>
+
+<div class="backdrop"></div>
+<div class="page-wrapper">
+
+<aside class="sidebar">
+  <div class="sidebar-search">
+    <span class="search-icon">🔍</span>
+    <input type="search" placeholder="Search sections…" autocomplete="off">
+  </div>
+  <div class="group-title">Getting started</div>
+  <a href="#intro">Overview</a>
+  <a href="#install">Install &amp; run</a>
+  <a href="#quick">Quick start</a>
+  <div class="group-title">Features</div>
+  <a href="#dashboard">Dashboard</a>
+  <a href="#skins">Skins: Volt / Paper Pop</a>
+  <a href="#trends">Trends</a>
+  <a href="#mini">Mini window</a>
+  <a href="#alerts">Alerts</a>
+  <a href="#info">Info page</a>
+  <div class="group-title">More</div>
+  <a href="#settings">Settings &amp; data</a>
+  <a href="#portable">Portable mode</a>
+  <a href="#headless">Headless tools</a>
+  <a href="#trouble">FAQ</a>
+</aside>
+
+<main class="main-content">
+
+<h1 id="intro">Momo System Monitor — User Guide</h1>
+<p class="page-desc">Windows 11 desktop widget v0.1.0 — live CPU / GPU / RAM / network / storage, fans, wattage, energy &amp; carbon footprint · 2026-09-14</p>
+
+<div class="callout info">
+  <p><strong>Momo System Monitor</strong> is a little Windows 11 widget that keeps an eye on your whole machine every second: CPU / GPU / RAM / network / storage, motherboard fans &amp; AIO pumps, wattage, cumulative energy, carbon footprint, electricity cost, and per-process power.</p>
+  <p>One rule for the whole UI: <strong>color only means "this reading is over budget."</strong> Everything else is the same accent color, because the bars share one baseline — length alone tells the story.</p>
+</div>
+
+<figure class="doc-figure">
+  <img class="doc-img" src="assets/images/volt-dashboard.png" alt="Volt skin dashboard">
+  <figcaption>Dashboard (Volt skin) — hero number is current power draw</figcaption>
+</figure>
+
+<!-- ====== Install ====== -->
+<h2 id="install">Install &amp; run</h2>
+
+<div class="card">
+  <h3>Requirements</h3>
+  <ul class="steps">
+    <li>Windows 11 (x64)</li>
+    <li><a href="https://dotnet.microsoft.com/download/dotnet/8.0" target="_blank" rel="noopener">.NET 8 Desktop Runtime</a> (the exe is framework-dependent)</li>
+    <li>Administrator rights for full sensor access (UAC prompt on launch)</li>
+  </ul>
+  <p>Optional but recommended — the <a href="https://namazso.net/pawnio.html" target="_blank" rel="noopener">PawnIO</a> driver unlocks CPU temperature, fans and board voltages. Install once (admin):</p>
+  <pre>winget install namazso.PawnIO -e</pre>
+  <p class="callout tip">Without admin rights (or PawnIO), temperature / fan / CPU-watt readings show <code>—</code>; everything else works normally.</p>
+</div>
+
+<div class="card">
+  <h3>Run</h3>
+  <ol class="steps">
+    <li>Download <code>MomoMonitor.exe</code> from <a href="https://github.com/tomideas/momo-monitor/releases" target="_blank" rel="noopener">Releases</a> (or build from source: <code>build.ps1</code>)</li>
+    <li>Double-click — allow the UAC prompt</li>
+    <li>The dashboard starts updating every second; the app lives in the system tray when minimized (off by default — see <a href="#settings">Settings</a>)</li>
+  </ol>
+</div>
+
+<!-- ====== Quick start ====== -->
+<h2 id="quick">Quick start</h2>
+
+<div class="card">
+  <ol class="steps">
+    <li><strong>Dashboard</strong> — the hero number is current estimated wattage; below it, cumulative energy / carbon footprint / cost. CPU, GPU, RAM, DISK and NET rows share one baseline bar list.</li>
+    <li><strong>Info</strong> — full hardware &amp; system details (WMI). Fixed drives share one card, one row per disk, with a copyable spec sheet.</li>
+    <li><strong>Settings (gear)</strong> — language, country (applies electricity price, currency &amp; carbon intensity at once), alert thresholds, display options.</li>
+  </ol>
+</div>
+
+<!-- ====== Dashboard ====== -->
+<h2 id="dashboard">Dashboard</h2>
+
+<div class="card">
+  <h3>Rows</h3>
+  <ul class="steps">
+    <li><strong>CPU</strong> — usage, package watts (RAPL when available, otherwise the TDP curve), clock, core count</li>
+    <li><strong>GPU</strong> — one row per card (auto-prefers discrete); temp, clocks, fan RPM, watts, load, VRAM used/total</li>
+    <li><strong>RAM</strong> — used / total with bar</li>
+    <li><strong>DISK</strong> — space <em>used</em> per drive (not I/O busy %); the warning condition is "free space below threshold"</li>
+    <li><strong>NET</strong> — up / down rates</li>
+    <li><strong>Fans &amp; pumps</strong> — motherboard SuperIO fans and AIO pumps with RPM</li>
+  </ul>
+  <p>Any bar reaching its threshold (90% by default; disk = free-space floor) turns the warning color. That's the only thing color ever means.</p>
+</div>
+
+<div class="card">
+  <h3>Top processes</h3>
+  <p>Processes ranked by attributed power — CPU/GPU usage share is mapped onto total system wattage. Count is adjustable in settings.</p>
+</div>
+
+<!-- ====== Skins ====== -->
+<h2 id="skins">Skins: Volt / Paper Pop</h2>
+
+<div class="card">
+  <p>Settings → General → Background: <strong>Volt</strong> (dark, neon accent) or <strong>Paper Pop</strong> (light, cobalt accent). Same layout skeleton, only the palette changes; applies instantly to all windows and is remembered. Old 7-background configs map automatically (deep blue → Volt, the rest → Paper Pop).</p>
+  <figure class="doc-figure">
+    <img class="doc-img" src="assets/images/paper-dashboard.png" alt="Paper Pop skin dashboard">
+    <figcaption>Paper Pop skin — same layout, different palette</figcaption>
+  </figure>
+</div>
+
+<!-- ====== Trends ====== -->
+<h2 id="trends">Trends</h2>
+
+<div class="card">
+  <p>60-second / 15-minute ranges for CPU/GPU load, RAM, VRAM, temperatures and estimated power. Hover for time &amp; value; min / avg / max are labeled. History covers this launch only (last 15 minutes) — no persistence across restarts. Gaps stay empty (missing sensor, interrupted sampling) instead of being filled with 0.</p>
+  <figure class="doc-figure">
+    <img class="doc-img" src="assets/images/features-trend-live.png" alt="Live trend charts">
+    <figcaption>Trend section with live sampling</figcaption>
+  </figure>
+</div>
+
+<!-- ====== Mini ====== -->
+<h2 id="mini">Mini window</h2>
+
+<div class="card">
+  <p>A 258 × 238 glance panel from the "Mini" toggle in the header: icons instead of labels, numbers instead of bars — power, CPU, main GPU, GPU memory, fullest disk, network. Drag it from anywhere (except the buttons and the pin checkbox); double-click anywhere to return to the main window. Position, pin and "start in mini" are remembered.</p>
+  <figure class="doc-figure">
+    <img class="doc-img" src="assets/images/features-mini.png" alt="Mini window">
+    <figcaption>Mini glance panel</figcaption>
+  </figure>
+</div>
+
+<!-- ====== Alerts ====== -->
+<h2 id="alerts">Alerts</h2>
+
+<div class="card">
+  <p>Defaults: CPU 90 °C, main GPU 85 °C, RAM/VRAM 90 %, fixed disk under 10 % free. A condition must hold for 15 s before it fires; each anomaly notifies once, and re-alerts are rate-limited by a 300 s cooldown. Thresholds and timing are editable in Settings → Monitoring &amp; Alerts (press "Apply"). The last 20 alerts of this launch stay in the in-app log there — useful when Windows Do-Not-Disturb suppresses tray notifications.</p>
+  <p class="callout tip">Readings that don't exist (no fan sensor on that GPU, no temperature on that CPU) never trigger alerts.</p>
+</div>
+
+<!-- ====== Info ====== -->
+<h2 id="info">Info page</h2>
+
+<div class="card">
+  <p>Hardware &amp; system details via WMI, queried in the background at startup / tab-entry / language change / manual refresh — never rebuilt every second. Fixed drives live in one card (one row per disk: "used X / Y (Z%)" + bar, with volume labels). Open any card's detail panel for the full spec sheet; it's copyable, Esc closes.</p>
+  <figure class="doc-figure">
+    <img class="doc-img" src="assets/images/paper-info.png" alt="Info page">
+    <figcaption>Info page — one card per fixed drive</figcaption>
+  </figure>
+</div>
+
+<!-- ====== Settings ====== -->
+<h2 id="settings">Settings &amp; data</h2>
+
+<div class="card">
+  <h3>Options</h3>
+  <ul class="steps">
+    <li>Language — English / 繁體中文</li>
+    <li>Country — one pick applies electricity price, currency and carbon intensity (France / Germany / UK / USA / China / India / Sweden / Poland / World average / Custom); fine-tune afterwards and the country flips to Custom</li>
+    <li>Displayed process count, reset cumulative energy</li>
+    <li>Monitoring &amp; Alerts — main GPU (auto = prefer discrete), hide integrated GPU, thresholds, recent-alert log</li>
+    <li>General — background skin, reduce motion, run-in-tray behavior</li>
+  </ul>
+  <figure class="doc-figure">
+    <img class="doc-img" src="assets/images/volt-settings.png" alt="Settings panel">
+    <figcaption>Settings (Volt skin)</figcaption>
+  </figure>
+  <h3>Data files</h3>
+  <p>Stored in <code>%APPDATA%\StatusMonitor\</code>:</p>
+  <ul class="steps">
+    <li><code>settings.json</code> — all preferences</li>
+    <li><code>totals.json</code> — cumulative energy (Wh), survives reboots</li>
+    <li><code>energy-history.json</code> — daily energy, ~400 days; powers "today / 7d / 30d"</li>
+  </ul>
+  <p>Tray behavior: by default ✕ exits the app. Enable "keep running in the tray" and ✕ / minimize just hide the window — sampling and alerts continue; exit stays available in the tray context menu (and saves totals on the way out).</p>
+</div>
+
+<!-- ====== Portable ====== -->
+<h2 id="portable">Portable mode</h2>
+
+<div class="card">
+  <p>Create a <code>momo-data</code> folder next to <code>MomoMonitor.exe</code> and the three data files move there — settings and energy totals travel with the exe. Without the folder, behavior is unchanged. On the first portable launch, existing <code>%APPDATA%</code> data is copied in automatically (only into an empty folder, never overwriting).</p>
+</div>
+
+<!-- ====== Headless ====== -->
+<h2 id="headless">Headless tools</h2>
+
+<div class="card">
+  <pre>MomoMonitor.exe --dump --out snapshot.json   # one sample as JSON
+MomoMonitor.exe --diag --out diag.txt        # list all visible sensors
+MomoMonitor.exe --render dash.png            # render the dashboard to PNG</pre>
+</div>
+
+<!-- ====== FAQ ====== -->
+<h2 id="trouble">FAQ</h2>
+
+<div class="card">
+  <h3>Why do some readings show — ?</h3>
+  <ul class="steps">
+    <li>No admin rights → temperature / fans / CPU watts are unavailable</li>
+    <li>PawnIO not installed → same set, plus board voltages</li>
+    <li>No fan sensor on that GPU (e.g. integrated) → fan RPM shows —</li>
+    <li>Motherboard chip not covered by LibreHardwareMonitor's SuperIO drivers → motherboard fans/pumps show —</li>
+  </ul>
+  <h3>Why is wattage an estimate?</h3>
+  <p>Real package watts come from RAPL/Nvidia/AMD sensors where present; components without sensors (disk, network, RAM) are estimated with linear models, and total system power is their sum. Per-process power is an attribution, not a measurement.</p>
+  <h3>Is it portable / one file?</h3>
+  <p>Yes — one <code>MomoMonitor.exe</code> (framework-dependent, needs .NET 8 Desktop Runtime on the target machine).</p>
+  <h3>License</h3>
+  <p>GPL-3.0. Power-estimation formulas were re-implemented from WattSeal (GPLv3).</p>
+</div>
+
+</main>
+</div>
+
+<script src="docs.js"></script>
+</body>
+</html>

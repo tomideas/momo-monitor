@@ -2,6 +2,10 @@
 
 **English | [繁體中文](README.zh-Hant.md)**
 
+完整使用指南（HTML，GitHub Pages）：
+
+👉 [tomideas.github.io/momo-monitor](https://tomideas.github.io/momo-monitor)
+
 Windows 11 桌面小工具：即時顯示整機狀態（CPU / GPU / RAM / 網路 / 儲存 / 風扇與水冷幫浦）、
 瓦數、累計用電、碳足跡、電費，以及 Top Processes。視覺參考開源專案 WattSeal（Rust，GPLv3）。
 介面為 **VOLT / PAPER POP** 雙皮設計：一頁一個英雄數字（目前功耗）、共用基準線的粗條列表、

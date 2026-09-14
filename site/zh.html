@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Momo 系統監測 v0.1.0 — 使用指南</title>
+<link rel="stylesheet" href="docs.css">
+</head>
+<body>
+
+<header class="site-header">
+  <a class="logo" href="#">🦫 Momo 監測指南</a>
+  <nav>
+    <a href="index.html" class="hide-mobile">English</a>
+    <a href="#quick" class="hide-mobile">快速上手</a>
+    <a href="https://github.com/tomideas/momo-monitor/releases" class="hide-mobile" target="_blank" rel="noopener">Releases</a>
+    <a href="https://github.com/tomideas/momo-monitor" class="hide-mobile" target="_blank" rel="noopener">GitHub</a>
+    <button class="menu-toggle" type="button" aria-label="選單">☰</button>
+  </nav>
+</header>
+
+<div class="backdrop"></div>
+<div class="page-wrapper">
+
+<aside class="sidebar">
+  <div class="sidebar-search">
+    <span class="search-icon">🔍</span>
+    <input type="search" placeholder="搜索章節…" autocomplete="off">
+  </div>
+  <div class="group-title">開始使用</div>
+  <a href="#intro">簡介</a>
+  <a href="#install">安裝與執行</a>
+  <a href="#quick">快速上手</a>
+  <div class="group-title">功能</div>
+  <a href="#dashboard">儀表板</a>
+  <a href="#skins">配色：Volt / Paper Pop</a>
+  <a href="#trends">趨勢圖</a>
+  <a href="#mini">迷你視窗</a>
+  <a href="#alerts">提醒</a>
+  <a href="#info">信息頁</a>
+  <div class="group-title">其他</div>
+  <a href="#settings">設定與資料</a>
+  <a href="#portable">可攜模式</a>
+  <a href="#headless">無介面工具</a>
+  <a href="#trouble">常見問題</a>
+</aside>
+
+<main class="main-content">
+
+<h1 id="intro">Momo 系統監測 — 使用指南</h1>
+<p class="page-desc">Windows 11 桌面小工具 v0.1.0 — CPU / GPU / RAM / 網路 / 儲存、風扇、瓦數、用電與碳足跡 · 2026-09-14</p>
+
+<div class="callout info">
+  <p><strong>Momo 系統監測</strong>是一個 Windows 11 桌面小工具，每秒監測整機狀態：CPU / GPU / RAM / 網路 / 儲存、主機板風扇與水冷幫浦、瓦數、累計用電、碳足跡、電費，以及每程式分攤功耗。</p>
+  <p>整個介面只有一條顏色規則：<strong>顏色只表示「這個讀數超標了」</strong>。其餘一律使用強調色——粗條共用同一條基準線，長度本身就足以比較。</p>
+</div>
+
+<figure class="doc-figure">
+  <img class="doc-img" src="assets/images/volt-dashboard.png" alt="Volt 皮儀表板">
+  <figcaption>儀表板（Volt 皮）——英雄數字是目前功耗</figcaption>
+</figure>
+
+<!-- ====== 安裝 ====== -->
+<h2 id="install">安裝與執行</h2>
+
+<div class="card">
+  <h3>前置需求</h3>
+  <ul class="steps">
+    <li>Windows 11（x64）</li>
+    <li><a href="https://dotnet.microsoft.com/download/dotnet/8.0" target="_blank" rel="noopener">.NET 8 Desktop Runtime</a>（exe 為 framework-dependent）</li>
+    <li>管理員權限才能讀完整感測器（啟動時 UAC 提示）</li>
+  </ul>
+  <p>建議選裝 —— <a href="https://namazso.net/pawnio.html" target="_blank" rel="noopener">PawnIO</a> 驅動解鎖 CPU 溫度、風扇與板載電壓，一次性安裝（管理員）：</p>
+  <pre>winget install namazso.PawnIO -e</pre>
+  <p class="callout tip">沒有管理員權限（或 PawnIO）時，溫度 / 風扇 / CPU 瓦數會顯示 <code>—</code>，其餘功能正常。</p>
+</div>
+
+<div class="card">
+  <h3>執行</h3>
+  <ol class="steps">
+    <li>從 <a href="https://github.com/tomideas/momo-monitor/releases" target="_blank" rel="noopener">Releases</a> 下載 <code>MomoMonitor.exe</code>（或自行建置：<code>build.ps1</code>）</li>
+    <li>雙擊執行，允許 UAC 提示</li>
+    <li>儀表板開始每秒更新；最小化後在系統匣（預設關閉，見<a href="#settings">設定</a>）</li>
+  </ol>
+</div>
+
+<!-- ====== 快速上手 ====== -->
+<h2 id="quick">快速上手</h2>
+
+<div class="card">
+  <ol class="steps">
+    <li><strong>儀表板</strong>——英雄數字是目前估算瓦數；下方三小格為累計用電 / 碳足跡 / 電費。CPU、GPU、RAM、DISK、NET 各列共用一條基準線。</li>
+    <li><strong>信息</strong>——WMI 硬體與系統資訊；固定磁碟收在同一張卡（每顆一列），詳情可複製。</li>
+    <li><strong>設定（齒輪）</strong>——語言、國家（一次套用電價／幣別／碳強度）、提醒門檻、顯示選項。</li>
+  </ol>
+</div>
+
+<!-- ====== 儀表板 ====== -->
+<h2 id="dashboard">儀表板</h2>
+
+<div class="card">
+  <h3>各列</h3>
+  <ul class="steps">
+    <li><strong>CPU</strong>——使用率、套件瓦數（有 RAPL 用實測，否則 TDP 曲線）、時脈、核心數</li>
+    <li><strong>GPU</strong>——每張卡一列（自動優先獨立顯卡）；溫度、時脈、風扇 RPM、瓦數、負載、VRAM 已用/總量</li>
+    <li><strong>RAM</strong>——已用 / 總量＋橫條</li>
+    <li><strong>DISK</strong>——空間<b>佔用率</b>（不是 I/O 忙碌率）；警示條件是「剩餘空間低於門檻」</li>
+    <li><strong>NET</strong>——上 / 下行速率</li>
+    <li><strong>風扇／幫浦</strong>——主機板 SuperIO 風扇與水冷幫浦 RPM</li>
+  </ul>
+  <p>任一條粗條達到門檻（預設 90%；磁碟為剩餘空間下限）就轉警示色——顏色只說這一件事。</p>
+</div>
+
+<div class="card">
+  <h3>Top Processes</h3>
+  <p>依分攤功耗排序的程式清單——CPU/GPU 使用率佔比映射到整機瓦數。顯示筆數在設定調整。</p>
+</div>
+
+<!-- ====== 配色 ====== -->
+<h2 id="skins">配色：Volt / Paper Pop</h2>
+
+<div class="card">
+  <p>設定 → 一般 → 背景配色：<strong>Volt 夜跑</strong>（深色、螢光強調）或 <strong>Paper Pop 日間</strong>（米白、鈷藍強調）。同一套排版骨架，只有色票不同；即時套用所有視窗並保留選擇。舊版七個背景自動映射（深海藍 → Volt，其餘 → Paper Pop）。</p>
+  <figure class="doc-figure">
+    <img class="doc-img" src="assets/images/paper-dashboard.png" alt="Paper Pop 皮儀表板">
+    <figcaption>Paper Pop 皮——同一版面，不同色票</figcaption>
+  </figure>
+</div>
+
+<!-- ====== 趨勢圖 ====== -->
+<h2 id="trends">趨勢圖</h2>
+
+<div class="card">
+  <p>60 秒 / 15 分鐘範圍：CPU/GPU 負載、RAM、VRAM、溫度與估算功耗。滑過看時間與數值，標出最低 / 平均 / 最高。歷史只覆蓋本次啟動最近 15 分鐘，重啟不保留；感測缺失或取樣中斷保留空段，不補成 0。</p>
+  <figure class="doc-figure">
+    <img class="doc-img" src="assets/images/features-trend-live.png" alt="即時趨勢圖">
+    <figcaption>趨勢區（實際取樣）</figcaption>
+  </figure>
+</div>
+
+<!-- ====== 迷你視窗 ====== -->
+<h2 id="mini">迷你視窗</h2>
+
+<div class="card">
+  <p>頁首「迷你」開啟的 258 × 238 速覽面板：圖示代替文字標籤、數值代替橫條——功耗、CPU、主 GPU、GPU 記憶體、最滿磁碟、網路。面板任意處可拖曳（按鈕與置頂勾選框除外），雙擊任意處回主視窗。位置、置頂、「啟動時開啟迷你」都會保留。</p>
+  <figure class="doc-figure">
+    <img class="doc-img" src="assets/images/features-mini.png" alt="迷你視窗">
+    <figcaption>迷你速覽面板</figcaption>
+  </figure>
+</div>
+
+<!-- ====== 提醒 ====== -->
+<h2 id="alerts">提醒</h2>
+
+<div class="card">
+  <p>預設：CPU 90 °C、主 GPU 85 °C、RAM/VRAM 90%、固定磁碟剩餘低於 10%。狀態須持續 15 秒才觸發；每次異常只通知一次，恢復後再超標仍受 300 秒冷卻限制。門檻與時間在 設定 → 監控與提醒 可修改（需按「套用」）。該分頁下方保留本次啟動最近 20 筆提醒記錄——Windows 勿擾模式壓掉系統匣通知時，這是唯一的程式內記錄。</p>
+  <p class="callout tip">不存在的讀數（該 GPU 沒有風扇感測器、該 CPU 沒有溫度）不會觸發提醒。</p>
+</div>
+
+<!-- ====== 信息頁 ====== -->
+<h2 id="info">信息頁</h2>
+
+<div class="card">
+  <p>WMI 硬體與系統資訊，只在啟動、進入分頁、切換語言或手動刷新時背景查詢，不每秒重建。固定磁碟收在同一張卡（每顆一列：「已用 X / Y（Z%）」＋橫條，帶磁碟區標籤）。開啟詳情面板可看完整規格並複製，Esc 關閉。</p>
+  <figure class="doc-figure">
+    <img class="doc-img" src="assets/images/paper-info.png" alt="信息頁">
+    <figcaption>信息頁——固定磁碟每顆一列</figcaption>
+  </figure>
+</div>
+
+<!-- ====== 設定 ====== -->
+<h2 id="settings">設定與資料</h2>
+
+<div class="card">
+  <h3>選項</h3>
+  <ul class="steps">
+    <li>語言——English / 繁體中文</li>
+    <li>國家／地區——一次套用電價、幣別與碳強度（France / Germany / UK / USA / China / India / Sweden / Poland / World average / Custom）；事後手動微調會自動變為 Custom</li>
+    <li>顯示程序數、重置累計用電</li>
+    <li>監控與提醒——主 GPU（自動＝優先獨立顯卡）、隱藏內顯、門檻、提醒記錄</li>
+    <li>一般——背景配色、減少動效、系統匣行為</li>
+  </ul>
+  <figure class="doc-figure">
+    <img class="doc-img" src="assets/images/volt-settings.png" alt="設定面板">
+    <figcaption>設定（Volt 皮）</figcaption>
+  </figure>
+  <h3>資料檔案</h3>
+  <p>存在 <code>%APPDATA%\StatusMonitor\</code>：</p>
+  <ul class="steps">
+    <li><code>settings.json</code>——所有偏好設定</li>
+    <li><code>totals.json</code>——累計用電（Wh），跨重啟</li>
+    <li><code>energy-history.json</code>——每日用電，約 400 天；「今日 / 7 天 / 30 天」由它算出</li>
+  </ul>
+  <p>系統匣：預設按 ✕ 直接結束。開啟「關閉或最小化時留在系統匣」後，✕ 與最小化只是隱藏，背景取樣與提醒繼續；系統匣右鍵永遠有「結束程式」，且走正常關閉流程（累計用電會存檔）。</p>
+</div>
+
+<!-- ====== 可攜模式 ====== -->
+<h2 id="portable">可攜模式</h2>
+
+<div class="card">
+  <p>在 <code>MomoMonitor.exe</code> 旁邊建一個 <code>momo-data</code> 資料夾，三個資料檔案就改存在裡面——設定與累計用電隨程式搬移。沒有這個資料夾則行為不變。第一次以可攜模式啟動時，<code>%APPDATA%</code> 既有資料自動複製過去（只複製到空資料夾，不覆蓋）。</p>
+</div>
+
+<!-- ====== 無介面 ====== -->
+<h2 id="headless">無介面工具</h2>
+
+<div class="card">
+  <pre>MomoMonitor.exe --dump --out snapshot.json   # 取樣一次輸出 JSON
+MomoMonitor.exe --diag --out diag.txt        # 列出所有可見感測器
+MomoMonitor.exe --render dash.png            # 把儀表板算繪成 PNG</pre>
+</div>
+
+<!-- ====== 常見問題 ====== -->
+<h2 id="trouble">常見問題</h2>
+
+<div class="card">
+  <h3>為什麼有些讀數顯示 — ？</h3>
+  <ul class="steps">
+    <li>非管理員執行 → 溫度 / 風扇 / CPU 瓦數不可用</li>
+    <li>未安裝 PawnIO → 同上，外加板載電壓</li>
+    <li>該 GPU 沒有風扇感測器（如內顯）→ 風扇 RPM 顯示 —</li>
+    <li>主機板晶片不在 LibreHardwareMonitor 的 SuperIO 支援清單 → 主機板風扇/幫浦顯示 —</li>
+  </ul>
+  <h3>為什麼瓦數是估算？</h3>
+  <p>有 RAPL/Nvidia/AMD 感測器的元件用實測；沒有感測器的（磁碟、網路、RAM）用線性模型估算，整機瓦數為總和。每程式功耗是分攤結果，不是直接測量。</p>
+  <h3>是單檔嗎？</h3>
+  <p>是——只有 <code>MomoMonitor.exe</code>（framework-dependent，執行端需 .NET 8 Desktop Runtime）。</p>
+  <h3>授權</h3>
+  <p>GPL-3.0。瓦數估算公式重新實作自 WattSeal（GPLv3）。</p>
+</div>
+
+</main>
+</div>
+
+<script src="docs.js"></script>
+</body>
+</html>

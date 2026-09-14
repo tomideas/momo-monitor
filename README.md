@@ -2,6 +2,10 @@
 
 **[繁體中文](README.zh-Hant.md) | English**
 
+Full user guide (HTML, GitHub Pages):
+
+👉 [tomideas.github.io/momo-monitor](https://tomideas.github.io/momo-monitor)
+
 ![Volt dashboard](dev/docs/previews/volt-dashboard.png)
 
 Hey — meet **Momo System Monitor**, a little Windows 11 widget that keeps an eye on your whole machine: CPU / GPU / RAM / network / storage, fans and AIO pumps, wattage, cumulative energy, carbon footprint, electricity cost, and top processes — all ticking every second.
