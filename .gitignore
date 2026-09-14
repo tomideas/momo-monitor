@@ -33,3 +33,6 @@ momo-data/
 
 # Logs
 *.log
+
+# Design system（設計系統：本地設計工具，不屬產品專案）
+design-system/

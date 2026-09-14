@@ -1,1 +1,0 @@
-window.designSystemEditorLink?.({"source":"file:///D:/temp/@coding/itx/tools/status/design-system/design/index.html","url":"http://127.0.0.1:62794/?workspace=a60080a5c368eec0dcf839a1fe18b472314f2b3d9dcb1e292faa09bf538c8b72"});
