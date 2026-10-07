@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="LibreHardwareMonitorLib"><HintPath>../../../StatusMonitor/libs/LibreHardwareMonitorLib.dll</HintPath></Reference>
+    <Reference Include="HidSharp"><HintPath>../../../StatusMonitor/libs/HidSharp.dll</HintPath></Reference>
+    <Compile Include="../../../StatusMonitor/Sensors/SensorResolver.cs" Link="SensorResolver.cs" />
+    <Compile Include="../../../StatusMonitor/Sensors/CpuSensor.cs" Link="CpuSensor.cs" />
+    <Compile Include="../../../StatusMonitor/Sensors/GpuSensor.cs" Link="GpuSensor.cs" />
+    <Compile Include="../../../StatusMonitor/Models/Snapshot.cs" Link="Snapshot.cs" />
+    <Compile Include="../../../StatusMonitor/Models/SensorReading.cs" Link="SensorReading.cs" />
+    <Compile Include="../../../StatusMonitor/Services/GpuSelection.cs" Link="GpuSelection.cs" />
+    <Compile Include="../FanChecks/MockHub.cs" Link="MockHub.cs" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,233 @@
+{
+  "direction": "product-to-design",
+  "createdAt": "2026-10-07T06:39:18.339Z",
+  "actualTokens": [
+    "--ds-accent",
+    "--ds-bg-page",
+    "--ds-bg-surface",
+    "--ds-bg-elevated",
+    "--ds-bg-pattern",
+    "--ds-border",
+    "--ds-border-subtle",
+    "--ds-border-strong",
+    "--ds-border-focus",
+    "--ds-text-primary",
+    "--ds-text-secondary",
+    "--ds-text-tertiary",
+    "--ds-text-inverse",
+    "--ds-on-accent",
+    "--ds-text-link",
+    "--ds-interactive-hover",
+    "--ds-interactive-pressed",
+    "--ds-accent-pressed",
+    "--ds-danger",
+    "--ds-accent-hover",
+    "--ds-interactive",
+    "--ds-bg-overlay",
+    "--ds-warning-subtle",
+    "--ds-warning",
+    "--ds-display-size",
+    "--ds-display-weight",
+    "--ds-title-size",
+    "--ds-title-weight",
+    "--ds-font-size",
+    "--ds-label-size",
+    "--ds-micro-size",
+    "--ds-font-weight",
+    "--ds-font-ui",
+    "--ds-font-mono",
+    "--ds-space-1",
+    "--ds-space-2",
+    "--ds-space-3",
+    "--ds-space-4",
+    "--ds-space-5",
+    "--ds-space-6",
+    "--ds-space-7",
+    "--ds-space-8",
+    "--ds-space-9",
+    "--ds-space-10",
+    "--ds-radius-xs",
+    "--ds-radius-sm",
+    "--ds-radius-md",
+    "--ds-radius-lg",
+    "--ds-radius-xl",
+    "--ds-shadow-sm",
+    "--ds-shadow-md",
+    "--ds-shadow-lg"
+  ],
+  "futureTokens": [
+    "--ds-accent-subtle",
+    "--ds-accent-disabled",
+    "--ds-bg-sunken",
+    "--ds-text-disabled",
+    "--ds-success",
+    "--ds-success-subtle",
+    "--ds-danger-subtle",
+    "--ds-info",
+    "--ds-info-subtle",
+    "--ds-line-height",
+    "--ds-control-height",
+    "--ds-shadow-xs",
+    "--ds-shadow-xl"
+  ],
+  "changes": [
+    {
+      "key": "--ds-accent-hover",
+      "before": "#262626",
+      "current": "rgba(10,60,255,0.86)",
+      "baseline": null,
+      "source": "悬停背景仍是 AccentBrush，bd 整面 Opacity=0.86，含文字一起變淡；token 記錄填色透明度，非獨立換色。"
+    },
+    {
+      "key": "--ds-accent-pressed",
+      "before": "#525252",
+      "current": "#0A3CFF",
+      "baseline": null,
+      "source": "SolidChipTemplate 按下保留 AccentBrush；另有 2/2 DIP 位移，不換独立色"
+    },
+    {
+      "key": "--ds-interactive",
+      "before": "#00000008",
+      "current": "#00000000",
+      "baseline": null,
+      "source": "中性图示、導覽和未選時段的默认背景 Transparent；SecondaryButton 的 CardBrush 是獨立變體。"
+    },
+    {
+      "key": "--ds-interactive-pressed",
+      "before": "#00000024",
+      "current": "#00000014",
+      "baseline": null,
+      "source": "ChipTemplate 滑鼠按下沿用 HoverBrush；另以 TranslateTransform 2/2 DIP 表達按下"
+    },
+    {
+      "key": "--ds-bg-elevated",
+      "before": "#FFFFFF",
+      "current": "#FAF8F3",
+      "baseline": null,
+      "source": "CardBrush：ComboBox Popup 與 ToolTip 浮層；設定／Mini 的變體使用 PopPaper"
+    },
+    {
+      "key": "--ds-border-subtle",
+      "before": "#F5F5F5",
+      "current": "#D5D1C5",
+      "baseline": null,
+      "source": "HairBrush：SectionRule、行分隔、表格網格，共用邊線色"
+    },
+    {
+      "key": "--ds-border-strong",
+      "before": "#D4D4D4",
+      "current": "#0D0D0C",
+      "baseline": null,
+      "source": "InkBrush：Info 類別徽章及權限提示的 1.5 DIP 強邊界"
+    },
+    {
+      "key": "--ds-text-tertiary",
+      "before": "#737373",
+      "current": "#4A4740",
+      "baseline": null,
+      "source": "MutedBrush：MicroLabel／RowName／DesignerCredit 元資料，共用次級色"
+    },
+    {
+      "key": "--ds-text-inverse",
+      "before": "#FFFFFF",
+      "current": "#FAF8F3",
+      "baseline": null,
+      "source": "OnAccentBrush：強調填色上的文字與勾選圖形，與 on-accent 共用"
+    },
+    {
+      "key": "--ds-text-link",
+      "before": "#000000",
+      "current": "#0A3CFF",
+      "baseline": null,
+      "source": "AccentBrush：DesignerWebsite Hyperlink、Bold，固定 HTTPS 網址"
+    },
+    {
+      "key": "--ds-warning",
+      "before": "#946E1B",
+      "current": "#101513",
+      "baseline": null,
+      "source": "權限提示文字直接使用此色；固定在淺黃提示面上，兩套皮膚共用。"
+    },
+    {
+      "key": "--ds-warning-subtle",
+      "before": "#F6F3ED",
+      "current": "#FEF3C7",
+      "baseline": null,
+      "source": "權限提示背景直接使用此色；不是未實作的假值。"
+    },
+    {
+      "key": "--ds-display-size",
+      "before": "28px",
+      "current": "20px",
+      "baseline": null,
+      "source": "現行設定主標題 20 DIP；Info 大標題已移除。Hero、RPM 和品牌讀數是另外的顯示層。"
+    },
+    {
+      "key": "--ds-shadow-sm",
+      "before": "0 3px 16px rgba(0,0,0,.30)",
+      "current": "0 3px 16px rgba(0,0,0,0.30)",
+      "baseline": null,
+      "source": "WPF BlurRadius=16、ShadowDepth=3、Direction=270、Opacity=0.30；CSS 為向下偏移。"
+    },
+    {
+      "key": "--ds-shadow-md",
+      "before": "0 4px 20px rgba(0,0,0,.34)",
+      "current": "0 4px 20px rgba(0,0,0,0.34)",
+      "baseline": null,
+      "source": "WPF BlurRadius=20、ShadowDepth=4、Direction=270、Opacity=0.34；CSS 為向下偏移。"
+    },
+    {
+      "key": "--ds-shadow-lg",
+      "before": "0 5px 24px rgba(0,0,0,.40)",
+      "current": "0 5px 24px rgba(0,0,0,0.40)",
+      "baseline": null,
+      "source": "WPF BlurRadius=24、ShadowDepth=5、Direction=270、Opacity=0.40；CSS 為向下偏移。"
+    }
+  ],
+  "themeBefore": {
+    "VOLT": {
+      "--ds-accent": "#D4FF00",
+      "--ds-on-accent": "#1F1F1C",
+      "--ds-bg-page": "#1F1F1C",
+      "--ds-bg-surface": "#2A2A27",
+      "--ds-bg-pattern": "#292925",
+      "--ds-border": "#3A3A35",
+      "--ds-text-primary": "#E6E4DE",
+      "--ds-text-secondary": "#BCB9AE",
+      "--ds-interactive-hover": "#333330",
+      "--ds-danger": "#FF3B14",
+      "--ds-accent-hover": "#E5E5E5",
+      "--ds-accent-pressed": "#D4D4D4",
+      "--ds-bg-sunken": "#0F0F0F",
+      "--ds-bg-elevated": "#262626",
+      "--ds-border-focus": "#D4FF00"
+    }
+  },
+  "themeCurrent": {
+    "VOLT": {
+      "--ds-accent": "#D4FF00",
+      "--ds-on-accent": "#1F1F1C",
+      "--ds-bg-page": "#1F1F1C",
+      "--ds-bg-surface": "#2A2A27",
+      "--ds-bg-pattern": "#292925",
+      "--ds-border": "#3A3A35",
+      "--ds-text-primary": "#E6E4DE",
+      "--ds-text-secondary": "#BCB9AE",
+      "--ds-interactive-hover": "#333330",
+      "--ds-danger": "#FF3B14",
+      "--ds-accent-hover": "rgba(212,255,0,0.86)",
+      "--ds-accent-pressed": "#D4FF00",
+      "--ds-bg-sunken": "#0F0F0F",
+      "--ds-bg-elevated": "#2A2A27",
+      "--ds-border-focus": "#D4FF00",
+      "--ds-border-subtle": "#3A3A35",
+      "--ds-border-strong": "#E6E4DE",
+      "--ds-text-tertiary": "#BCB9AE",
+      "--ds-text-inverse": "#1F1F1C",
+      "--ds-text-link": "#D4FF00",
+      "--ds-interactive-pressed": "#333330"
+    }
+  },
+  "productSourceChanged": false,
+  "verification": "2026-10-07：按當前 WPF 源碼反向同步，未修改產品源碼或根執行檔。隔離副本 Release 構建 0 warnings / 0 errors；PAPER POP / English 與 VOLT / 繁中各通過 159 項原生介面、4 項首頁捲動、19 項設定斷言。首頁、Info、Process、Fans 自訂、設定與 Mini 原生截圖已核對；字體、顏色、形狀和間距以目前 runtime Style／Theme.Apply 為準。證據：dev/verification/design-system-current/。"
+}

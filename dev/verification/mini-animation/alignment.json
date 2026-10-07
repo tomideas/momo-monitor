@@ -1,0 +1,43 @@
+{
+  "canvas": [
+    256,
+    256
+  ],
+  "centerX": 153.80152671755727,
+  "footBaseline": 236,
+  "restHeight": 168.5496183206107,
+  "clips": {
+    "mini-click": {
+      "scale": 0.37791394242289394,
+      "firstBounds": [
+        68,
+        67,
+        240,
+        236
+      ],
+      "lastBounds": [
+        68,
+        68,
+        240,
+        236
+      ],
+      "durationMs": 6600
+    },
+    "mini-drag": {
+      "scale": 0.3053435114503817,
+      "firstBounds": [
+        67,
+        67,
+        241,
+        236
+      ],
+      "lastBounds": [
+        67,
+        67,
+        241,
+        236
+      ],
+      "durationMs": 6600
+    }
+  }
+}

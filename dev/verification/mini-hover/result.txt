@@ -1,0 +1,1 @@
+2026-10-07：移除 MiniWindow 外層 Border 的 drag_hint ToolTip。Release 構建 0 警告 / 0 錯誤，自包含 win-x64 publish 成功。TrayStartupChecks 原生檢查通過，包含已開啟 Mini 的根 Border.ToolTip 為 null；PAPER POP 英文 / VOLT 繁中原生渲染 PNG 已目視核對。測試專案有既有 MSB3277 參照版本警告。 根 MomoMonitor.exe 已更新，執行中程式需重新開啟。

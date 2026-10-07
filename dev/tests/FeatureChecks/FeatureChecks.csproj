@@ -5,7 +5,13 @@
     <Compile Include="../../../StatusMonitor/Services/TelemetryHistory.cs" Link="TelemetryHistory.cs" />
     <Compile Include="../../../StatusMonitor/Services/GpuSelection.cs" Link="GpuSelection.cs" />
     <Compile Include="../../../StatusMonitor/Models/Snapshot.cs" Link="Snapshot.cs" />
+    <Compile Include="../../../StatusMonitor/Models/Snapshot.Telemetry.cs" Link="Snapshot.Telemetry.cs" />
+    <Compile Include="../../../StatusMonitor/Models/SensorReading.cs" Link="SensorReading.cs" />
+    <Compile Include="../../../StatusMonitor/Models/BatteryReading.cs" Link="BatteryReading.cs" />
+    <Compile Include="../../../StatusMonitor/Power/PowerAccounting.cs" Link="PowerAccounting.cs" />
     <Compile Include="../../../StatusMonitor/Settings/AppSettings.cs" Link="AppSettings.cs" />
+    <Compile Include="../../../StatusMonitor/Settings/DataStorageService.cs" Link="DataStorageService.cs" />
+    <Compile Include="../../../StatusMonitor/Services/ProcessRanking.cs" Link="ProcessRanking.cs" />
     <!-- AppSettings.EnergyPeriod lives here, so the settings type no longer compiles without it. -->
     <Compile Include="../../../StatusMonitor/Services/EnergyHistory.cs" Link="EnergyHistory.cs" />
     <!-- Fan curve maths is deliberately free of any hardware type, so it is testable here.
@@ -14,6 +20,9 @@
     <!-- Which header is which is decided from its name alone, and this machine has no
          motherboard fans to try it on, so the rules are checked here against a real board's. -->
     <Compile Include="../../../StatusMonitor/Models/FanNaming.cs" Link="FanNaming.cs" />
+    <!-- What a fan follows once the user's choice is folded in. Pure, so it runs here; the
+         service that reads the chosen sensor is hardware-bound and is not linked in. -->
+    <Compile Include="../../../StatusMonitor/Models/FanFollow.cs" Link="FanFollow.cs" />
     <!-- The rule that decides whether a remembered window position is still on a screen.
          It has to hold for monitor layouts this machine does not have. -->
     <Compile Include="../../../StatusMonitor/Models/WindowPlacement.cs" Link="WindowPlacement.cs" />
@@ -23,5 +32,8 @@
     <!-- The box the owner types a board power into. It guards the one figure nothing else on
          the machine can supply, so what it accepts and rejects is worth pinning. -->
     <Compile Include="../../../StatusMonitor/ViewModels/GpuTdpVm.cs" Link="GpuTdpVm.cs" />
+    <!-- What "start with Windows" actually registers on the machine. The definition is text,
+         so it is checked here; the schtasks call that hands it over is not exercised. -->
+    <Compile Include="../../../StatusMonitor/Services/StartupService.cs" Link="StartupService.cs" />
   </ItemGroup>
 </Project>

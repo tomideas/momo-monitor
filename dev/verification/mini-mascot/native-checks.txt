@@ -1,0 +1,1 @@
+PASS: transparent mini.webp playback frames loaded on a fixed 256x256 transparent canvas in a 48x48 DIP box; no LIVE text or ReadingStatus footer; both themes and locales; existing CPU/RAM/dual-GPU/all-disk checks passed.

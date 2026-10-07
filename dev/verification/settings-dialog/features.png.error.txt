@@ -1,0 +1,4 @@
+System.InvalidOperationException: Designer footer is not laid out.
+   at StatusMonitor.MainWindow.VerifyBrandFooter() in D:\temp\@coding\@tools\MomoMonitor\StatusMonitor\MainWindow.FeatureChecks.cs:line 21
+   at StatusMonitor.MainWindow.VerifyFeatureInteractions() in D:\temp\@coding\@tools\MomoMonitor\StatusMonitor\MainWindow.FeatureChecks.cs:line 413
+   at StatusMonitor.App.<>c__DisplayClass2_0.<RenderWindow>b__0(Object _, EventArgs _) in D:\temp\@coding\@tools\MomoMonitor\StatusMonitor\App.xaml.cs:line 221

@@ -1,0 +1,1 @@
+PASS: 18 native settings assertions (tabs, draft isolation, Cancel/X, deferred reset/startup, validation, OK, footer layout).

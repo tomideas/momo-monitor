@@ -1,0 +1,1 @@
+PASS: 9 native telemetry assertions (battery direction, power scope, sources, min/max, coverage, read-only preview).

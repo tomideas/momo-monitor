@@ -1,0 +1,4 @@
+System.ArgumentOutOfRangeException: The parameter value must be greater than zero. (Parameter 'pixelWidth')
+   at System.Windows.Media.Imaging.RenderTargetBitmap..ctor(Int32 pixelWidth, Int32 pixelHeight, Double dpiX, Double dpiY, PixelFormat pixelFormat)
+   at Program.Capture(SplashWindow window, String name) in D:\temp\@coding\@tools\MomoMonitor\dev\tests\SplashChecks\Program.cs:line 68
+   at Program.<>c__DisplayClass0_0.<<Main>b__0>d.MoveNext() in D:\temp\@coding\@tools\MomoMonitor\dev\tests\SplashChecks\Program.cs:line 31

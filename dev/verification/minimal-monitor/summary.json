@@ -1,0 +1,11 @@
+{
+  "buildPassed": true,
+  "nativePassed": true,
+  "rootUpdated": true,
+  "version": "2.22.32.0",
+  "build": "Release: 0 warnings, 0 errors. Self-contained Windows x64 publish succeeded; NU1900 vulnerability endpoint unavailable. No Portable package created.",
+  "native": "PAPER POP / English and VOLT / Traditional Chinese: 161 WPF assertions each. Battery discharge and charge: 9 telemetry assertions each.",
+  "visual": "460x760 DIP native dashboard and Process screenshots inspected in both themes. Footer guidance removed, DISK static, Process contains trends and ranked processes without sensor details, action row or coverage prose.",
+  "preparedExeSha256": "257052059018021461DB08BE079918D187A2BD77AC35EFAFB244963B7A7E46FD",
+  "deployment": "Root executable replaced and SHA256 verified against prepared output. Current product source hashes match publish input. No real user data changes or fan writes."
+}

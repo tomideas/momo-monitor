@@ -1,0 +1,1 @@
+PASS: CPU MHz; both GPU VRAM used quantities including unknown total; RAM used GB; fullest disk used GB/TB; live updates; missing readings; no disks/GPUs; fixed mini width; PAPER POP/VOLT and English/Chinese.

@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <NoWarn>$(NoWarn);CA1416</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System.Management"><HintPath>../../../StatusMonitor/libs/System.Management.dll</HintPath></Reference>
+    <Reference Include="LibreHardwareMonitorLib"><HintPath>../../../StatusMonitor/libs/LibreHardwareMonitorLib.dll</HintPath></Reference>
+    <Compile Include="../../../StatusMonitor/Models/BatteryReading.cs" Link="BatteryReading.cs" />
+    <Compile Include="../../../StatusMonitor/Models/SensorReading.cs" Link="SensorReading.cs" />
+    <Compile Include="../../../StatusMonitor/Sensors/BatterySensor.cs" Link="BatterySensor.cs" />
+    <Compile Include="../../../StatusMonitor/Services/SensorReportService.cs" Link="SensorReportService.cs" />
+    <EmbeddedResource Include="../../../StatusMonitor/libs/LibreHardwareMonitor.provenance.json" Link="LibreHardwareMonitor.provenance.json" />
+  </ItemGroup>
+</Project>

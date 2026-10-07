@@ -1,0 +1,33 @@
+{
+  "version": "0.1.6",
+  "buildPassed": true,
+  "nativePassed": true,
+  "logicPassed": true,
+  "checks": "FeatureChecks 443、AlertChecks 44、FanChecks 43、HubChecks 18、PowerChecks 66、TelemetryChecks 40、BatteryChecks 42，共 696 項",
+  "nativeChecksPerTheme": 152,
+  "telemetryChecksPerScenario": 9,
+  "renderFiles": [
+    "battery-charge-volt.png",
+    "battery-discharge-paper.png",
+    "native-paper-en.png",
+    "native-volt-zh.png",
+    "sensors-paper-en.png",
+    "sensors-short-volt.png",
+    "sensors-volt-zh.png",
+    "sensors-wide-paper.png"
+  ],
+  "rootVersion": "0.1.6",
+  "rootExeSHA256": "CFD2E52333F7ED7177A753B149DFE9DC3766712DFA8F310E40454C21D9C2313A",
+  "sensorLibrarySHA256": "C81F48135F56BFD22E5273B61D8265D1E75C4E7C9964845FD56AF27286EE07AA",
+  "packagingPolicy": "Only on explicit request; build.ps1 requires -Portable",
+  "defaultBuild": {
+    "compiled": true,
+    "rootReplacement": "Blocked by running application; existing root is already version 0.1.6",
+    "distributionZipUnchanged": true
+  },
+  "physicalLaptopAccuracyVerified": false,
+  "realFanWrites": false,
+  "warnings": [
+    "NU1900: vulnerability-data endpoint unavailable under network restrictions"
+  ]
+}

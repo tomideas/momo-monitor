@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="LibreHardwareMonitorLib"><HintPath>../../../StatusMonitor/libs/LibreHardwareMonitorLib.dll</HintPath></Reference>
+    <Reference Include="HidSharp"><HintPath>../../../StatusMonitor/libs/HidSharp.dll</HintPath></Reference>
+    <Compile Include="../../../StatusMonitor/Services/FanControlService.cs" Link="FanControlService.cs" />
+    <Compile Include="../../../StatusMonitor/Sensors/SensorResolver.cs" Link="SensorResolver.cs" />
+    <Compile Include="../../../StatusMonitor/Models/Snapshot.cs" Link="Snapshot.cs" />
+    <Compile Include="../../../StatusMonitor/Models/SensorReading.cs" Link="SensorReading.cs" />
+    <Compile Include="../../../StatusMonitor/ViewModels/FanProfileVm.cs" Link="FanProfileVm.cs" />
+    <Compile Include="../../../StatusMonitor/Models/FanCurve.cs" Link="FanCurve.cs" />
+    <Compile Include="../../../StatusMonitor/Models/FanFollow.cs" Link="FanFollow.cs" />
+    <Compile Include="../../../StatusMonitor/Models/FanNaming.cs" Link="FanNaming.cs" />
+    <Compile Include="../../../StatusMonitor/Settings/AppSettings.cs" Link="AppSettings.cs" />
+    <Compile Include="../../../StatusMonitor/Settings/DataStorageService.cs" Link="DataStorageService.cs" />
+    <Compile Include="../../../StatusMonitor/Services/EnergyHistory.cs" Link="EnergyHistory.cs" />
+    <Compile Include="../../../StatusMonitor/I18n/Loc.cs" Link="Loc.cs" />
+  </ItemGroup>
+</Project>

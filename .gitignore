@@ -36,3 +36,10 @@ momo-data/
 
 # Design system（設計系統：本地設計工具，不屬產品專案）
 design-system/
+
+# Build output folders
+/dist/
+
+# Animation source files (webp resources are committed)
+StatusMonitor/Assets/mini.json
+StatusMonitor/Assets/startup.json

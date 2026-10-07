@@ -1,0 +1,1 @@
+PASS: hidden startup; visible tray icon; hardware warm-up; English/Chinese menu labels and separator; menu Open Dashboard restores despite StartInMiniMode; Settings opens from hidden and Mini; menu Exit disposes tray.

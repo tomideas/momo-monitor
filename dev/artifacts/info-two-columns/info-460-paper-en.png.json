@@ -1,0 +1,46 @@
+{
+  "Title": "Momo System Monitor",
+  "Width": 460,
+  "Cards": [
+    {
+      "Title": "CPU",
+      "ActualWidth": 191,
+      "ActualHeight": 280
+    },
+    {
+      "Title": "GPU",
+      "ActualWidth": 191,
+      "ActualHeight": 280
+    },
+    {
+      "Title": "GPU",
+      "ActualWidth": 191,
+      "ActualHeight": 280
+    },
+    {
+      "Title": "GPU",
+      "ActualWidth": 191,
+      "ActualHeight": 280
+    },
+    {
+      "Title": "Memory",
+      "ActualWidth": 191,
+      "ActualHeight": 280
+    },
+    {
+      "Title": "System",
+      "ActualWidth": 191,
+      "ActualHeight": 280
+    },
+    {
+      "Title": "Storage",
+      "ActualWidth": 191,
+      "ActualHeight": 280
+    },
+    {
+      "Title": "Display",
+      "ActualWidth": 191,
+      "ActualHeight": 280
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+System.InvalidOperationException: Live sample history is empty
+   at StatusMonitor.MainWindow.<>c__DisplayClass6_0.<VerifyFeatureInteractions>g__Check|0(Boolean ok, String reason) in D:\temp\@coding\@tools\MomoMonitor\StatusMonitor\MainWindow.FeatureChecks.cs:line 16
+   at StatusMonitor.MainWindow.VerifyFeatureInteractions() in D:\temp\@coding\@tools\MomoMonitor\StatusMonitor\MainWindow.FeatureChecks.cs:line 122
+   at StatusMonitor.App.<>c__DisplayClass2_0.<RenderWindow>b__0(Object _, EventArgs _) in D:\temp\@coding\@tools\MomoMonitor\StatusMonitor\App.xaml.cs:line 209

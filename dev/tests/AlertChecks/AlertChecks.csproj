@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType><TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../../StatusMonitor/Services/AlertEngine.cs" Link="AlertEngine.cs" />
+    <Compile Include="../../../StatusMonitor/Services/AlertHistory.cs" Link="AlertHistory.cs" />
+    <Compile Include="../../../StatusMonitor/Settings/DataStorageService.cs" Link="DataStorageService.cs" />
+    <Compile Include="../../../StatusMonitor/ViewModels/MainViewModel.AlertEvents.cs" Link="MainViewModel.AlertEvents.cs" />
+    <Compile Include="../../../StatusMonitor/I18n/Loc.cs" Link="Loc.cs" />
+  </ItemGroup>
+</Project>

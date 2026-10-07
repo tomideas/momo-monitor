@@ -1,0 +1,13 @@
+{
+  "buildPassed": true,
+  "nativePassed": true,
+  "rootUpdated": true,
+  "version": "2.22.32",
+  "build": "Release product build: 0 warnings, 0 errors. Self-contained Windows x64 publish succeeded; NU1900 vulnerability endpoint unavailable. No Portable package created.",
+  "settings": "19 native assertions passed for PAPER POP / Traditional Chinese, VOLT / English, and 460x330 English: three tabs, folder actions removed, draft isolation, GPU calibration, deferred reset/startup, Cancel/X, validation, OK, and usable compact layout.",
+  "navigation": "161 existing and updated WPF assertions passed for PAPER POP and VOLT: Process owns Trends / Top Processes, dashboard has no duplicate fans/trends/processes, metric and alert drill-downs reach Process, settings/mini/tray behavior retained.",
+  "tray": "TrayStartupChecks passed with current product assembly: English/Chinese menu, dashboard/Mini/Settings/Exit, Settings opens from hidden or Mini.",
+  "visual": "Native dashboard, Process, Data & Info, Monitoring & alerts, and short-window Settings screenshots inspected. Render capture waits for WPF column layout to settle.",
+  "preparedExeSha256": "60AA6E56174AFEC4E3D24CF7C890FCE7A70BE9EE6B6637C11726698157D3FEFF",
+  "deployment": "Root MomoMonitor.exe replaced by build.ps1 and its SHA256 verified against the prepared self-contained executable. User data was not modified by verification. No driver installation or actual fan control performed."
+}

@@ -1,0 +1,1 @@
+2026-10-07：Mini 加入圖 2 的既有水豚 IP 圖 Assets/momo.png（48 DIP 盒、保持原比例），移除整個底部 LIVE/ReadingStatus 列。Release 構建 0 警告 / 0 錯誤、自包含 win-x64 publish 成功；PAPER POP 英文 / VOLT 繁中 PNG 已目視核對。TrayStartupChecks 原生驗證圖像載入、尺寸/比例、沒有 LIVE 或 ReadingStatus 綁定，雙主題/語言、CPU/RAM/雙 GPU/全部磁盤及磁盤捲動回歸通過。測試資源由當前 App.xaml 重新產生；測試專案既有 MSB3277 參照警告。根 MomoMonitor.exe 已更新，執行中程式需重新開啟。證據：dev/verification/mini-mascot/。

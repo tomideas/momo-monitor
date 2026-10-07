@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType><TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF><UseWindowsForms>true</UseWindowsForms><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable>
+    <EnableDefaultPageItems>false</EnableDefaultPageItems><PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+  <ItemGroup>
+    <Using Remove="System.Windows.Forms" />
+    <Using Remove="System.Drawing" />
+    <Reference Include="MomoMonitor"><HintPath>$(MomoAssembly)</HintPath></Reference>
+    <Page Include="../SplashChecks/Resources.xaml" Link="Resources.xaml" />
+    <Resource Include="../../../StatusMonitor/Fonts/*" Link="Fonts/%(Filename)%(Extension)" />
+    <Resource Include="../../../StatusMonitor/app.ico" Link="app.ico" />
+    <Resource Include="../../../StatusMonitor/Assets/momo.png" Link="Assets/momo.png" />
+    <Resource Include="../../../StatusMonitor/Assets/mini-click.frames.zip" Link="Assets/mini-click.frames.zip" />
+    <Resource Include="../../../StatusMonitor/Assets/mini-drag.frames.zip" Link="Assets/mini-drag.frames.zip" />
+  </ItemGroup>
+</Project>

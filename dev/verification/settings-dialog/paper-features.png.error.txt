@@ -1,0 +1,4 @@
+System.InvalidOperationException: A settings combo without an ItemTemplate will print its item's type name
+   at StatusMonitor.MainWindow.<>c__DisplayClass7_0.<VerifyFeatureInteractions>g__Check|0(Boolean ok, String reason) in D:\temp\@coding\@tools\MomoMonitor\StatusMonitor\MainWindow.FeatureChecks.cs:line 37
+   at StatusMonitor.MainWindow.VerifyFeatureInteractions() in D:\temp\@coding\@tools\MomoMonitor\StatusMonitor\MainWindow.FeatureChecks.cs:line 435
+   at StatusMonitor.App.<>c__DisplayClass2_0.<RenderWindow>b__0(Object _, EventArgs _) in D:\temp\@coding\@tools\MomoMonitor\StatusMonitor\App.xaml.cs:line 221

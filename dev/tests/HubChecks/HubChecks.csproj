@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <!-- The test-only Computer deliberately shadows the native driver-owning class. -->
+    <NoWarn>$(NoWarn);CS0436</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="LibreHardwareMonitorLib"><HintPath>../../../StatusMonitor/libs/LibreHardwareMonitorLib.dll</HintPath></Reference>
+    <Reference Include="HidSharp"><HintPath>../../../StatusMonitor/libs/HidSharp.dll</HintPath></Reference>
+    <Compile Include="../../../StatusMonitor/Sensors/HardwareMonitorHub.cs" Link="HardwareMonitorHub.cs" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,1 @@
+PASS: all C/D drives show label, percentage and used capacity; 0/1/2/8 drives; live update and stable order after peak changes; GB/TB and zero used; bounded disk scroll and last drive reachable; compact two-drive height; both themes/locales; CPU/RAM/dual GPU details retained.

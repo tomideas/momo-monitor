@@ -1,0 +1,1 @@
+PASS: 48 fan monitoring / source / control-state checks; all controls are mocks.

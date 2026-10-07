@@ -18,6 +18,24 @@ Windows 11 桌面小工具：即時顯示整機狀態（CPU / GPU / RAM / 網路
 - 硬體感測：自行建置的 **LibreHardwareMonitor master** ＋ **PawnIO** 驅動（見下）
 - 分頁：**儀表板**（即時狀態）／**信息**（硬體與系統資訊，WMI）
 
+## 0.1.6 溫度與能耗改善
+
+- **溫度來源可追查**：首頁與 CPU 風扇監測共用溫度選擇邏輯；無效讀值不再擋住有效備選，Distance to TjMax 不當成實際溫度。GPU 核心、熱點、記憶體接面依硬體支援保留各自名稱與單位。
+- **功耗避免重複**：選取單一整卡功耗來源，不再把整卡、核心與電源軌全部相加；內顯功耗不再重複加進 CPU package。有效的 0 W 保留為零。
+- **筆電保守處理**：筆電或無法確認的機型不套桌機 TDP、周邊與 PSU 曲線。插電時只呈現標示清楚的 CPU＋GPU 範圍，使用感測值或使用者明確填入的 GPU 校準；離電且 Windows 有有效放電率時，以電池端功耗呈現。充電瓦數獨立顯示，不當成電腦用電。
+- **只累計有效監測**：睡眠／喚醒或長時間採樣中斷會切斷積分，不把睡眠時間填成最後一次運作功耗。用電說明加入已監測時間、缺少功耗讀值的時間與量測範圍；舊歷史仍可讀取。
+- **感測明細與 CSV**：可展開來源、識別碼、單位、範圍、目前／最低／最高與讀取狀態，並由使用者匯出當次樣本的 UTF-8 CSV，包含採樣時間與內附感測程式庫指紋，不蒐集主機名或硬體序號。
+
+感測支援仍取決於韌體與 LibreHardwareMonitor。筆電實機準確度尚未完成跨機驗證，對照方法與測試矩陣見 [溫度與功耗驗證方案](dev/docs/temperature-power-validation.md)。
+
+## 0.1.5 改善
+
+- **風扇資訊完整**：Auto／自訂模式都保留溫度與感測來源；顯示韌體控制、自訂已生效、等待套用或控制失敗，並區分「0 RPM 停轉」與「轉速讀數不可用」。
+- **首頁直接追查**：點 CPU／GPU 查看溫度趨勢；點 RAM 查看記憶體趨勢並按占用排序程序；點 DISK 查看按磁碟活動排序的程序。查看另一張 GPU 不會改變主 GPU 提醒偏好。
+- **缺值有原因與下一步**：採樣過期、權限受限、感測驅動缺失與無有效讀數都有說明，可重新讀取或開啟監測設定。缺值不會當成零。
+- **提醒可以回查**：獨立提醒頁保留最近 7 天事件，跨重啟保存開始／結束、持續時間、峰值或最低剩餘空間、恢復狀態與確認標記。點系統匣通知直達事件，並可查看相關讀數。
+- **正式可攜包**：使用者不需安裝 .NET；設定與歷史保存在 `momo-data`。儲存問題可見、備份可恢復；換電腦保留歷史並讓風扇回 Auto。
+
 ## 外觀與背景
 
 設定 → 一般 → 背景配色，可選 **Volt 夜跑**（深色，螢光強調）或 **Paper Pop 日間**（米白，鈷藍強調）。
@@ -42,7 +60,7 @@ Windows 11 桌面小工具：即時顯示整機狀態（CPU / GPU / RAM / 網路
 - **主 GPU**：設定 →「監控與提醒」。自動模式優先獨立顯卡，可手動指定，套用於第一張卡、GPU 趨勢、迷你模式及 GPU 提醒。以感測器識別碼保留選擇；原卡不可用時暫用自動選擇。
 - **隱藏內顯**：僅在有獨立顯卡時隱藏已辨識的內顯；只剩內顯時仍會顯示。手動選內顯會取消隱藏；未知型號保守保留。可讀到共享記憶體時標示 Shared／共享記憶體。
 - **超標提醒**：預設 CPU 90°C、主 GPU 85°C、RAM／GPU 記憶體 90%、固定磁碟剩餘空間 10%，持續 15 秒才觸發；每次異常只通知一次，恢復後再超標仍受 300 秒冷卻限制。門檻與時間可修改，需按「套用提醒設定」。
-- **提醒記錄**：設定 →「監控與提醒」分頁下方，保留本次啟動最近 20 筆。Windows 系統匣通知是否顯示取決於系統通知／勿擾設定；通知受抑制時仍有程式內記錄。
+- **提醒事件**：頁首「提醒」保留最近 7 天、跨重啟的事件，顯示異常持續／已恢復／監測中斷、時間、峰值與確認狀態；點通知直達相關事件，也可開啟相關趨勢。Windows 系統匣通知是否顯示取決於系統通知／勿擾設定；通知受抑制時仍有程式內記錄。歷史事件保留摘要，趨勢圖只涵蓋本次開啟期間。
 - **資料來源限制**：溫度、顯存等依感測器支援；不存在的數值不觸發提醒。磁碟剩餘空間每 30 秒查詢一次。歷史統計為有效取樣值的統計，功耗與用電仍包含估算。
 
 驗證：48 項核心斷言、14 項 UI 互動斷言、20 秒實際取樣累積，以及中英文／720 DIP 畫面檢查均通過；非管理員測試不等於所有硬體感測器支援驗證。系統匣初始化與釋放已測試，未用測試警報打擾使用者。
@@ -111,16 +129,25 @@ Windows 11 桌面小工具：即時顯示整機狀態（CPU / GPU / RAM / 網路
 
 瓦數與每程式分攤公式移植自 WattSeal（GPLv3）。
 
-## 前置需求：PawnIO
+## 感測驅動：PawnIO（內建，會詢問後安裝）
 
-新版 LibreHardwareMonitor 使用 **PawnIO**（開源、有簽章的核心驅動）做低階硬體存取，
-取代被 Microsoft 封鎖的 WinRing0。**首次使用需一次性安裝**（管理員）：
+CPU 溫度、CPU 封裝功耗與主機板風扇轉速在 Windows 上**只能透過核心驅動讀取**——沒有任何使用者模式程式能繞過，管理員權限也不行。看起來「不用裝驅動」的工具，都是把自家驅動包在安裝程式裡。
+
+LibreHardwareMonitor 新版改用 **PawnIO**（開源、有簽章的通用核心驅動），取代被 Microsoft 易受攻擊驅動封鎖清單擋下的 WinRing0。所需模組（`IntelMSR`、`LpcIO`）已包在函式庫內。
+
+**Momo 內建官方簽章的 PawnIO 安裝程式**（`StatusMonitor\Drivers\PawnIO_setup.exe`，原樣未修改，其授權明文允許原樣轉散佈）。在讀不到這些感測器的機器上第一次啟動時，Momo 會詢問一次是否安裝；按下後靜默安裝（`-install -silent`）、不需重新啟動 Windows，Momo 會自行重開以載入驅動。婉拒會被記住，設定 →「監控與提醒」在驅動缺席期間會一直保留這個安裝入口。
+
+也可以自行安裝，效果相同：
 
 ```powershell
 winget install namazso.PawnIO -e
 ```
 
-未安裝 PawnIO 時，CPU 溫度 / 風扇 / 板載電壓會顯示 `—`，其餘功能正常。
+或到 [pawnio.eu](https://pawnio.eu/) 下載。未安裝時，CPU 溫度 / 主機板風扇 / 板載電壓顯示 `—`，其餘功能正常；GPU 溫度與風扇走 NVAPI／ADL，不受影響。
+
+裝好驅動後風扇仍是 `—`，代表該主機板的 SuperIO 晶片不在 LibreHardwareMonitor 的支援清單內（OEM 整機常見）。用 `.\MomoMonitor.exe --diag diag.txt` 檢查 `[Motherboard]` 底下有沒有列出感測器。
+
+PawnIO 為 GPL-2.0，版權屬 namazso，專案位於 [github.com/namazso/PawnIO](https://github.com/namazso/PawnIO)。
 
 ## 建置
 
@@ -138,20 +165,27 @@ Invoke-WebRequest https://dot.net/v1/dotnet-install.ps1 -OutFile $env:TEMP\dotne
 powershell -ExecutionPolicy Bypass -File .\build.ps1
 ```
 
-產物為 `MomoMonitor.exe`（framework-dependent，執行端需 .NET 8 Desktop Runtime）。
+正式建置預設只更新根目錄的 **Windows x64 自包含單檔 `MomoMonitor.exe`**，使用者不需安裝 .NET，不會自動建立發佈資料夾或 ZIP。
 
-> 因為專案位於網路路徑，`build.ps1` 會先複製到本機暫存資料夾再編譯。產物**只有
-> `MomoMonitor.exe` 這一個檔案**；若它正在執行而被鎖住，建置會直接報錯要求你先關掉程式
-> （從系統匣結束，累計用電才會存檔），不會另外產生第二個檔名。
+明確需要打包時才執行 `powershell -ExecutionPolicy Bypass -File .\build.ps1 -Portable`，產生 `dist/MomoMonitor-Portable-win-x64/` 與 ZIP，包含 exe、說明、授權及空白 `momo-data/`；**不會打包本機個人設定或歷史**。
+
+`-Test` 產生另有名稱的非管理員測試執行檔；`-FrameworkDependent` 是開發用精簡版，執行端才需安裝 .NET 8 Desktop Runtime。明確打包時，若發佈資料夾已含使用者資料，建置會要求先搬走，避免覆蓋或刪除。
+
+還原固定使用 `StatusMonitor/NuGet.Config`，建置用 AppData 與 NuGet 套件快取隔離在 `dev/.build-env/`。首次自包含建置若沒有快取，需要連線到 NuGet 取得 Windows x64 執行階段套件；腳本結束會恢復呼叫端的 AppData 環境設定。
+
+> `build.ps1` 會先複製原始碼到本機暫存資料夾再編譯。執行檔固定使用
+> `MomoMonitor.exe` 這個名稱；若根目錄 exe 被執行中的程式鎖住，會明確回報尚未更新，
+> 不會自動關閉使用者程式。明確指定 `-Portable` 時仍可完成發佈資料夾與 ZIP。
+> 請自行從系統匣結束 Momo（累計用電才會存檔），再替換或啟動新版。
 >
-> 暫存資料夾（每次約 165 MB）在建置結束時自動刪除，**失敗時也會清**；啟動時另會掃掉一小時前
-> 遺留的舊資料夾。要保留以便除錯，加上 `-KeepWork`。
+> 建置結束時清除已驗證路徑的暫存資料夾，**失敗時也會清**；啟動時另會掃掉一小時前
+> 遺留的建置暫存資料夾，不刪含連結的資料夾。要保留以便除錯，加上 `-KeepWork`。
 >
 > `StatusMonitor\libs\` 內為自行建置的 LibreHardwareMonitor master 及其相依 DLL。
 
 ## 執行
 
-雙擊 `MomoMonitor.exe`，會出現 UAC 提示（讀取硬體感測器需要管理員權限）。
+先將 **整個可攜資料夾** 解壓縮到可寫入的本機位置，再雙擊 `MomoMonitor.exe`；不要直接在 zip 裡執行。保留 exe 旁的 `momo-data`，搬移、更新或備份前先結束 Momo。啟動會出現 UAC 提示（讀取硬體感測器需要管理員權限）。
 若沒有管理員權限，溫度 / 風扇 / CPU 瓦數會顯示 `—`，其餘功能正常。
 
 ## 設定
@@ -163,24 +197,32 @@ powershell -ExecutionPolicy Bypass -File .\build.ps1
   （France / Germany / UK / USA / China / India / Sweden / Poland / World average / Custom）
 - 電價（＋幣別）與碳強度可再手動微調；手動改值後國家自動變為 Custom
 - 顯示程序數、重置累計用電
+- **開機時自動啟動**：勾選後以「工作排程器」註冊一個登入工作，以最高可用權限執行，登入約 20 秒後啟動，因此不會像「啟動」資料夾那樣每次登入都跳 UAC；取消勾選即刪除該工作。設定這個選項本身需要以管理員身分執行 Momo。開啟方式與手動啟動相同（含「啟動時開啟迷你模式」）。
 
 ### 資料檔案
 
-預設存在 `%APPDATA%\StatusMonitor\`，共三個：
+正式可攜包預設保存在 exe 旁的 `momo-data/`；設定頁會顯示實際資料路徑與儲存狀態：
 
 | 檔案 | 內容 |
 |---|---|
-| `settings.json` | 所有偏好設定 |
+| `settings.json` | 偏好設定與單向雜湊的主機識別 |
 | `totals.json` | 累計用電（Wh），跨重啟 |
 | `energy-history.json` | 每日用電，保留約 400 天，「今日／7 天／30 天」由它算出 |
+| `alert-history.json` | 最近提醒事件，包含異常恢復資訊 |
 
-**可攜模式**：在 `MomoMonitor.exe` 旁邊建一個 `momo-data` 資料夾，這三個檔案就改存在裡面，隨程式一起搬移、備份。沒有這個資料夾則行為不變。第一次以可攜模式啟動時，`%APPDATA%` 裡既有的資料會自動複製過去（只複製到空資料夾，不會覆蓋）。
+JSON 採原子保存，每份保留上一版 `.bak`。主檔損毀時會嘗試備份、顯示恢復提示，並保留損毀原檔；沒有有效副本則保護原檔，避免用預設值覆蓋。無法儲存時會明確回報，**不會偷偷改存 AppData**。請將整個資料夾搬到可寫入位置後重開。
+
+搬到另一台電腦時，一般偏好與歷史保留；風扇回到韌體 Auto，風扇名稱／來源、主 GPU、功耗硬體校正、Windows 自動啟動／啟動迷你偏好與視窗位置會重設。沒有主機識別的舊設定也會執行一次安全重設；請在該電腦重新確認硬體設定後再開啟自訂控制。
+
+**舊版相容**：刻意移除 `momo-data` 時仍使用 `%APPDATA%\StatusMonitor\`。空白可攜資料夾首次啟動會複製既有 AppData 資料；已有任何可攜資料就不再合併，舊 AppData 原檔仍保留。
+
+驅動安裝與「開機時自動啟動」是目前電腦上的系統設定，不會隨資料夾搬移。從原電腦刪除可攜副本前，先關閉自動啟動；在同一台電腦搬移資料夾後，下次手動啟動會修正已啟用工作的路徑。
 
 ## 驗證（無介面）
 
 ```powershell
 .\MomoMonitor.exe --dump --out snapshot.json   # 取樣一次輸出 JSON
-.\MomoMonitor.exe --diag --out diag.txt        # 列出所有可見硬體感測器
+.\MomoMonitor.exe --diag diag.txt             # 列出所有可見硬體感測器
 .\MomoMonitor.exe --render dash.png            # 把儀表板算繪成 PNG
 ```
 
@@ -190,7 +232,7 @@ powershell -ExecutionPolicy Bypass -File .\build.ps1
   晶片驅動（本機 ASUS ROG STRIX B850-I 為 Nuvoton NCT6701D，已支援）。不支援的板子會顯示 `—`。
 - **GPU 風扇**以 RPM 顯示（LibreHardwareMonitor `GPU Fan 1`）；無風扇感測器的卡（如 AMD 內顯）顯示 `—`。
 - 非管理員執行時，溫度/風扇/CPU 瓦數顯示 `—`，其餘功能正常。
-- 單檔 exe 為 framework-dependent，執行端需安裝 .NET 8 Desktop Runtime。
+- 可攜資料需放在可寫入位置；選用 PawnIO 驅動與 Windows 自動啟動會改動目前電腦，不屬於可攜資料。
 
 ## 設計文件
 

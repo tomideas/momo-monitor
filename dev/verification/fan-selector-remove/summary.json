@@ -1,0 +1,12 @@
+{
+  "buildPassed": true,
+  "nativePassed": true,
+  "rootUpdated": true,
+  "version": "2.22.32.0",
+  "build": "Release: 0 warnings, 0 errors. Self-contained Windows x64 publish succeeded; NU1900 vulnerability endpoint unavailable. No Portable package created.",
+  "fan": "48 mock assertions passed: hardware source selection, missing temperature handling, legacy GPU override ignored for CPU fan, control-state recovery retained.",
+  "features": "440 assertions passed including legacy Source values 1/2/3 ignored without losing fan identity.",
+  "native": "PAPER POP / English and VOLT / Traditional Chinese: 159 WPF assertions each. Actual custom panel screenshots inspected: no Follow, Auto, CPU or GPU source row; only temperature curve and constant speed controls.",
+  "preparedExeSha256": "7B047101446247242E556463D5151FF467192F83ABBB93F69D602C2EF5AC7683",
+  "deployment": "Prepared executable source hashes match current product. No real fan writes or user data changes."
+}

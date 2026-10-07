@@ -1,0 +1,13 @@
+{
+  "direction": "product-to-design",
+  "buildPassed": true,
+  "nativePassed": true,
+  "productSourceUnchanged": true,
+  "productFilesVerified": 120,
+  "changedTokens": 16,
+  "implementedTokens": 52,
+  "futureTokens": 13,
+  "native": "PAPER POP / English and VOLT / Traditional Chinese each passed 159 UI, 4 scrolling and 19 settings assertions. Native dashboard, Info, Process, Fans, Settings and Mini inspected.",
+  "design": "Formal JSON reread and schema validated; fresh mappings, two themes, removed options/headings, shapes, spacing and source lineage synchronized. Derived markdown and preview-data regenerated. Current source compared with historic import-baseline for shared keys. Defaults not read.",
+  "maintenance": "design-system/AI.md now records same-task synchronization of GUI changes and removals."
+}

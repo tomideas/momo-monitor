@@ -1,0 +1,17 @@
+{
+  "source": "D:\\temp\\@coding\\@momo\\gif\\Ref2VA_00008_-ezgif.com-video-to-gif-converter.gif",
+  "frameCount": 66,
+  "durationMs": 6600,
+  "loop": 1,
+  "size": [
+    798,
+    577
+  ],
+  "crop": [
+    2,
+    131,
+    800,
+    708
+  ],
+  "transparentBackground": true
+}

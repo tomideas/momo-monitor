@@ -1,0 +1,1 @@
+PASS: 440 assertions (alerts, GPU identity, bounded history, settings compatibility, fan curve, header naming, window placement, data location, power curves, logon task)

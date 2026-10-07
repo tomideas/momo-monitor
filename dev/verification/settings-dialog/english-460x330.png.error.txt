@@ -1,0 +1,4 @@
+System.InvalidOperationException: Short windows must retain a usable scrolling settings area
+   at StatusMonitor.MainWindow.<VerifySettingsInteractions>g__Check|96_0(Boolean ok, String reason, <>c__DisplayClass96_0&) in D:\temp\@coding\@tools\MomoMonitor\StatusMonitor\MainWindow.Settings.cs:line 147
+   at StatusMonitor.MainWindow.VerifySettingsInteractions() in D:\temp\@coding\@tools\MomoMonitor\StatusMonitor\MainWindow.Settings.cs:line 157
+   at StatusMonitor.App.<>c__DisplayClass2_0.<RenderWindow>b__0(Object _, EventArgs _) in D:\temp\@coding\@tools\MomoMonitor\StatusMonitor\App.xaml.cs:line 223

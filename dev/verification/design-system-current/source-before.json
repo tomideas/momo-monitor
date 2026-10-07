@@ -1,0 +1,482 @@
+[
+  {
+    "path": "StatusMonitor/app.asinvoker.manifest",
+    "sha256": "22795D017DBF51D16EAE87AAD632CF30E9C008A4CC0E1E84398E12B419BF1126"
+  },
+  {
+    "path": "StatusMonitor/app.ico",
+    "sha256": "A71C33E5E628AE7018C3D9EC369BA1DD988D15412AD883D1022EA93CE3F2E13E"
+  },
+  {
+    "path": "StatusMonitor/app.manifest",
+    "sha256": "8C2068E2513BE0BECF7CEA2DD7A2421F40C88C7240AC8F9438FE36D25BF987AB"
+  },
+  {
+    "path": "StatusMonitor/App.xaml",
+    "sha256": "427AA3A75980272DF0960B8437EE1CC94FB79BBEAB6E9820DB9379987F27AC88"
+  },
+  {
+    "path": "StatusMonitor/App.xaml.cs",
+    "sha256": "92391DAF3DCBBAD2D243EBA5933A4553F4411E956BDCD708600B64EC8B4104A4"
+  },
+  {
+    "path": "StatusMonitor/MainWindow.Alerts.cs",
+    "sha256": "A80ED2E32A7DA1C8D60E210CB1645D72017D18C5B3E0E1CDA7B6F6A547623A0A"
+  },
+  {
+    "path": "StatusMonitor/MainWindow.FeatureChecks.cs",
+    "sha256": "7264E09092815D1886FE2F4814887863B3655B4138E2B4C1B3A6B5391FCC253F"
+  },
+  {
+    "path": "StatusMonitor/MainWindow.Features.cs",
+    "sha256": "1A299A29CAB58A0113CFB2ED0EE10BAA2392626DBEAF0A0858F6CFFFD025752F"
+  },
+  {
+    "path": "StatusMonitor/MainWindow.Inspection.cs",
+    "sha256": "8A40D73DEA59EF8459800DDBC4E44C71B7118E69868B9E0E070F729E7D81AB49"
+  },
+  {
+    "path": "StatusMonitor/MainWindow.Settings.cs",
+    "sha256": "57E51C248C361FF99F254C2A7F23D64B39D326D991280BC4A9224E8465371635"
+  },
+  {
+    "path": "StatusMonitor/MainWindow.Telemetry.cs",
+    "sha256": "3481FD72D2770A8A94DB1323D0207A217FFAF3A21B452AE95E07B66E412FDA24"
+  },
+  {
+    "path": "StatusMonitor/MainWindow.xaml",
+    "sha256": "99D44992BC774424793959D258267FF9784095E93519EDAC6706CB1DAA193077"
+  },
+  {
+    "path": "StatusMonitor/MainWindow.xaml.cs",
+    "sha256": "8991922F42544CF8976FA1D1DE55EFDDACD535D1004C93148C74D8AEB5CC4D3D"
+  },
+  {
+    "path": "StatusMonitor/MiniWindow.xaml",
+    "sha256": "189A3BA8322E4BC979B5AD7672CCECB60765C69EC1F65CD244253C7A5473BF64"
+  },
+  {
+    "path": "StatusMonitor/MiniWindow.xaml.cs",
+    "sha256": "5BD829E1D5DD856E2F6A69367E34A54F60DCE864F1161C49890617289CF7A5A6"
+  },
+  {
+    "path": "StatusMonitor/NuGet.Config",
+    "sha256": "F545A7E2EA14AC53CDFB91217CAE67B8FF14275313F6298F9A3331D205B6C948"
+  },
+  {
+    "path": "StatusMonitor/premium-audit.json",
+    "sha256": "3F7FA41E1387C21C73BDBA19D869D64F4D48FA1FE1A4833423F151074EC61D40"
+  },
+  {
+    "path": "StatusMonitor/SplashWindow.xaml",
+    "sha256": "3048CF98C9FEE18464BA1C9DAB90D0BA3C2835BA135E9986164621165E823065"
+  },
+  {
+    "path": "StatusMonitor/SplashWindow.xaml.cs",
+    "sha256": "A59330508533AA355149754F013E8D0C489999496EFBD560BF9AB8F7D5C3A14B"
+  },
+  {
+    "path": "StatusMonitor/StatusMonitor.csproj",
+    "sha256": "3A974E29C666E950F6072B951AA7725B5EA4AC4C9AF965BDC9716B174A648539"
+  },
+  {
+    "path": "StatusMonitor/Assets/mini-click.frames.zip",
+    "sha256": "1F6843B864C4EF82009ECD78161DC0667045BC244508FABC9557E17D4AF1EF84"
+  },
+  {
+    "path": "StatusMonitor/Assets/mini-click.webp",
+    "sha256": "30438E85CE8F5977A2698F46AAB64FD4E2E73B202EB6A131E2B902DD0AF5125F"
+  },
+  {
+    "path": "StatusMonitor/Assets/mini-drag.frames.zip",
+    "sha256": "EB2097027BA7FBD1F4993EF8B1F8A726462B539B7ED56010C94501EC81EDD994"
+  },
+  {
+    "path": "StatusMonitor/Assets/mini-drag.webp",
+    "sha256": "617A7A5C0D092FDA4D6CC48E56CFFC21D033A29FB357605A27A1710944A69977"
+  },
+  {
+    "path": "StatusMonitor/Assets/mini.frames.zip",
+    "sha256": "B5862F183D637FB0096F02721472795270CE483C5557068B832BBD11755F8BFD"
+  },
+  {
+    "path": "StatusMonitor/Assets/mini.json",
+    "sha256": "EB54E92E207F5F2C40DA6EA13DFEBAD8F81533A9549739409329A8755F062506"
+  },
+  {
+    "path": "StatusMonitor/Assets/mini.webp",
+    "sha256": "1261BB2859CE51436B901D66152D8CB3F09F2263819CE9C9DE70906833BA1379"
+  },
+  {
+    "path": "StatusMonitor/Assets/momo.png",
+    "sha256": "59E80FD4CC37830965D4703B4702E06259FBA59FAB24C25EC45A060312515E91"
+  },
+  {
+    "path": "StatusMonitor/Assets/startup.frames.zip",
+    "sha256": "6353397DEF523212FE2A2C0617D5E038C511443D02874CE547945A50B5E0F57B"
+  },
+  {
+    "path": "StatusMonitor/Assets/startup.json",
+    "sha256": "E39ACF15C0EE56C42E708756EFFA3183FDB2AF949C07505B81A3121BD5F3A1A5"
+  },
+  {
+    "path": "StatusMonitor/Assets/startup.webp",
+    "sha256": "7F87C5909239DA29D6401F15C1C4F84E36266EDC02A3464E1CA4E2F9AD65C2C3"
+  },
+  {
+    "path": "StatusMonitor/Controls/RowUniformPanel.cs",
+    "sha256": "2AED4F43A19294D155D3DF7FEBFC55AA01B4A5AB24F7A58E0DE506BD2EC6E86F"
+  },
+  {
+    "path": "StatusMonitor/Converters/BoolToHiddenConverter.cs",
+    "sha256": "E023965C54B3B6A356780C5C8FCB54FB691CA3FB8C9A85FABD95833E2C13BDDC"
+  },
+  {
+    "path": "StatusMonitor/Converters/InfoCardColumnsConverter.cs",
+    "sha256": "E72D1054BA827C51E4EE2016FA8EA0626B1D9FD8C5B0F564853499A819458051"
+  },
+  {
+    "path": "StatusMonitor/Converters/ToneBrushConverter.cs",
+    "sha256": "EBFD34CE78305451C3F596CDB3C878C7AC0BE9203DFD1323ACEFC1620AC9D6A4"
+  },
+  {
+    "path": "StatusMonitor/Drivers/PawnIO_setup.exe",
+    "sha256": "1F519A22E47187F70A1379A48CA604981C4FCF694F4E65B734AAA74A9FBA3032"
+  },
+  {
+    "path": "StatusMonitor/Fonts/BarlowCondensed-Black.ttf",
+    "sha256": "E74B750DF582C608F35DB467B711B2B60D2217618E85E60B72B42DFD00446CAB"
+  },
+  {
+    "path": "StatusMonitor/Fonts/BarlowCondensed-BlackItalic.ttf",
+    "sha256": "E1ED5D7E50C6A4498454D40509CE2362384A2C7870DF3418FDBD010F81DFFAD3"
+  },
+  {
+    "path": "StatusMonitor/Fonts/BarlowCondensed-BoldItalic.ttf",
+    "sha256": "D8694F65CD70C3E5E600EAD37657AAB0ADB5F63B275D0C1F6F4A7046DE222145"
+  },
+  {
+    "path": "StatusMonitor/Fonts/Geist-Bold.ttf",
+    "sha256": "E866B423B755233CAE8BCE6A37519F6FE630BE9772FA08FC3114BFF15BC8580F"
+  },
+  {
+    "path": "StatusMonitor/Fonts/Geist-Medium.ttf",
+    "sha256": "0090E004725F6F64B841715B4167920580F883FCF9B67FC6D744089103FEC101"
+  },
+  {
+    "path": "StatusMonitor/Fonts/Geist-Regular.ttf",
+    "sha256": "5C8968EAFB98A4C4F47033DAF29E38E284A6F2A82EB017D171AB040FE7C4B615"
+  },
+  {
+    "path": "StatusMonitor/Fonts/Geist-SemiBold.ttf",
+    "sha256": "612EC98DF33935354F39E81E54101656961AB6E5549F64B63EB57868BA7BAB8D"
+  },
+  {
+    "path": "StatusMonitor/Fonts/Geist-V.ttf",
+    "sha256": "CDCC4815CBF5F9882FA74E48F8AB410A0495781A58FF7316570F664E7E987753"
+  },
+  {
+    "path": "StatusMonitor/Fonts/GeistMono-Bold.ttf",
+    "sha256": "EA1CABB4D152088721B5E0B1865BB43C75C1B2D468384A551E0958E53D4FA370"
+  },
+  {
+    "path": "StatusMonitor/Fonts/GeistMono-Medium.ttf",
+    "sha256": "90B15711DC3779B2E64E8AFF5228154DD019A90BCE4947549C4A8A8A43F2AC25"
+  },
+  {
+    "path": "StatusMonitor/Fonts/GeistMono-Regular.ttf",
+    "sha256": "42D8AD2E610238E64E8ABFCDE3037C63F7850A73928742B7AB7229D897BCB155"
+  },
+  {
+    "path": "StatusMonitor/Fonts/GeistMono-SemiBold.ttf",
+    "sha256": "8B6E127117B03046495B40D4227DE66BF5F81F7FE2F4546EE578E89738052314"
+  },
+  {
+    "path": "StatusMonitor/Fonts/GeistMono-V.ttf",
+    "sha256": "0E1AF3F507A1C8DFBB03D13FFAD585834CD45ED7CCB78C756C7CE7873D180D30"
+  },
+  {
+    "path": "StatusMonitor/Fonts/NotoSansTC-Bold.otf",
+    "sha256": "55420B259EB119BF5F2A0AADBA10CF9D736C12D64AB93E78546D69EF5F43558B"
+  },
+  {
+    "path": "StatusMonitor/Fonts/NotoSansTC-Medium.otf",
+    "sha256": "BF206DCA0975779BAC71CB49A037A364156CA98A0C431B1B7D6B29FB8952AC7E"
+  },
+  {
+    "path": "StatusMonitor/Fonts/NotoSansTC-Regular.otf",
+    "sha256": "5BAB0CB3C1CF89DDE07C4A95A4054B195AFBCFE784D69D75C340780712237537"
+  },
+  {
+    "path": "StatusMonitor/I18n/Loc.cs",
+    "sha256": "3A6CB0CECC5ADEAE7F77C5423CD1D809ADD3CD3855361626C2D13EEC8BF6C0AE"
+  },
+  {
+    "path": "StatusMonitor/libs/BlackSharp.Core.dll",
+    "sha256": "B1DCBE5A23548FEFA19E252EEE6A36802105A95B95DE04F0427B18FE3CC18C99"
+  },
+  {
+    "path": "StatusMonitor/libs/DiskInfoToolkit.dll",
+    "sha256": "8CD2B342AF26C8D51DA1B9C50932EA66F65EF3EA2E69CAD4D56552ED657C6A80"
+  },
+  {
+    "path": "StatusMonitor/libs/HidSharp.dll",
+    "sha256": "79F2BC8DDFF102E6DBEDE84B2C211A3AEA2ED675BF762FA0F02ECB65F61EE812"
+  },
+  {
+    "path": "StatusMonitor/libs/libMonoPosixHelper.dll",
+    "sha256": "B16F77C155A36559A44DA32E17E0BF63D899DB0BB48C6590BC8EBA7BB0FF87A8"
+  },
+  {
+    "path": "StatusMonitor/libs/LibreHardwareMonitor.provenance.json",
+    "sha256": "8E8D0D61054CD5181416FED07FDA9FE5A9991DD13CC85BCE4847BC8AB0CA9A7B"
+  },
+  {
+    "path": "StatusMonitor/libs/LibreHardwareMonitorLib.dll",
+    "sha256": "C81F48135F56BFD22E5273B61D8265D1E75C4E7C9964845FD56AF27286EE07AA"
+  },
+  {
+    "path": "StatusMonitor/libs/Mono.Posix.NETStandard.dll",
+    "sha256": "BE0215D90462ADBAE5F03D6E5C3A969C9842A866B013DF7A395769C5C352FA7E"
+  },
+  {
+    "path": "StatusMonitor/libs/MonoPosixHelper.dll",
+    "sha256": "A57141B26D6EA3326B165BDCB15CA2BCD34737370F52358E12FFC8DF41B92C62"
+  },
+  {
+    "path": "StatusMonitor/libs/RAMSPDToolkit-NDD.dll",
+    "sha256": "C7F4EA19F5BB5FB1BABF43E608BE7F26941065C38CAF8B1186D62A8A93DB4E7F"
+  },
+  {
+    "path": "StatusMonitor/libs/System.CodeDom.dll",
+    "sha256": "C0F126EA64F58C4E74662EB640A1D295257935C50CFF497239F558F4620D1613"
+  },
+  {
+    "path": "StatusMonitor/libs/System.IO.Ports.dll",
+    "sha256": "2CF5FE18D3B7F75A6361BDF9440175DF33489605E7CEC376AA831B9EC1DB9F77"
+  },
+  {
+    "path": "StatusMonitor/libs/System.Management.dll",
+    "sha256": "E2678BB69776324D9CAF70A66411415C640DDF1404507907F58E06D96CB79854"
+  },
+  {
+    "path": "StatusMonitor/libs/System.Threading.AccessControl.dll",
+    "sha256": "1D74556C5BF6A2AEC0DE4A0792C403935A949325FC8DDA119C2FB1E5B3B7C0B6"
+  },
+  {
+    "path": "StatusMonitor/Models/BatteryReading.cs",
+    "sha256": "946E38AC39647127219E8641CA1B3DB4E2E0E3CA8CBA0FAE37ED50D74B011D7F"
+  },
+  {
+    "path": "StatusMonitor/Models/FanCurve.cs",
+    "sha256": "E2EBD0B611B14A01B78B39C12FE2F1293A00473A5F977BD2FA66B5D47AFEA51F"
+  },
+  {
+    "path": "StatusMonitor/Models/FanFollow.cs",
+    "sha256": "78ADE59AC0A052C3D6359519537AC6597CBD7ADAFCC8640B1A6742000FD9C7F8"
+  },
+  {
+    "path": "StatusMonitor/Models/FanNaming.cs",
+    "sha256": "A6A634E69C19F1B98C33C2B3E09FD89B4DCEFA5F1E12DB9663CBCE2D00E5643C"
+  },
+  {
+    "path": "StatusMonitor/Models/SensorReading.cs",
+    "sha256": "C727A7587E48798E0A44681CE4F5F8C58EA98AFC0B9BA08274E314E928AD99E9"
+  },
+  {
+    "path": "StatusMonitor/Models/Snapshot.cs",
+    "sha256": "9A7296DDDBDF50659588C85207D92C6CC51033B0C813298C8E35832281F5BF8F"
+  },
+  {
+    "path": "StatusMonitor/Models/Snapshot.Telemetry.cs",
+    "sha256": "1AA6D7CE8C5542D5027DD01BB1D79ED76DAC633477FBFD578118E856F286031C"
+  },
+  {
+    "path": "StatusMonitor/Models/SystemInfo.cs",
+    "sha256": "596CBF09C675CF956DA8E25D1A18CDF96483DFD51BA92E4F6282D240F0EF4531"
+  },
+  {
+    "path": "StatusMonitor/Models/WindowPlacement.cs",
+    "sha256": "9AB6DC95022B2DFC593D12751A6BC54B72481C4BB6175CB38D45353157E80CE0"
+  },
+  {
+    "path": "StatusMonitor/Power/EnergyIntegrator.cs",
+    "sha256": "611D9138EAF0D7F8EF50AA6DC5873F050A2571E9C6A26453D749A8D2421F08C1"
+  },
+  {
+    "path": "StatusMonitor/Power/PowerAccounting.cs",
+    "sha256": "73D8448DBC0C573FF20A07C0F77C15017BE375AF65240A265C705284E0649F2C"
+  },
+  {
+    "path": "StatusMonitor/Power/PowerModel.cs",
+    "sha256": "BD51E043E8FED18F9CE2DC1DA492A76243EF20989ECA716C8B62C53608DB3F1C"
+  },
+  {
+    "path": "StatusMonitor/Sensors/BatterySensor.cs",
+    "sha256": "9D433BA36CA8CC864E86FE90E32B85BFD1199937C3D91576306D8A00CBB37B1B"
+  },
+  {
+    "path": "StatusMonitor/Sensors/CpuClockSensor.cs",
+    "sha256": "A54BB36F6352193EC2136E90BFA537EDDF39FC77AA358718A827BF66E134853A"
+  },
+  {
+    "path": "StatusMonitor/Sensors/CpuSensor.cs",
+    "sha256": "A842F6A433A2714AA51264118C984FF0DA27545A95089E3D1E4B81DA85BACDB7"
+  },
+  {
+    "path": "StatusMonitor/Sensors/GpuSensor.cs",
+    "sha256": "D89482A86E278D4A8117C2D72C3CF1FA9967F88B1D99171361193D150003A8E5"
+  },
+  {
+    "path": "StatusMonitor/Sensors/HardwareMonitorHub.cs",
+    "sha256": "08B3DC4929A502EA770F8733392E27D93E5D834CF61CA33D7E92E79837AE4413"
+  },
+  {
+    "path": "StatusMonitor/Sensors/NetworkSensor.cs",
+    "sha256": "23B2B58BC8CA1A6B43A8F802A6144AED91A8EE392CD25B6B7C615BACF9B89582"
+  },
+  {
+    "path": "StatusMonitor/Sensors/ProcessSensor.cs",
+    "sha256": "F23A8903D0B673F1F1A89A4E84C7FC27F8048E3846B1D023B8061BFAAA04DEC8"
+  },
+  {
+    "path": "StatusMonitor/Sensors/RamSensor.cs",
+    "sha256": "011D87138E35F64C1E6528E0398C19B8F9F743A2DE6E74CB24B028934A3584C3"
+  },
+  {
+    "path": "StatusMonitor/Sensors/SensorResolver.cs",
+    "sha256": "88DC0CD191A047933036659E4C9F0D6542F817EEA22CDCAC90C7F3D1B6E9B176"
+  },
+  {
+    "path": "StatusMonitor/Sensors/StorageSensor.cs",
+    "sha256": "E2D21A5E413EC51369AB85F80CCDE707D896E1921C05CD411F5760B4EE5CEA68"
+  },
+  {
+    "path": "StatusMonitor/Services/AlertEngine.cs",
+    "sha256": "C02B34238B5A3BFFA23E9E74A987116041EEC427BD7D3240298A651ACB1265B8"
+  },
+  {
+    "path": "StatusMonitor/Services/AlertHistory.cs",
+    "sha256": "D56177BE95F90DD558942AFBEDA7B7237F9690F7130DF0AA2211A5CBFDCF6B27"
+  },
+  {
+    "path": "StatusMonitor/Services/AwakeClock.cs",
+    "sha256": "1A0E5BDE0172F583C5A917375705BEBEE1AAC33F71D2E864E4A44216F216918D"
+  },
+  {
+    "path": "StatusMonitor/Services/EnergyHistory.cs",
+    "sha256": "6E5A8DD7ED7D2AB89180EB83BF3C37D247520D35E24161E074750D8A295A51F6"
+  },
+  {
+    "path": "StatusMonitor/Services/FanControlService.cs",
+    "sha256": "FCBD31B8687C73230323B3BD84E1001113A4AA30CB2A1215B806F19A50F54046"
+  },
+  {
+    "path": "StatusMonitor/Services/GpuSelection.cs",
+    "sha256": "78490BF186F531274A95C4EC9DD55AF81FFF6098A9C88E78075D3AE9BE328207"
+  },
+  {
+    "path": "StatusMonitor/Services/MonitorService.cs",
+    "sha256": "DF4C8B20FBCA5A371E79214501FA900D09019C12F1A008C77D4B544E417167B6"
+  },
+  {
+    "path": "StatusMonitor/Services/ProcessRanking.cs",
+    "sha256": "E1A03263DD5A837DBE4488031711CED88214E092D835906C624D32579E5E3DA8"
+  },
+  {
+    "path": "StatusMonitor/Services/SensorDriverService.cs",
+    "sha256": "03AADDA439DB2161B5CD3EE091A29381A1CCB9E7DF315B91C7128E10D29C513C"
+  },
+  {
+    "path": "StatusMonitor/Services/SensorReportService.cs",
+    "sha256": "91A8715173BD8E8B9A30F08119905AE969085FF5264935667ADE7E2A74805CB7"
+  },
+  {
+    "path": "StatusMonitor/Services/StartupService.cs",
+    "sha256": "12418686370CDEF9C8890335BF5A19332617B986E43BEA509A0B22BA322C37D1"
+  },
+  {
+    "path": "StatusMonitor/Services/SystemInfoService.cs",
+    "sha256": "2B59F7F097105757D6F149AC2EB0543E292BD981AD127D042F8D8D966F015FF8"
+  },
+  {
+    "path": "StatusMonitor/Services/TelemetryHistory.cs",
+    "sha256": "FC77AD41E7B7EC0B87934DAB361B96EC773BBCF095298CFC1E19EF9FB58F52FD"
+  },
+  {
+    "path": "StatusMonitor/Services/TrayService.cs",
+    "sha256": "61C5F47C5523A147891A362D98E80508CC87314D27C5FAEA8E7E33291812C23C"
+  },
+  {
+    "path": "StatusMonitor/Settings/AppFont.cs",
+    "sha256": "DE5584E37F96DD8A23082D00BCF094C273ED5CA6A4A24EE1C02848C45D83D0C0"
+  },
+  {
+    "path": "StatusMonitor/Settings/AppSettings.cs",
+    "sha256": "A62834B704FB8C88FE2F7148D22BAC14028E909746D3BF5C06C2F8F91ABCB0F8"
+  },
+  {
+    "path": "StatusMonitor/Settings/DataStorageService.cs",
+    "sha256": "9997347F4436646850B5E68DAF0B8604CEC4A74B636CF8089A492C738769251C"
+  },
+  {
+    "path": "StatusMonitor/ViewModels/FanProfileVm.cs",
+    "sha256": "5225B67A63F934B06C57476D4A37E757C2679BEEC2A949D4AA51339CE9BBF0DC"
+  },
+  {
+    "path": "StatusMonitor/ViewModels/GpuTdpVm.cs",
+    "sha256": "292EE1656127633C3F0EAFDE132FC1486ED60E70B773906861EFACE6B47F562B"
+  },
+  {
+    "path": "StatusMonitor/ViewModels/MainViewModel.AlertEvents.cs",
+    "sha256": "9925C426637A839FB88F81D2F25B98441C0D844801BF3C0B76763F7008A4807B"
+  },
+  {
+    "path": "StatusMonitor/ViewModels/MainViewModel.cs",
+    "sha256": "CD30F2421425CCBAD0757A649DF58A8E7863920C8F803E184EDE2D933841BB55"
+  },
+  {
+    "path": "StatusMonitor/ViewModels/MainViewModel.Features.cs",
+    "sha256": "87126A0B2276D1AE51FD9D201BC08361833B0A19021764620ADD53B3C7B22E3D"
+  },
+  {
+    "path": "StatusMonitor/ViewModels/MainViewModel.Inspection.cs",
+    "sha256": "D33BB3D73FE0BB8385683749A602DED1216EF2DE42F3E23FE9F3A8B1FC320617"
+  },
+  {
+    "path": "StatusMonitor/ViewModels/MainViewModel.PowerEvents.cs",
+    "sha256": "3D924E28566B7A3C4D30ADBAB8C1072143717EAC02312935C9875B4ECD0CFB4B"
+  },
+  {
+    "path": "StatusMonitor/ViewModels/MainViewModel.Storage.cs",
+    "sha256": "05A70F54376A8F01D0307C322E51B0B0EB4F070FCEB06DDB15EEED9A63D161B0"
+  },
+  {
+    "path": "StatusMonitor/ViewModels/MainViewModel.Telemetry.cs",
+    "sha256": "6C456225F74602BB2884A670E9EF0CBA7C92EE50535C20E321F61135B8988611"
+  },
+  {
+    "path": "StatusMonitor/Views/MascotAnimation.cs",
+    "sha256": "8C4AFFB6D3FE71DB4825882E390F6F2A03A2456F10E857667DAD5EF53604EAED"
+  },
+  {
+    "path": "StatusMonitor/Views/MetricBar.cs",
+    "sha256": "8A9031B4962EFC43C42042E6944DD0F63F22C0C2581E6AEB9915E5BF877B36FD"
+  },
+  {
+    "path": "StatusMonitor/Views/Motion.cs",
+    "sha256": "DEA83BB7D7B142B72486C7AF91C093D85CAFCF8867F28AD5D89E3BB185FCAFE5"
+  },
+  {
+    "path": "StatusMonitor/Views/Theme.cs",
+    "sha256": "6B15F76870DCA66654173FB2B7566FD2F15CFC65639410E67AFCCF49EB1092F6"
+  },
+  {
+    "path": "StatusMonitor/Views/TitleBar.cs",
+    "sha256": "FA49B5EA715A2562950F254C4B5BC1715CADC45CCC76F4F667FA45E304AB0B9F"
+  },
+  {
+    "path": "StatusMonitor/Views/TrendChart.cs",
+    "sha256": "765CF9D1FEED1A60EDB8F9C723E68BF4F4418F759C73CCF629A38E7B862B8C94"
+  }
+]

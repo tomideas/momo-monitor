@@ -1,0 +1,6 @@
+{
+  "library": "LibreHardwareMonitorLib",
+  "fileVersion": "0.9.6.0",
+  "sha256": "C81F48135F56BFD22E5273B61D8265D1E75C4E7C9964845FD56AF27286EE07AA",
+  "provenance": "Custom build from upstream master with NCT6701D/B850 support, as documented in StatusMonitor.csproj. The original build did not record an upstream commit. This fingerprint identifies the bundled binary; it does not assert the official 0.9.6 release tag."
+}

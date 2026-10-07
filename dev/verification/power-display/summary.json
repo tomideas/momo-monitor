@@ -1,0 +1,10 @@
+{
+  "buildPassed": true,
+  "nativePassed": true,
+  "rootUpdated": true,
+  "build": "Release build: 0 warnings, 0 errors. Self-contained Windows x64 publish succeeded; NU1900 package vulnerability endpoint unavailable due to restricted network.",
+  "native": "PAPER POP and VOLT each passed 152 existing WPF interaction assertions. Native dashboard and Traditional Chinese / English Settings screenshots visually inspected.",
+  "source": "Removed estimate prefixes from TotalWattsValue, CPU PowerText and GPU PowerText; removed estimate-only PowerNote; calculation help appears only in General Settings. PowerEstimated metadata and accounting remain unchanged.",
+  "deployment": "Root MomoMonitor.exe replaced successfully; SHA256 matches the verified prepared executable. No Portable packaging.",
+  "preparedExeSha256": "73AD542693F477F1D953A79A9AFC7ECF78034F304A6036B6565A5C9969E32FD0"
+}

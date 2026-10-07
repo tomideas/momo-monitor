@@ -1,0 +1,1 @@
+2026-10-07：App.xaml 最後 NET Border 局部 BorderThickness=0，移除末尾 stroke，其餘 LoadRow 分隔線保留。Release 構建 0 警告 / 0 錯誤，自包含 win-x64 publish 成功；PAPER POP 英文及 VOLT 繁中 460×660 原生 --bottom 截圖已目視確認。根 MomoMonitor.exe 被執行中程式鎖住、未替換；新版在 dev/artifacts/net-bottom-border/MomoMonitor.exe。證據：dev/verification/net-bottom-border/。

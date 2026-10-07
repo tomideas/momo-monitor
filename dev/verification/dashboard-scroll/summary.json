@@ -1,0 +1,12 @@
+{
+  "buildPassed": true,
+  "nativePassed": true,
+  "rootUpdated": true,
+  "version": "2.22.32.0",
+  "build": "Release: 0 warnings, 0 errors. Self-contained Windows x64 publish succeeded; NU1900 vulnerability endpoint unavailable. No Portable package created.",
+  "native": "PAPER POP / English and VOLT / Traditional Chinese: 161 WPF assertions and 4 native dashboard scrolling assertions each. Fit without scrollbar, single 12 DIP bottom gutter, short-window scrollbar, NET reachable.",
+  "visual": "Native dashboard fit, Info, Fans, Alerts screenshots inspected. Info duplicate heading, underline and intro removed; all five pages use PageContent 12/4/12/12 DIP margin. Existing WMI availability limits preview Info to Storage in this environment; hardware discovery logic unchanged.",
+  "static": "Strict audit of WPF product StatusMonitor: zero findings. Repository-wide web auditor reports existing unrelated design-editor HTML findings, kept in static-audit.json.",
+  "preparedExeSha256": "A4FA2BD1D58FC1388F3144D62F3EDA8CA2356885A08043D5406F1087DC38A0A6",
+  "deployment": "Prepared self-contained executable source hashes match current product files. No fan writes or real data changes."
+}

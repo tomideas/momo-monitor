@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType><TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable>
+    <EnableDefaultPageItems>false</EnableDefaultPageItems><PlatformTarget>x64</PlatformTarget>
+    <NoWarn>$(NoWarn);CS0436</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Use the last successful application build's dependencies/resources when
+         unrelated in-progress source changes prevent a complete product build. -->
+    <Reference Include="MomoMonitor"><HintPath>../../../StatusMonitor/bin/Release/net8.0-windows/MomoMonitor.dll</HintPath></Reference>
+    <Compile Include="../../../StatusMonitor/SplashWindow.xaml.cs" Link="SplashWindow.xaml.cs" />
+    <Compile Include="../../../StatusMonitor/Views/Motion.cs" Link="Motion.cs" />
+    <Page Include="SplashWindow.xaml" />
+    <Page Include="Resources.xaml" />
+    <Resource Include="../../../StatusMonitor/Assets/startup.frames.zip" Link="Assets/startup.frames.zip" />
+    <Resource Include="../../../StatusMonitor/Fonts/*" Link="Fonts/%(Filename)%(Extension)" />
+  </ItemGroup>
+</Project>

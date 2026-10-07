@@ -1,0 +1,11 @@
+{
+  "Title": "Momo System Monitor",
+  "Width": 460,
+  "Cards": [
+    {
+      "Title": "Storage",
+      "ActualWidth": 420,
+      "ActualHeight": 280
+    }
+  ]
+}

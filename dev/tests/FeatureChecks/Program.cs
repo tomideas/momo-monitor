@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Xml.Linq;
 using StatusMonitor.Models;
 using StatusMonitor.Power;
 using StatusMonitor.Services;
@@ -166,12 +167,47 @@ Check(FanNaming.IconFor("CPU Pump") == "pump", "A CPU pump must be drawn as a pu
 Check(FanNaming.IsCpuServing("CPU Fan") && FanNaming.IsCpuServing("AIO Pump"),
     "A CPU fan and an AIO pump must both follow the CPU");
 Check(!FanNaming.IsCpuServing("Chassis Fan") && !FanNaming.IsCpuServing("Extra Flow Fan"),
-    "A chassis fan must not be pinned to the CPU — it follows whichever of CPU and GPU is hotter");
+    "A chassis header must retain its chassis identity rather than be renamed as a CPU fan");
 // Whatever the label, the row still gets a fan of some kind: this page is a list of fans, and a
 // header nobody anticipated should not be the one row that looks like a piece of hardware.
 foreach (var odd in new[] { "Fan #7", "High Amp Fan", "VRM Fan", "M.2 Fan", "" })
     Check(new[] { "fan", "cpufan", "chassis", "flow", "pump" }.Contains(FanNaming.IconFor(odd)),
         $"'{odd}' must still resolve to a known glyph");
+
+// LHM's older NVAPI tachometer path names the reading "GPU" at index 1 but its PWM control
+// "GPU Fan" at index 0. Their semantic names, not ISensor.Index, identify the physical fan.
+Check(FanNaming.RpmMatchKey("GPU") == FanNaming.RpmMatchKey("GPU Fan"),
+    "A legacy NVIDIA tachometer must match its GPU Fan control");
+Check(FanNaming.RpmMatchKey("GPU 1") == FanNaming.RpmMatchKey("GPU Fan 1") &&
+      FanNaming.RpmMatchKey("GPU Fan 1") != FanNaming.RpmMatchKey("GPU Fan 2"),
+    "Multi-fan GPU channels must match by number without crossing channels");
+Check(FanNaming.RpmMatchKey("System Fan #2") == FanNaming.RpmMatchKey("System PWM #2"),
+    "Motherboard tachometer and PWM labels must normalize to the same channel");
+
+// ---- what a fan follows ----
+// Sources are determined by the fan's hardware, without a configurable override.
+foreach (var (kind, expected) in new[]
+{
+    ("gpu", "gpu"), ("cpu", "cpu"), ("fan", "cpu"),
+})
+    Check(FanFollow.Category(kind) == expected,
+        $"A '{kind}' header must follow {expected}, got {FanFollow.Category(kind)}");
+
+// The choice is saved per fan, keyed by the control's identifier exactly like its curve.
+foreach (int legacyValue in new[] { 1, 2, 3 })
+{
+    var legacySource = JsonSerializer.Deserialize<FanIdentity>($"{{\"Name\":\"GPU Fan\",\"Source\":{legacyValue}}}")!;
+    Check(legacySource.Name == "GPU Fan" && !JsonSerializer.Serialize(legacySource).Contains("Source"),
+        "Legacy CPU/GPU/combined overrides must be ignored without losing the fan name");
+}
+var followed = new AppSettings();
+followed.FanIdentities["/lpc/nct6798d/0/control/0"] = new FanIdentity { Name = "CPU Fan" };
+var followedBack = JsonSerializer.Deserialize<AppSettings>(JsonSerializer.Serialize(followed))!;
+Check(followedBack.FanIdentities.TryGetValue("/lpc/nct6798d/0/control/0", out var keptIdentity) &&
+      keptIdentity.Name == "CPU Fan",
+    "A fan's name must survive a restart");
+Check(JsonSerializer.Deserialize<AppSettings>("{\"Language\":\"en\"}")!.FanIdentities.Count == 0,
+    "Settings from before this existed must have no fan identities, not fail to load");
 
 // ---- remembering where the window was ----
 // The saved rectangle names a desktop that may have changed since: a monitor unplugged, a
@@ -282,8 +318,61 @@ Check(PowerModel.LookupCpuTdp("Intel(R) Core(TM) i7-12700KF") == 125, "KF is cov
 Check(PowerModel.LookupCpuTdp("Intel(R) Core(TM) i7-14700") == 65, "The i7-14700 without the K is 65 W");
 Check(PowerModel.LookupCpuTdp("Intel(R) Core(TM) i5-13600K") == 125, "The i5-13600K is a 125 W part");
 Check(PowerModel.LookupCpuTdp("Intel(R) Core(TM) i3-12100T") == 35, "A T i3 is a 35 W part");
-// An unknown CPU still falls back rather than reading zero, because a CPU always draws power.
-Check(PowerModel.LookupCpuTdp("Some Future Intel Thing") == 65, "An unknown CPU must fall back, not read zero");
+// Zero means an unknown rating. It must not become an invented 65 W desktop estimate.
+Check(PowerModel.LookupCpuTdp("Some Future Intel Thing") == 0, "An unknown CPU must not acquire a desktop rating");
+
+// ---- power boundaries and mobile fallback ----
+var packageWithIntegrated = new Snapshot
+{
+    Cpu = new() { PowerWatts = 20, PowerScope = "cpu-package" },
+    Gpus = new() { new() { IsIntegrated = true, PowerWatts = 5, PowerScope = "gpu-board" } },
+    GpuNames = new() { "Intel Arc Graphics" }
+};
+PowerAccounting.Apply(packageWithIntegrated, "Unknown CPU", new());
+Check(packageWithIntegrated.HasPowerReading && packageWithIntegrated.TotalWatts == 20 && packageWithIntegrated.Gpus[0].PowerWatts == 5,
+    "CPU package includes iGPU energy: keep its raw reading but do not add it twice");
+var stoppedDiscrete = new Snapshot
+{
+    Cpu = new() { PowerWatts = 20, PowerScope = "cpu-package" },
+    Gpus = new() { new() { PowerWatts = 0, PowerScope = "gpu-board" } },
+    GpuNames = new() { "NVIDIA GeForce RTX 4070" }
+};
+PowerAccounting.Apply(stoppedDiscrete, "Unknown CPU", new());
+Check(stoppedDiscrete.HasPowerReading && stoppedDiscrete.TotalWatts == 20 && !stoppedDiscrete.Gpus[0].PowerEstimated,
+    "A valid whole-board zero must not be replaced by a GPU idle curve");
+var chipOnly = new Snapshot
+{
+    Cpu = new() { PowerWatts = 20, PowerScope = "cpu-package" },
+    Gpus = new() { new() { PowerWatts = 10, PowerScope = "gpu-chip" } },
+    GpuNames = new() { "Unrated card" }
+};
+PowerAccounting.Apply(chipOnly, "Unknown CPU", new());
+Check(!chipOnly.HasPowerReading && chipOnly.PowerIncomplete && chipOnly.Gpus[0].PowerWatts == 10,
+    "GPU chip power alone cannot establish total board consumption");
+var mobileMissing = new Snapshot
+{
+    Platform = "Portable", Cpu = new() { PowerWatts = 20, PowerScope = "cpu-package" },
+    Gpus = new() { new() }, GpuNames = new() { "NVIDIA GeForce RTX 4070 Laptop GPU" }
+};
+PowerAccounting.Apply(mobileMissing, "Intel Core i7-14700HX", new());
+Check(!mobileMissing.HasPowerReading && mobileMissing.Gpus[0].PowerWatts is null,
+    "A laptop missing GPU telemetry must not use a desktop board rating");
+var discharging = new Snapshot { Platform = "Portable", Battery = new() { IsOnAcPower = false, DischargeWatts = 24.2 } };
+PowerAccounting.Apply(discharging, "Unknown CPU", new());
+Check(discharging.HasPowerReading && discharging.TotalWatts == 24.2 && discharging.PowerBasis == "measured:battery" && !discharging.PowerEstimated,
+    "Valid unplugged battery discharge is the measured machine power boundary");
+var charging = new Snapshot
+{
+    Platform = "Portable", Cpu = new() { PowerWatts = 20, PowerScope = "cpu-package" },
+    Battery = new() { IsOnAcPower = true, ChargeWatts = 30 }
+};
+PowerAccounting.Apply(charging, "Unknown CPU", new());
+Check(charging.HasPowerReading && charging.TotalWatts == 20 && charging.PowerBasis == "measured:cpu-gpu",
+    "Charging power is not machine consumption and must not override component measurements");
+var unknownDesktop = new Snapshot { Platform = "Desktop" };
+PowerAccounting.Apply(unknownDesktop, "Future unknown CPU", new());
+Check(!unknownDesktop.HasPowerReading && unknownDesktop.Cpu.PowerWatts is null,
+    "An unknown desktop CPU must remain unknown instead of receiving the old 65 W default");
 
 // ---- fans ----
 // Fans were counted as nothing while visibly turning. This is the one piece of board overhead
@@ -372,5 +461,69 @@ Check(tdpRestored.GpuTdpWatts.TryGetValue("Some Unreleased Card 9999", out doubl
 Check(oldSettings.GpuTdpWatts.Count == 0,
     "Settings from before this existed must simply have no figures, not fail to load");
 
-Console.WriteLine($"PASS: {checks} assertions (alerts, GPU identity, bounded history, settings compatibility, fan curve, header naming, window placement, data location, power curves)");
+
+// ---- starting with Windows ----
+// The task definition is the whole of what that checkbox promises, and it is registered on a
+// machine rather than kept in the settings file, so what gets written is pinned here instead
+// of being read back out of Task Scheduler by eye.
+XNamespace task = "http://schemas.microsoft.com/windows/2004/02/mit/task";
+string exe = @"C:\Tools\Momo & Co\MomoMonitor.exe";
+string xml = StartupService.BuildTaskXml(exe, @"DESK\ada");
+Check(xml.StartsWith("<?xml"), "schtasks reads the definition as a document, so the declaration must be the first thing in it");
+var definition = XDocument.Parse(xml);
+string Only(string name) => (string)definition.Descendants(task + name).Single();
+// A folder with an ampersand in it is an ordinary folder, and an unescaped one would make the
+// file unparseable rather than merely wrong.
+Check(Only("Command") == exe, "A path containing characters XML cares about must arrive intact");
+Check(Only("WorkingDirectory") == @"C:\Tools\Momo & Co", "The task must start the app in its own folder");
+Check(Only("Arguments") == "--tray", "Windows logon must start only in the system tray");
+Check(StartupService.StartsInTray(["--tray"]), "The task launch bypasses visible panels");
+Check(StartupService.StartsInTray(["--TRAY"]), "Background launch flag is case insensitive");
+Check(!StartupService.StartsInTray([]), "Manual launch still opens the app");
+Check(!StartupService.StartsInTray(["--render", "--tray-other"]), "Unrelated arguments do not hide the app");
+// Without this the task starts the app unelevated, and it comes up with no temperatures, no
+// fan speeds and no CPU package power — the failure the whole scheduled task exists to avoid.
+Check(Only("RunLevel") == "HighestAvailable", "The startup task must run elevated");
+Check(definition.Descendants(task + "LogonTrigger").Count() == 1 &&
+      Only("Delay") == $"PT{StartupService.LogonDelaySeconds}S",
+    "It must start once at sign-in, after the delay the settings page states");
+Check(definition.Descendants(task + "UserId").All(u => (string)u == @"DESK\ada"),
+    "The task must belong to and run as the signed-in user, never as every account on the machine");
+Check(Only("MultipleInstancesPolicy") == "IgnoreNew",
+    "A second copy must never be started over one that is already running");
+// PT0S is the scheduler's word for "no limit". The default is three days, after which it
+// would stop a monitor that is doing exactly what it was asked to do.
+Check(Only("ExecutionTimeLimit") == "PT0S", "A monitor left running must not be stopped by a time limit");
+Check(Only("StopIfGoingOnBatteries") == "false" && Only("DisallowStartIfOnBatteries") == "false",
+    "Running on battery is when a power monitor matters most");
+Check(!StartupService.Enable(""), "Without an executable path there is nothing to register");
+// Ranking must happen over the complete input before Take, including low-power high-memory processes.
+var rankingRows = new List<ProcessRow> { new() { Name = "power", PowerWatts = 100, RamMb = 10 }, new() { Name = "memory", PowerWatts = 1, RamMb = 8000 }, new() { Name = "cpu", CpuPercent = 90 } };
+Check(ProcessRanking.Order(rankingRows, "ram").First().Name == "memory", "RAM ranking must include processes outside the power leaders");
+Check(ProcessRanking.Order(rankingRows, "cpu").First().Name == "cpu", "CPU ranking must select CPU consumers");
+Check(ProcessRanking.Order(rankingRows, "power").First().Name == "power", "Default ranking remains power");
+var scope = new AppSettings { SavedMachineId = "old", Language = "zh", FanProfiles = { new FanProfile { Mode = FanMode.Constant } }, LaunchAtLogon = true, WallPowerMode = true };
+Check(scope.ApplyMachineScope("new", true), "A new computer must apply the safety boundary");
+Check(scope.FanProfiles[0].Mode == FanMode.Auto && !scope.LaunchAtLogon && !scope.WallPowerMode && scope.Language == "zh", "Machine controls reset while general preferences travel");
+scope.FanProfiles[0].Mode = FanMode.Sensor;
+Check(!scope.ApplyMachineScope("new", true) && scope.FanProfiles[0].Mode == FanMode.Sensor, "The same computer must retain confirmed custom settings");
+string storageBase = Path.GetFullPath(AppContext.BaseDirectory);
+string storageTest = Path.GetFullPath(Path.Combine(storageBase, "storage-check-" + Guid.NewGuid().ToString("N")));
+if (!storageTest.StartsWith(storageBase, StringComparison.OrdinalIgnoreCase)) throw new InvalidOperationException("Unsafe test location");
+Directory.CreateDirectory(storageTest);
+try
+{
+    string dataFile = Path.Combine(storageTest, "check.json");
+    Check(DataStorageService.TryWriteJson(dataFile, new Dictionary<string, int> { ["value"] = 1 }), "First atomic save succeeds");
+    Check(DataStorageService.TryWriteJson(dataFile, new Dictionary<string, int> { ["value"] = 2 }) && File.Exists(dataFile + ".bak"), "A replacement preserves the last good backup");
+    File.WriteAllText(dataFile, "broken JSON");
+    var recovered = DataStorageService.ReadJsonWithRecovery<Dictionary<string, int>>(dataFile);
+    Check(recovered?["value"] == 1 && Directory.GetFiles(storageTest, "*.corrupt-*").Length == 1, "A damaged primary is preserved and a backup is recovered");
+    string brokenFile = Path.Combine(storageTest, "unrecoverable.json");
+    File.WriteAllText(brokenFile, "broken");
+    Check(DataStorageService.ReadJsonWithRecovery<Dictionary<string, int>>(brokenFile) is null, "An unreadable file is detected");
+    Check(!DataStorageService.TryWriteJson(brokenFile, new Dictionary<string, int>()) && File.ReadAllText(brokenFile) == "broken", "Defaults must never overwrite unreadable data");
+}
+finally { Directory.Delete(storageTest, recursive: true); }
+Console.WriteLine($"PASS: {checks} assertions (alerts, GPU identity, bounded history, settings compatibility, fan curve, header naming, window placement, data location, power curves, logon task)");
 

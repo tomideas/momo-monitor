@@ -1,0 +1,8 @@
+{
+  "animation": "mini.webp",
+  "installed": "D:/Program/MomoMonitor/MomoMonitor.exe",
+  "sha256": "319C7B76D559D41C86E39824089328E2F9D8C8BFF587AD71FC0BAB04D7215399",
+  "intervalSeconds": 300,
+  "backup": "D:/Program/MomoMonitor/MomoMonitor.before-mini-animation-20261007-133645.exe",
+  "runningProcessRestarted": false
+}

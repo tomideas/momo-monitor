@@ -1,0 +1,1 @@
+PASS: 148 UI assertions (GPU selection, range, validation, mini/restore, pin, tray lifecycle, language, theme contrast)

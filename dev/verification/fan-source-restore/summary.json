@@ -1,0 +1,12 @@
+{
+  "buildPassed": true,
+  "nativePassed": true,
+  "rootUpdated": true,
+  "version": "2.22.32.0",
+  "build": "Release: 0 warnings, 0 errors. Self-contained Windows x64 publish succeeded; NU1900 vulnerability endpoint unavailable. No Portable package created.",
+  "fan": "48 mock fan assertions passed: single source, hotter GPU ignored by CPU/board Auto, selected CPU/GPU absence has no cross-category fallback, control-state recovery retained.",
+  "features": "444 source/feature assertions passed including legacy combined source numeric 3 restored to Auto with identity preserved.",
+  "native": "PAPER POP / English and VOLT / Traditional Chinese: 161 WPF assertions each. Fans custom panel screenshots inspected: only Auto, CPU and GPU source options.",
+  "preparedExeSha256": "A514B42A6B0D678172F52B1DB3ECD2E6F9BC370B80319B5067519EFEB316568B",
+  "deployment": "Root executable replaced and hash matches prepared output. Current source hashes match publish input. No real fan writes or user data changes."
+}

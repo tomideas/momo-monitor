@@ -1,0 +1,9 @@
+{
+  "buildPassed": true,
+  "nativePassed": true,
+  "rootUpdated": false,
+  "build": "Product Release build: 0 warnings and 0 errors. Self-contained Windows x64 publish succeeded; NU1900 package vulnerability endpoint unavailable. Native test harness built with two pre-existing framework/library version conflict warnings.",
+  "native": "TrayStartupChecks passed: hidden startup, visible tray, English and Traditional Chinese menu order/labels/separator, Open Dashboard, Mini, Settings from hidden main window and Mini, Exit disposes tray. Native en-menu.png and zh-menu.png visually inspected.",
+  "deployment": "Root executable locked by running Momo. New executable ready at dev/artifacts/MomoMonitor-tray-menu.exe; no Portable package created.",
+  "preparedExeSha256": "60D7F03699B11386F349F2C14A070DB6C8C2B3695F96BA4B2664F13C58834DFB"
+}
