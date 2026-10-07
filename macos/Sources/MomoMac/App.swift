@@ -54,7 +54,6 @@ final class AppController: NSObject, NSApplicationDelegate, NSPopoverDelegate, N
             button.sendAction(on: [.leftMouseUp, .rightMouseUp])
         }
         popover.behavior = .transient; popover.animates = false; popover.delegate = self
-        popover.contentViewController = NSHostingController(rootView: dashboard())
         store.onUpdate = { [weak self] in self?.updateChrome() }
         updateChrome(); store.start()
         if CommandLine.arguments.contains("--verify-ui") {
@@ -64,11 +63,11 @@ final class AppController: NSObject, NSApplicationDelegate, NSPopoverDelegate, N
         }
     }
 
-    private func dashboard() -> DashboardView {
+    private func dashboard(width: CGFloat? = 400) -> DashboardView {
         DashboardView(store: store, mascot: dashboardMascot,
                       showMini: { [weak self] in self?.showMini() },
                       showSettings: { [weak self] in self?.showSettings() },
-                      quit: { NSApplication.shared.terminate(nil) })
+                      quit: { NSApplication.shared.terminate(nil) }, width: width)
     }
     private func updateChrome() {
         statusItem?.button?.title = " " + store.wattsText + " W"
@@ -83,9 +82,26 @@ final class AppController: NSObject, NSApplicationDelegate, NSPopoverDelegate, N
     }
     func showDashboard(startup: Bool = false) {
         guard let button = statusItem.button else { return }
+        prepareDashboard(for: button.window?.screen ?? NSScreen.main)
         NSApplication.shared.activate(ignoringOtherApps: true)
         popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
         dashboardMascot.play(startup ? "startup" : "mini-click", reducedMotion: store.reducedMotion)
+    }
+    private func prepareDashboard(for screen: NSScreen?, heightLimit: CGFloat? = nil) {
+        // NSPopover positions from contentSize, not the hosting view's intrinsic
+        // size. Its default 320×320 caused the taller dashboard to leave screen.
+        let measurement = NSHostingView(rootView: dashboard())
+        let naturalHeight = measurement.fittingSize.height
+        let availableHeight = heightLimit ?? max(1, (screen?.visibleFrame.height ?? 800) - 48)
+        let height = min(naturalHeight, availableHeight)
+        popover.contentViewController = NSHostingController(rootView:
+            ScrollView(.vertical) {
+                dashboard(width: nil).fixedSize(horizontal: false, vertical: true)
+            }
+            .scrollBounceBehavior(.basedOnSize)
+            .frame(width: 400, height: height)
+            .background(store.theme.paper))
+        popover.contentSize = NSSize(width: 400, height: height)
     }
     func popoverDidClose(_ notification: Notification) { dashboardMascot.stop() }
 
@@ -168,6 +184,37 @@ final class AppController: NSObject, NSApplicationDelegate, NSPopoverDelegate, N
         assertions["liveSampling"] = store.hasSample
         assertions["powerValidOrExplicitlyMissing"] = store.sample.hasValidPower || store.wattsText == "—"
         assertions["liveEnergyAccumulated"] = !store.sample.hasValidPower || store.today.monitoredSeconds >= 2
+        showDashboard()
+        try? await Task.sleep(nanoseconds: 500_000_000)
+        if let view = popover.contentViewController?.view, let window = view.window {
+            print("Popover content: \(view.bounds), window: \(window.frame), visible screen: \(window.screen?.visibleFrame ?? .zero), content size: \(popover.contentSize)")
+            let contentFrame = window.convertToScreen(view.convert(view.bounds, to: nil))
+            assertions["popoverWithinScreen"] = window.screen?.visibleFrame.contains(contentFrame) == true
+            assertions["popoverSizeMatchesContent"] = abs(view.bounds.height - popover.contentSize.height) < 1
+            assertions["popoverScreenshot"] = capturePNG(view, to: directory.appendingPathComponent("popover.png"))
+            assertions["popoverMascotVisible"] = dashboardMascot.image != nil
+        } else { assertions["popoverWithinScreen"] = false }
+        popover.performClose(nil)
+        if let button = statusItem.button {
+            prepareDashboard(for: button.window?.screen, heightLimit: 440)
+            popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
+            try? await Task.sleep(nanoseconds: 300_000_000)
+            if let view = popover.contentViewController?.view, let window = view.window {
+                let contentFrame = window.convertToScreen(view.convert(view.bounds, to: nil))
+                assertions["shortPopoverWithinScreen"] = window.screen?.visibleFrame.contains(contentFrame) == true
+                assertions["shortPopoverBounded"] = abs(view.bounds.height - 440) < 1
+                assertions["shortPopoverScreenshot"] = capturePNG(view, to: directory.appendingPathComponent("popover-short.png"))
+                if let scroll = findScrollView(in: view), let document = scroll.documentView {
+                    let bottom = max(0, document.bounds.height - scroll.contentView.bounds.height)
+                    scroll.contentView.scroll(to: NSPoint(x: 0, y: bottom))
+                    scroll.reflectScrolledClipView(scroll.contentView)
+                    try? await Task.sleep(nanoseconds: 200_000_000)
+                    assertions["shortPopoverScrollsToBottom"] = bottom > 0 && scroll.documentVisibleRect.maxY >= document.bounds.maxY - 1
+                    assertions["shortPopoverFooterScreenshot"] = capturePNG(view, to: directory.appendingPathComponent("popover-short-bottom.png"))
+                } else { assertions["shortPopoverScrollsToBottom"] = false }
+            } else { assertions["shortPopoverWithinScreen"] = false }
+            popover.performClose(nil)
+        }
         let capture = NSPanel(contentRect: NSRect(x: 0, y: 0, width: 400, height: 600), styleMask: [.titled], backing: .buffered, defer: false)
         for (mode, language, name) in [("PAPER POP", "en", "paper-en"), ("VOLT", "zh-Hant", "volt-zh")] {
             var preferences = store.preferences; preferences.theme = mode; preferences.language = language; preferences.reduceMotion = true
@@ -179,6 +226,7 @@ final class AppController: NSObject, NSApplicationDelegate, NSPopoverDelegate, N
             assertions[name + "Width"] = abs(capture.contentView!.bounds.width - 400) < 1
             showMini(); miniMascot.stop()
             try? await Task.sleep(nanoseconds: 200_000_000)
+            assertions[name + "MiniVisible"] = mini?.isVisible == true && mini?.screen?.visibleFrame.contains(mini!.frame) == true
             assertions[name + "MiniScreenshot"] = capturePNG(mini!.contentView!, to: directory.appendingPathComponent(name + "-mini.png"))
             hideMini(); assertions[name + "HiddenStopsAnimation"] = !miniMascot.isPlaying
             showSettings()
@@ -233,5 +281,10 @@ final class AppController: NSObject, NSApplicationDelegate, NSPopoverDelegate, N
         view.cacheDisplay(in: view.bounds, to: bitmap)
         guard let data = bitmap.representation(using: .png, properties: [:]) else { return false }
         do { try data.write(to: url, options: .atomic); return true } catch { return false }
+    }
+    private func findScrollView(in view: NSView) -> NSScrollView? {
+        if let scroll = view as? NSScrollView { return scroll }
+        for child in view.subviews { if let scroll = findScrollView(in: child) { return scroll } }
+        return nil
     }
 }

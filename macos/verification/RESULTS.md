@@ -30,6 +30,30 @@ other hardware or older macOS versions.
 The first animation check exposed per-frame scheduling drift. Playback now uses
 absolute monotonic deadlines, and the single-shot completion check passes.
 
+## Menu-bar popover correction
+
+The user's screenshot exposed a gap in the initial verification: captures from
+a standalone panel did not check the actual menu-bar popover's screen placement.
+The real popover used the default 320×320 content size to position a 400×645 pt
+hosting view. Its window extended above the display (maxY 1469 vs visible maxY
+1139). `AppController.prepareDashboard` now measures the content before showing,
+sets the popover's content size explicitly and bounds the viewport to the anchor
+screen's visible height minus 48 pt. One native vertical scroller handles overflow;
+the dashboard adapts to its available width instead of clipping at the scrollbar.
+
+The corrected real popover content is fully within the visible screen. Its window
+includes the system arrow, which may extend into menu-bar chrome; geometry checks
+use the actual hosting content converted to screen coordinates, not that arrow.
+All **35/35 native checks** passed, including normal popover geometry, a 440 pt
+viewport, scrolling to the bottom and both Mini windows being visible on screen.
+Snapshots `popover-fixed/popover.png`, `popover-short.png` and
+`popover-short-bottom.png` were inspected. See `popover-fixed/native-checks.json`
+and `popover-fixed.log`. Release build, ad-hoc signature verification, all 13 core
+checks and strict static UI audit also passed. The normal app was relaunched.
+
+The Computer Use service timed out again. These are native programmatic window
+and scroll checks; a real mouse click/drag and full keyboard pass remain unverified.
+
 ## Remaining validation
 
 The Computer Use service timed out when selecting the built application. Actual

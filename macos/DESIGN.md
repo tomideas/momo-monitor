@@ -31,3 +31,8 @@ is static. Opening the energy panel never waits for startup animation to finish.
 The initial interface uses a 400 pt energy panel and a 278 pt Mini window. Power
 and today’s energy lead; CPU and memory are supporting context. Color does not
 indicate arbitrary hardware categories. Missing readings remain an em dash.
+
+The menu-bar popover is explicitly measured before positioning; its content size
+must match the native hosting viewport. On a short screen its height is bounded
+by the anchor screen's visible area, with one native vertical scroller. The body
+adapts to scrollbar width so the header, mascot and actions are never cropped.

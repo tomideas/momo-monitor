@@ -1,0 +1,13 @@
+﻿Capturing actual English WPF views with administrator sensor access; preview mode prevents data and fan writes.
+PASS paper-dashboard-en.png
+PASS volt-dashboard-en.png
+PASS settings-en.png
+PASS monitoring-en.png
+PASS data-en.png
+PASS info-en.png
+PASS process-en.png
+PASS mini-en.png
+PASS fans-en.png
+PASS fan-custom-en.png
+PASS alerts-en.png
+PASS settings detail captures; DONE

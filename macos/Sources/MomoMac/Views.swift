@@ -12,6 +12,7 @@ struct DashboardView: View {
     let showMini: () -> Void
     let showSettings: () -> Void
     let quit: () -> Void
+    var width: CGFloat? = 400
     private var theme: MomoTheme { store.theme }
     private var l: L10n { store.l10n }
 
@@ -104,7 +105,8 @@ struct DashboardView: View {
         }
         .font(MomoTheme.body(theme.bodySize)).foregroundStyle(theme.ink)
         .padding(theme.size("--ds-space-10"))
-        .frame(width: 400)
+        .frame(maxWidth: .infinity)
+        .frame(width: width)
         .background(theme.paper)
         .tint(theme.accent)
         .preferredColorScheme(store.preferences.theme == "VOLT" ? .dark : .light)

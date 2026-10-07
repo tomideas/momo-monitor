@@ -7,6 +7,7 @@ and Mini interaction contract. The Mac edition is read-only hardware monitoring.
 | Capability | Owner | Behavior | Verification |
 |---|---|---|---|
 | Navigation | AppController | Click menu bar to toggle energy panel; right-click offers panel, Mini, settings and Quit. | Native UI and pointer checks |
+| Popover layout | AppController.prepareDashboard; DashboardView | Measure content before positioning on the menu-bar screen. Bound height to the visible screen minus 48 pt; the single native vertical scroller keeps all contents reachable on short screens. | Real popover geometry and short-height scroll checks |
 | Mini | AppController; MiniGestures | Drag the body; double-click opens energy panel; arrow opens it without dragging; X hides Mini while sampling continues. | Native pointer checks |
 | Animation | MascotPlayer | Idle pointer movement plays once; active playback ignores hover; drag overrides; keyboard/accessibility activation can play; hidden and reduced-motion states stop playback. | Native animation checks |
 | Form | SettingsView; TariffInput | Save validates and commits; Cancel, Escape and window close discard the draft. Blank tariff disables cost, zero is valid, invalid full input is rejected. | Core checks and native interactions |

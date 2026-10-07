@@ -1,0 +1,39 @@
+{
+  "pages": 15,
+  "version": "0.1.6",
+  "checks": [
+    "PASS links, anchors, media dimensions, English copy and version: alerts.html",
+    "PASS links, anchors, media dimensions, English copy and version: dashboard.html",
+    "PASS links, anchors, media dimensions, English copy and version: fans.html",
+    "PASS links, anchors, media dimensions, English copy and version: getting-started.html",
+    "PASS links, anchors, media dimensions, English copy and version: index.html",
+    "PASS links, anchors, media dimensions, English copy and version: info.html",
+    "PASS links, anchors, media dimensions, English copy and version: installation.html",
+    "PASS links, anchors, media dimensions, English copy and version: mini.html",
+    "PASS links, anchors, media dimensions, English copy and version: portable.html",
+    "PASS links, anchors, media dimensions, English copy and version: power.html",
+    "PASS links, anchors, media dimensions, English copy and version: privacy.html",
+    "PASS links, anchors, media dimensions, English copy and version: process.html",
+    "PASS links, anchors, media dimensions, English copy and version: settings.html",
+    "PASS links, anchors, media dimensions, English copy and version: tools.html",
+    "PASS links, anchors, media dimensions, English copy and version: troubleshooting.html",
+    "PASS 18 token exports match the canonical design-system JSON"
+  ],
+  "screenshotHashes": {
+    "alert-settings-en.png": "d3170dc0779314a1347f471c3b80ecf99e06260dbbaa6d69b5efb424d673740c",
+    "alerts-en.png": "f2a0f88fc82c841509a9e064cbf4f9912047ade0411436294cfe742cd1815f2a",
+    "data-en.png": "33569dbf8e373ac66ae9d2be098a176d0ceb70faf6098ed376437890ada7e602",
+    "fan-custom-en.png": "952a2ce6c643c093c6bd59bbd2b9c3dc26babd649a6bc6bccf3a6c33d751fc08",
+    "fans-en.png": "ed92ee431a54bcf72611c954811105c37ddb56135667b2cd8d2818aabd16bb10",
+    "info-en.png": "30dffc4717b092d94e717c5612a1ac64de111d86118f832ec90055b3da6c7f3a",
+    "mini-en.png": "598b5031127a3781dda85ac66bac3d6fdf20bc5400c819f15b039adbf7d9b13d",
+    "monitoring-en.png": "a301a69a7d9b31cfe5d649c674eea20faed795c25662d000f8fa1a00702f3028",
+    "paper-dashboard-en.png": "29d041cb9dcb42e7ee471747f22c2fcce92a18626fd34cdff30ae9dacc25d01d",
+    "process-en.png": "31be409c574cae1bd8d865b8feb4da50148f1f0466bfa2802c26130d01df6370",
+    "runtime-settings-en.png": "f520c17b908ff23191ac22ec0f5f743daebde621721765610018eb4585a5ce32",
+    "sensor-access-en.png": "3a7ac7568b3afb47fa77736c5b65775e45f440310dfb0b42a9aa1201420078ca",
+    "settings-en.png": "7a2b79fe320f76f003a5d3d60f220ba42aece37e77951c8cb0d790be4500b25e",
+    "trends-en.png": "40148e4e766681d1dd25ff31b1c081083b68bef60de582b5a2d6c19b49161668",
+    "volt-dashboard-en.png": "521ca92e5f26ad6541daba5c4b3af12e50678c3fe13b9e7a12c5b0df9fa6138b"
+  }
+}
