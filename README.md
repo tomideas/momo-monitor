@@ -1,4 +1,4 @@
-# 🦫 Momo System Monitor
+# Momo System Monitor
 
 **[中文](README.zh-Hant.md) | English**
 
