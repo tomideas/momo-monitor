@@ -28,23 +28,64 @@ uint32_t momo_smc_open(void) {
 }
 void momo_smc_close(uint32_t connection) { if (connection) IOServiceClose(connection); }
 
-int momo_smc_read_watts(uint32_t connection, const char *key, double *watts) {
-    if (!connection || !key || strlen(key) != 4 || !watts) return 0;
+static int read_payload(uint32_t connection, const char *key, uint32_t *type, uint32_t *length, uint8_t bytes[32]) {
+    if (!connection || !key || strlen(key) != 4) return 0;
     SMCMessage request = {0}, response = {0};
     for (int i = 0; i < 4; i++) request.key = (request.key << 8) | (uint8_t)key[i];
     request.command = 9; // Read key metadata.
     size_t size = sizeof(response);
     if (IOConnectCallStructMethod(connection, 2, &request, sizeof(request), &response, &size)
         != KERN_SUCCESS || response.result || size != sizeof(response)) return 0;
-    if (response.info.size != 4 || response.info.type != 0x666c7420) return 0; // "flt "
+    if (!response.info.size || response.info.size > 32) return 0;
+    *type = response.info.type; *length = response.info.size;
     request.info.size = response.info.size;
     request.command = 5; // Read bytes; never issue a write command.
     size = sizeof(response);
     if (IOConnectCallStructMethod(connection, 2, &request, sizeof(request), &response, &size)
         != KERN_SUCCESS || response.result || size != sizeof(response)) return 0;
-    float value;
-    memcpy(&value, response.bytes, sizeof(value));
-    if (!isfinite(value) || value < 0 || value > 2000) return 0;
-    *watts = value; // A valid zero is preserved.
+    memcpy(bytes, response.bytes, *length);
     return 1;
+}
+
+int momo_smc_decode_number(uint32_t type, const uint8_t *bytes, size_t size, double *value) {
+    if (!bytes || !value) return 0;
+    double decoded;
+    switch (type) {
+        case 0x666c7420: { // flt: little-endian IEEE float on supported Apple Silicon.
+            if (size != 4) return 0;
+            float raw; memcpy(&raw, bytes, 4); decoded = raw; break;
+        }
+        case 0x73703738: { // sp78: signed big-endian fixed point, 8 fractional bits.
+            if (size != 2) return 0;
+            uint16_t raw = ((uint16_t)bytes[0] << 8) | bytes[1];
+            decoded = (raw >= 0x8000 ? (int32_t)raw - 65536 : raw) / 256.0; break;
+        }
+        case 0x66706532: // fpe2: unsigned fixed point, 2 fractional bits (fan RPM).
+            if (size != 2) return 0;
+            decoded = (((uint16_t)bytes[0] << 8) | bytes[1]) / 4.0; break;
+        case 0x75693820: // ui8: fan count, including valid zero on fanless Macs.
+            if (size != 1) return 0;
+            decoded = bytes[0]; break;
+        case 0x75693136:
+            if (size != 2) return 0;
+            decoded = ((uint16_t)bytes[0] << 8) | bytes[1]; break;
+        case 0x75693332:
+            if (size != 4) return 0;
+            decoded = ((uint32_t)bytes[0] << 24) | ((uint32_t)bytes[1] << 16) | ((uint32_t)bytes[2] << 8) | bytes[3]; break;
+        default: return 0;
+    }
+    if (!isfinite(decoded)) return 0;
+    *value = decoded; return 1;
+}
+
+int momo_smc_read_number(uint32_t connection, const char *key, double *value) {
+    uint32_t type = 0, length = 0; uint8_t bytes[32] = {0};
+    return read_payload(connection, key, &type, &length, bytes) && momo_smc_decode_number(type, bytes, length, value);
+}
+
+int momo_smc_read_watts(uint32_t connection, const char *key, double *watts) {
+    uint32_t type = 0, length = 0; uint8_t bytes[32] = {0}; double value;
+    if (!watts || !read_payload(connection, key, &type, &length, bytes) || type != 0x666c7420 ||
+        !momo_smc_decode_number(type, bytes, length, &value) || value < 0 || value > 2000) return 0;
+    *watts = value; return 1;
 }

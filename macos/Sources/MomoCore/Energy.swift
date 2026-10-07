@@ -15,13 +15,16 @@ public struct PowerSample: Codable, Sendable {
     public var batteryPercent: Double?
     public var cpuPercent: Double?
     public var memoryPercent: Double?
+    public var hardware: HardwareSnapshot?
 
     public init(date: Date = Date(), uptime: Double, watts: Double?, scope: PowerScope?,
                 source: String, onAC: Bool? = nil, chargingWatts: Double? = nil,
-                batteryPercent: Double? = nil, cpuPercent: Double? = nil, memoryPercent: Double? = nil) {
+                batteryPercent: Double? = nil, cpuPercent: Double? = nil, memoryPercent: Double? = nil,
+                hardware: HardwareSnapshot? = nil) {
         self.date = date; self.uptime = uptime; self.watts = watts; self.scope = scope
         self.source = source; self.onAC = onAC; self.chargingWatts = chargingWatts
         self.batteryPercent = batteryPercent; self.cpuPercent = cpuPercent; self.memoryPercent = memoryPercent
+        self.hardware = hardware
     }
 
     public var hasValidPower: Bool {
