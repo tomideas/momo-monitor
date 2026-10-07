@@ -12,6 +12,7 @@ try {
     var toggle = document.querySelector('.menu-toggle');
     var backdrop = document.querySelector('.backdrop');
     if (!toggle || !sidebar) return;
+    toggle.disabled = false;
     function close() { sidebar.classList.remove('open'); if (backdrop) backdrop.classList.remove('show'); }
     toggle.addEventListener('click', function () {
       sidebar.classList.toggle('open');

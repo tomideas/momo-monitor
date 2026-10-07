@@ -1,0 +1,14 @@
+PASS trapezoidal energy and coverage
+PASS missing readings never become zero
+PASS valid zero remains monitored
+PASS scope and source changes break integration
+PASS sleep and restart never backfill
+PASS wall-clock changes break integration
+PASS midnight splits energy
+PASS invalid values never accumulate
+PASS history reload resets the live baseline
+PASS signed battery current
+PASS today keeps scopes separate
+PASS tariff validates the entire input
+PASS corrupt history is rejected
+Core checks: 13/13

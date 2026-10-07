@@ -1,0 +1,29 @@
+{
+  "pages": 15,
+  "network": "blocked during checks",
+  "checks": [
+    "PASS desktop offline: alerts.html",
+    "PASS desktop offline: dashboard.html",
+    "PASS desktop offline: fans.html",
+    "PASS desktop offline: getting-started.html",
+    "PASS desktop offline: index.html",
+    "PASS desktop offline: info.html",
+    "PASS desktop offline: installation.html",
+    "PASS desktop offline: mini.html",
+    "PASS desktop offline: portable.html",
+    "PASS desktop offline: power.html",
+    "PASS desktop offline: privacy.html",
+    "PASS desktop offline: process.html",
+    "PASS desktop offline: settings.html",
+    "PASS desktop offline: tools.html",
+    "PASS desktop offline: troubleshooting.html",
+    "PASS topic search, no-results state, clear and focus restoration",
+    "PASS five-step walkthrough, keyboard activation and endpoint states",
+    "PASS clipboard-denied fallback selects the actual commands",
+    "PASS all 15 narrow pages, drawer, inert hidden nav, Escape, focus and topic navigation",
+    "PASS legacy single-page anchor redirects",
+    "PASS print shows every walkthrough step",
+    "PASS no-JavaScript mobile navigation and full walkthrough"
+  ],
+  "errors": []
+}

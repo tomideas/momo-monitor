@@ -1,0 +1,7 @@
+{"date":"2026-10-07T07:59:09Z","memoryPercent":50.53882598876953,"onAC":true,"scope":"system","source":"SMC PSTR","uptime":186329.10873033333,"watts":10.073188781738281}
+{"cpuPercent":15.868477483917085,"date":"2026-10-07T07:59:11Z","memoryPercent":50.55346488952637,"onAC":true,"scope":"system","source":"SMC PSTR","uptime":186331.12146300002,"watts":11.472901344299316}
+{"cpuPercent":15.44511977118341,"date":"2026-10-07T07:59:13Z","memoryPercent":50.556111335754395,"onAC":true,"scope":"system","source":"SMC PSTR","uptime":186333.13239179167,"watts":10.737523078918457}
+{"cpuPercent":8.94134477825465,"date":"2026-10-07T07:59:15Z","memoryPercent":50.55584907531738,"onAC":true,"scope":"system","source":"SMC PSTR","uptime":186335.139487375,"watts":8.542719841003418}
+{"cpuPercent":10.315186246418339,"date":"2026-10-07T07:59:17Z","memoryPercent":50.557518005371094,"onAC":true,"scope":"system","source":"SMC PSTR","uptime":186337.14404075002,"watts":5.645759105682373}
+{"cpuPercent":11.745805069617994,"date":"2026-10-07T07:59:19Z","memoryPercent":50.55685043334961,"onAC":true,"scope":"system","source":"SMC PSTR","uptime":186339.153884125,"watts":7.031116008758545}
+{"buckets":[{"day":"2026-10-07","monitoredSeconds":10.045153791666962,"scope":"system","wattHours":0.025089928974559444}],"missingSeconds":0}

@@ -1,0 +1,4 @@
+module CMomoSMC {
+    header "MomoSMC.h"
+    export *
+}

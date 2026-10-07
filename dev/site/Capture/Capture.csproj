@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType><TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable>
+    <PlatformTarget>x64</PlatformTarget>
+    <Version>2.22.32</Version>
+  </PropertyGroup>
+  <ItemGroup><ProjectReference Include="../../../StatusMonitor/StatusMonitor.csproj" /></ItemGroup>
+  <ItemGroup>
+    <Resource Include="../../../StatusMonitor/app.ico" Link="app.ico" />
+    <Resource Include="../../../StatusMonitor/Assets/*" Link="Assets/%(Filename)%(Extension)" />
+    <Resource Include="../../../StatusMonitor/Fonts/*" Link="Fonts/%(Filename)%(Extension)" />
+    <Reference Include="System.Threading.AccessControl"><HintPath>../../../StatusMonitor/libs/System.Threading.AccessControl.dll</HintPath></Reference>
+    <Reference Include="System.CodeDom"><HintPath>../../../StatusMonitor/libs/System.CodeDom.dll</HintPath></Reference>
+  </ItemGroup>
+</Project>

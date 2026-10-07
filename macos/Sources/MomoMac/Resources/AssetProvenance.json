@@ -1,0 +1,23 @@
+{
+  "designSource": "design-system/design-system.json",
+  "assets": {
+    "startup": {
+      "source": "StatusMonitor/Assets/startup.frames.zip",
+      "sha256": "6353397def523212fe2a2c0617d5e038c511443d02874ce547945a50b5e0f57b",
+      "frames": 66,
+      "milliseconds": 6600
+    },
+    "mini-click": {
+      "source": "StatusMonitor/Assets/mini-click.frames.zip",
+      "sha256": "1f6843b864c4ef82009ecd78161dc0667045bc244508fabc9557e17d4af1ef84",
+      "frames": 66,
+      "milliseconds": 6600
+    },
+    "mini-drag": {
+      "source": "StatusMonitor/Assets/mini-drag.frames.zip",
+      "sha256": "eb2097027ba7fbd1f4993ef8b1f8a726462b539b7ed56010c94501ec81edd994",
+      "frames": 66,
+      "milliseconds": 6600
+    }
+  }
+}

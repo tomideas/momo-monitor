@@ -20,6 +20,7 @@
   --font-mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
 }
 html{scroll-behavior:smooth;scroll-padding-top:calc(var(--header-h) + 24px)}
+*{scrollbar-color:var(--c-border) var(--c-bg);scrollbar-width:thin}
 body{font-family:var(--font-sans);color:var(--c-text);background:var(--c-bg);line-height:1.5;-webkit-font-smoothing:antialiased;font-size:16px}
 a{color:var(--c-link);text-decoration:none}
 a:hover{text-decoration:underline}
